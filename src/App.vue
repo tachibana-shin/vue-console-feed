@@ -72,7 +72,8 @@ const tt = {
   },
   abort: new AbortController(),
 };
-tt.tt = tt;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(tt as unknown as any).tt = tt;
 const data = Encode(tt);
 console.log(tt);
 console.log(data);

@@ -4,8 +4,8 @@
   "description": "a repository npm package",
   "scripts": {
     "format": "prettier -w src",
-    "build": "tsup",
-    "dev": "tsx ./src/index.ts",
+    "build": "vue-tsc --noEmit && vite build",
+    "dev": "vite dev",
     "lint": "eslint src --ext=.ts",
     "lint:fix": "pnpm lint --fix",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
