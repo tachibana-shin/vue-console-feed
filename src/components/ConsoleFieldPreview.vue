@@ -1,7 +1,8 @@
 <template>
-  <span v-if="data['@t'] === 'string'" class="string"
-    >'{{ data["@value"] }}'</span
-  >
+  <span v-if="data['@t'] === 'string'" class="string">
+    <template v-if="full">"{{ data["@value"].replace(/"/g, '\\"') }}"</template
+    ><template v-else>'{{ data["@value"].replace(/'/g, "\\'") }}'</template>
+  </span>
   <span v-else-if="data['@t'] === 'number'" class="number">{{
     data["@value"]
   }}</span>
@@ -29,7 +30,7 @@
     }}<template v-if="data['@size'] !== null">({{ data["@size"] }})</template>
   </template>
   <template v-else-if="data['@t'] === 'array'"
-    >Array({{ data["@size"] }})</template
+    >{{ data["@name"] ?? "Array" }}({{ data["@size"] }})</template
   >
   <template v-else-if="data['@t'] === 'function'">
     <template v-if="showNameFn"> {{ data["@name"] }}</template>
@@ -39,13 +40,14 @@
 </template>
 
 <script lang="ts" setup>
-import { DataPreview } from "../logic/Encode";
+import { DataPreview } from "../logic/Encode"
 
 defineProps<{
-  data: DataPreview.objReal[""]["@value"];
-  hideNameObject?: boolean;
-  showNameFn?: boolean;
-}>();
+  data: DataPreview.objReal[""]["@value"]
+  hideNameObject?: boolean
+  showNameFn?: boolean
+  full?: boolean
+}>()
 </script>
 
 <style lang="scss" scoped>

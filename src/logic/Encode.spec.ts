@@ -78,7 +78,7 @@ describe("Encode", () => {
 
     const result = Encode(tt) as Data.Record
 
-    expect(result["@des"]).toEqual({
+    expect(result["@des"]["@value"]).toEqual({
       r: {
         "@hidden": false,
         "@value": { "@t": "regexp", "@name": "/script/" }

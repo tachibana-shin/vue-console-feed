@@ -1,31 +1,48 @@
 .number {
-  color: #9980ff;
+  color: #9980dc;
 }
 .bint,
-.nill,
+.nill {
+  color: #7b896f;
+}
 .array-size {
-  color: rgb(165 165 165);
+  color: #9aa09a;
+  margin-right: 4px;
 }
 .string,
 .regexp,
 .symbol {
-  color: rgb(1 200 1); //rgb(233, 63, 59);
+  color: #35d4c7; //rgb(233, 63, 59);
 }
 .char-f {
-  font-style: italic;
   color: #f29766;
+}
+.function,
+.char-f {
+  font-style: italic;
 }
 
 .propName {
-  color: rgb(39 116 240); //rgb(227, 110, 236);
+  color: #5db0b5; //rgb(227, 110, 236);
+  font-weight: 500;
 }
 .proto {
-  color: #7f7f7f;
+  color: #9aa0a6 !important;
 }
 .propHidden {
-  opacity: 0.8;
+  color: #45778f;
 }
 .is {
   color: #fff;
   margin-right: 0.7em;
+}
+
+.collapse-summary {
+  .propName {
+    // color: #9aa0a6;
+  }
+}
+
+.comma {
+  margin-right: 4px;
 }

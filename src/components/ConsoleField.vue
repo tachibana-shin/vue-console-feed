@@ -7,16 +7,17 @@
       data['@t'] === 'symbol' ||
       data['@t'] === 'nill'
     "
+    class="ml-[12px]"
   >
     <slot />
-    <ConsoleFieldPreview :data="data" />
+    <ConsoleFieldPreview :data="data" full />
   </div>
-  <Collapse v-else-if="data['@t'] === 'function'" class="function" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'function'" :flat="flat">
     <slot />
-    <div class="function">
+    <span class="function">
       <span class="char-f">ƒ</span>
       {{ data["@name"] }}
-    </div>
+    </span>
 
     <template v-slot:content>
       <ConsoleLink
@@ -28,7 +29,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
-          '@real': data['@real'],
+          '@real': data['@real']
         }"
         flat
       />
@@ -49,35 +50,31 @@
           <ConsoleFieldPreview :data="item[0]" /> =>
           <ConsoleFieldPreview :data="item[1]" />
         </span>
-        <span v-else> <ConsoleFieldPreview :data="item[0]" /> </span
-        ><template v-if="index < data['@size'] - 1">, </template></span
-      >}</template
-    >
+        <span v-else> <ConsoleFieldPreview :data="item[0]" /> </span>
+        <span v-if="index < data['@size'] - 1" class="comma">,</span> </span
+      >}
+    </template>
     <template v-else>{}</template>
 
     <template v-slot:summary-opened>
+      <slot />
       {{ data["@name"]
       }}<template v-if="data['@size'] !== null">({{ data["@size"] }})</template>
     </template>
 
     <template v-slot:content>
       <Collapse show>
-        <slot />
         <PropName :hidden="false" name="[[Entries]]" />
 
         <template v-slot:content>
-          <Collapse
-            v-for="(item, index) in data['@entries']"
-            class="flex"
-            :key="index"
-          >
+          <Collapse v-for="(item, index) in data['@entries']" :key="index">
             <PropName :hidden="false" :name="index + ''" />
             <span v-if="data['@name'].endsWith('Map')">
               {<ConsoleFieldPreview :data="item[0]" /> =>
               <ConsoleFieldPreview :data="item[1]" show-name-fn />}
             </span>
             <span v-else>
-              <ConsoleFieldPreview :data="item[0]" show-name-fs />
+              <ConsoleFieldPreview :data="item[0]" show-name-fn />
             </span>
 
             <template v-slot:content>
@@ -90,15 +87,15 @@
                       ? {
                           key: {
                             '@hidden': false,
-                            '@value': item[0],
-                          },
+                            '@value': item[0]
+                          }
                         }
                       : {}),
                     value: {
                       '@hidden': false,
-                      '@value': item[1],
-                    },
-                  },
+                      '@value': item[1]
+                    }
+                  }
                 }"
                 flat
               />
@@ -111,7 +108,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
-          '@real': data['@real'],
+          '@real': data['@real']
         }"
         flat
       />
@@ -128,7 +125,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
-          '@real': data['@real'],
+          '@real': data['@real']
         }"
         flat
       />
@@ -137,14 +134,16 @@
   <Collapse v-else-if="data['@t'] === 'object'" :flat="flat">
     <slot />
     <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span>
-    {
-    <template v-for="(item, name) in data['@des']" :key="name">
+    {<template v-for="(item, name) in data['@des']['@value']" :key="name">
       <PropName :hidden="item['@hidden']" :name="name + ''" />
-      <ConsoleFieldPreview :data="item['@value']" hide-name-object />,
-    </template>
-    }
+      <ConsoleFieldPreview :data="item['@value']" hide-name-object />
+      <span class="comma" v-if="name !== data['@des']['@lastKey']"
+        >,</span
+      > </template
+    >}
 
     <template v-slot:summary-opened>
+      <slot />
       <template v-if="!hideNameObject">{{ data["@name"] }}</template>
     </template>
 
@@ -164,7 +163,7 @@
         <!-- get/set -->
         <template v-if="item['@value']['@t'] === 'gs'">
           <!-- @value -->
-          <div class="flex">
+          <div class="ml-[12px]">
             <PropName :hidden="item['@hidden']" :name="name + ''" />
             <GetterField :getter="item['@value']['@value']" />
           </div>
@@ -200,16 +199,14 @@
   </Collapse>
   <Collapse v-else-if="data['@t'] === 'error'">
     <slot />
-    <div class="truncate">
-      {{ data["@stack"] }}
-    </div>
+    {{ data["@stack"] }}
 
     <template v-slot:content>
       <ConsoleField
         :data="{
           '@t': 'object',
           '@name': null,
-          '@real': data['@real'],
+          '@real': data['@real']
         }"
         flat
       />
@@ -217,6 +214,7 @@
   </Collapse>
   <Collapse v-else-if="data['@t'] === 'array'" :flat="flat">
     <slot />
+    <span class="array-size" v-if="data['@name']">{{ data["@name"] }}</span>
     <span class="array-size"
       >({{ data["@real"].length["@value"]["@value"] }})</span
     >
@@ -227,13 +225,19 @@
       <ConsoleFieldPreview
         :data="(data['@real'][item - 1]['@value'] as Exclude<typeof data['@real'][0]['@value'], Data.GetSetter>)"
         hide-name-object
-      /><template v-if="+data['@real'].length['@value']['@value'] > item"
-        >,
-      </template></template
+      />
+      <span
+        v-if="+data['@real'].length['@value']['@value'] > item"
+        class="comma"
+        >,</span
+      > </template
     >]
 
     <template v-slot:summary-opened>
-      Array ({{ data["@real"].length["@value"]["@value"] }})
+      <slot />
+      {{ data["@name"] ?? "Array" }} ({{
+        data["@real"].length["@value"]["@value"]
+      }})
     </template>
 
     <template v-slot:content>
@@ -241,7 +245,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
-          '@real': data['@real'],
+          '@real': data['@real']
         }"
         flat
       />
@@ -267,25 +271,29 @@
 </template>
 
 <script lang="ts" setup>
-import { Data, Encode } from "../logic/Encode";
-import _ConsoleField from "./ConsoleField.vue";
-import ConsoleLink from "./ConsoleLink.vue";
-import Collapse from "./Collapse.vue";
-import PropName from "./PropName.vue";
-import ConsoleFieldPreview from "./ConsoleFieldPreview.vue";
-import { DefineComponent } from "vue";
+import { Data, Encode } from "../logic/Encode"
+import _ConsoleField from "./ConsoleField.vue"
+import ConsoleLink from "./ConsoleLink.vue"
+import Collapse from "./Collapse.vue"
+import PropName from "./PropName.vue"
+import ConsoleFieldPreview from "./ConsoleFieldPreview.vue"
+import _GetterField from "./GetterField.vue"
+import { DefineComponent } from "vue"
 
 const ConsoleField = _ConsoleField as unknown as DefineComponent<{
-  data: ReturnType<typeof Encode>;
-  hideNameObject?: boolean;
-  flat?: boolean;
-}>;
+  data: ReturnType<typeof Encode>
+  hideNameObject?: boolean
+  flat?: boolean
+}>
+const GetterField = _GetterField as unknown as DefineComponent<{
+  getter: Data.Link
+}>
 
 defineProps<{
-  data: ReturnType<typeof Encode>;
-  flat?: boolean;
-  hideNameObject?: boolean;
-}>();
+  data: ReturnType<typeof Encode>
+  flat?: boolean
+  hideNameObject?: boolean
+}>()
 </script>
 
 <style lang="scss" scoped>
@@ -293,6 +301,6 @@ defineProps<{
 // color: rgb(85, 106, 242);
 
 div {
-  font-family: sans-serif;
+  font-family: monospace;
 }
 </style>

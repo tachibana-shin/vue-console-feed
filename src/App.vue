@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { Encode } from "./logic/Encode";
-import ConsoleField from "./components/ConsoleField.vue";
+import { Encode } from "./logic/Encode"
+import ConsoleField from "./components/ConsoleField.vue"
 
+const el = document.createElement("div")
+el.innerHTML = "<span>Hello </span>"
 const tt = {
+  nl: el.childNodes,
   r: /script/,
+  [Symbol("aafe")]: [3124],
   e: new WeakMap(),
   c: new Map([[45, [789, 89]]]),
-  s: new Set([2,54,65,[123], () => 2]),
+  s: new Set([2, 54, 65, [123], () => 2]),
   ae: [
     /script/,
     new WeakMap(),
@@ -54,7 +58,7 @@ const tt = {
     { a: 34 },
     1,
     3,
-    { a: 34 },
+    { a: 34 }
   ],
   foo: { x: 245, y: 843 },
   year: 10,
@@ -64,19 +68,21 @@ const tt = {
   sym: Symbol("a"),
   map: new Map([[45, [789, 89]]]),
   get lusa() {
-    return this.year ** 2;
+    return this.year ** 2
   },
   matcher: /\<script\s+\>/,
   increment: function increment(value = 56) {
-    this.year++;
+    this.year++
   },
-  abort: new AbortController(),
-};
+  abort: new AbortController()
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(tt as unknown as any).tt = tt;
-const data = Encode(tt);
-console.log(tt);
-console.log(data);
+;(tt as unknown as any).tt = tt
+const data = Encode(tt)
+console.log(tt)
+console.log(data)
+
+console.log(document.body)
 </script>
 
 <template>

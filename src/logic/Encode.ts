@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { entries } from "./entries"
+import { keys } from "./keys"
+import { isList } from "./isList"
 // eslint-disable-next-line @typescript-eslint/no-namespace
 namespace Data {
   export interface String {
@@ -48,7 +51,7 @@ namespace Data {
     }>
   }
   export interface objReal {
-    [name: string | symbol | number]: {
+    [name: string]: {
       "@hidden": boolean
       "@value":
         | GetSetter
@@ -76,7 +79,10 @@ namespace Data {
     "@t": "object"
     "@name": string | null
     "@real": objReal | Link
-    "@des"?: DataPreview.objReal
+    "@des"?: {
+      "@value": DataPreview.objReal
+      "@lastKey": string
+    }
   }
   export interface Error {
     "@t": "error"
@@ -87,6 +93,7 @@ namespace Data {
   export interface Array {
     "@t": "array"
     "@size": number
+    "@name"?: string
     "@real": objReal & {
       length: {
         // TODO:いみわかない！
@@ -96,12 +103,23 @@ namespace Data {
     }
   }
 }
+// ============= dom api ==============
+function isDom(el: any): el is HTMLElement {
+  try {
+    if (el instanceof HTMLElement) return el.childNodes !== undefined
+
+    return false
+  } catch {
+    return true
+  }
+}
+// ====================================
 
 // ============= link object ==============
 const linkStore = new Map<string, object>()
 function createLinkObject(obj: object): Data.Link {
   const name =
-    typeof obj === "function" ? obj.name : obj?.constructor.name ?? null
+    typeof obj === "function" ? obj.name : obj?.constructor?.name ?? null
 
   for (const [link, tObj] of linkStore) {
     if (tObj === obj) {
@@ -240,10 +258,11 @@ function Encode(
         return meta
       }
 
-      if (data instanceof Array) {
+      if (isList(data)) {
         const meta: Data.Array = {
           "@t": "array",
           "@size": data.length,
+          "@name": data instanceof NodeList ? "NodeList" : undefined,
           "@real": encodeObject(data, data) as ReturnType<
             typeof encodeObject
           > & {
@@ -281,7 +300,7 @@ function Encode(
       // getsyoubi no tawata
       const meta: Data.Record = {
         "@t": "object",
-        "@name": data.constructor.name,
+        "@name": data.constructor?.name ?? null,
         // わかない。ぜんぜんわかない！
         "@real": linkReal ? createLinkObject(data) : encodeObject(data, data),
         "@des": createPreviewObject(data)
@@ -306,18 +325,16 @@ function getOwnDescriptorsRegExp(reg: RegExp) {
 
   const proto = Object.getPrototypeOf(/a/)
 
-  Object.entries(Object.getOwnPropertyDescriptors(proto)).forEach(
-    ([name, meta]) => {
-      const { value } = meta
-      if (name === "lastIndex") return
+  entries(Object.getOwnPropertyDescriptors(proto)).forEach(([name, meta]) => {
+    const { value } = meta
+    if (name === "lastIndex") return
 
-      if (typeof value !== "function")
-        des[name] = {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          value: (reg as unknown as any)[name]
-        }
-    }
-  )
+    if (typeof value !== "function")
+      des[name.toString()] = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        value: (reg as unknown as any)[name]
+      }
+  })
 
   return des
 }
@@ -328,7 +345,7 @@ export namespace DataPreview {
   export type Error = Pick<Data.Error, "@t" | "@name" | "@stack">
   export type RegExp = Pick<Data.RegExp, "@t" | "@name">
   export type Collection = Pick<Data.Collection, "@t" | "@name" | "@size">
-  export type Array = Pick<Data.Array, "@t" | "@size">
+  export type Array = Pick<Data.Array, "@t" | "@size" | "@name">
   export type Function = Pick<Data.Function, "@t" | "@name">
 
   export interface objReal {
@@ -353,17 +370,23 @@ export namespace DataPreview {
 /**
  * @description show prototype public
  */
-function createPreviewObject(data: object): DataPreview.objReal {
-  const publics = Object.keys(data)
+function createPreviewObject(data: object): {
+  "@value": DataPreview.objReal
+  "@lastKey": string
+} {
+  const publics = keys(data)
+
+  let lastKey: string | number | symbol = ""
   const meta = Object.fromEntries(
-    Object.entries(getOwnDescriptorsIn(data)).map(
+    entries(getOwnDescriptorsIn(data)).map(
       ([name, meta]): [string, DataPreview.objReal[""]] => {
+        lastKey = name
         const { value } = meta
         if (value instanceof Error) {
           return [
             name,
             {
-              "@hidden": publics.includes(name) === false,
+              "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "error",
                 "@name": value.name,
@@ -377,7 +400,7 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             /* object */ {
-              "@hidden": publics.includes(name) === false,
+              "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "regexp",
                 "@name": value + ""
@@ -389,7 +412,7 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             /* object */ {
-              "@hidden": publics.includes(name) === false,
+              "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "collection",
                 "@name": toString
@@ -400,13 +423,14 @@ function createPreviewObject(data: object): DataPreview.objReal {
             }
           ]
         }
-        if (value instanceof Array) {
+        if (isList(value)) {
           return [
             name,
             /* object */ {
-              "@hidden": publics.includes(name) === false,
+              "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "array",
+                "@name": value instanceof NodeList ? "NodeList" : undefined,
                 "@size": value.length
               }
             }
@@ -417,10 +441,10 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             /* object */ {
-              "@hidden": publics.includes(name) === false,
+              "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "object",
-                "@name": value.constructor.name
+                "@name": value.constructor?.name ?? null
               }
             }
           ]
@@ -429,7 +453,7 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             {
-              "@hidden": publics.includes(name) === false,
+              "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "function",
                 "@name": ""
@@ -441,7 +465,7 @@ function createPreviewObject(data: object): DataPreview.objReal {
         return [
           name,
           {
-            "@hidden": publics.includes(name) === false,
+            "@hidden": !meta.enumerable,
             "@value": Encode(value, false)
           }
         ]
@@ -449,16 +473,19 @@ function createPreviewObject(data: object): DataPreview.objReal {
     )
   )
 
-  return meta
+  return {
+    "@value": meta,
+    "@lastKey": lastKey
+  }
 }
 function encodeObject(
   data: object | Function | RegExp,
   receiver = data,
   proto: object | Function = Object.getPrototypeOf(data)
 ): Data.objReal {
-  const publics = Object.keys(data)
+  const publics = keys(data)
   const meta = Object.fromEntries(
-    Object.entries(
+    entries(
       Object.assign(
         getOwnDescriptorsIn(data),
         Object.getOwnPropertyDescriptors(data),
@@ -471,9 +498,9 @@ function encodeObject(
         if (meta.get) at.get = Encode(meta.get) as Data.Function
         if (meta.set) at.set = Encode(meta.set) as Data.Function
         return [
-          name,
+          name.toString(),
           {
-            "@hidden": publics.includes(name) === false,
+            "@hidden": !meta.enumerable,
             "@value": {
               "@t": "gs",
               "@value": createLinkObject(() => getValue(data, name, receiver)), //meta.get?.(),
@@ -488,30 +515,30 @@ function encodeObject(
         !(value instanceof RegExp) &&
         !isCollection(value) &&
         !(value instanceof Error) &&
-        !(value instanceof Array)
+        !isList(value)
       ) {
         return [
-          name,
+          name.toString(),
           {
-            "@hidden": publics.includes(name) === false,
+            "@hidden": !meta.enumerable,
             "@value": Encode(value, false, true) //createLinkObject(value),
           }
         ]
       }
       if (typeof value === "function") {
         return [
-          name,
+          name.toString(),
           {
-            "@hidden": publics.includes(name) === false,
+            "@hidden": !meta.enumerable,
             "@value": Encode(value, false, true) // createLinkObject(value),
           }
         ]
       }
 
       return [
-        name,
+        name.toString(),
         {
-          "@hidden": publics.includes(name) === false,
+          "@hidden": !meta.enumerable,
           "@value": Encode(value, false)
         }
       ]
@@ -541,14 +568,18 @@ function isCollection(
     data !== null &&
     typeof data === "object" &&
     // なんで？わかない。ぼくわかない。
-    Object.getPrototypeOf(data) === data.constructor.prototype &&
+    Object.getPrototypeOf(data) === data.constructor?.prototype &&
     (type === "Map" ||
       type === "WeakMap" ||
       type === "Set" ||
       type === "WeakSet")
   )
 }
-function getValue(data: object, name: string, receiver: object) {
+function getValue(
+  data: object,
+  name: string | symbol | number,
+  receiver: object
+) {
   try {
     return Reflect.get(data, name, receiver)
   } catch (e) {

@@ -1,6 +1,6 @@
 <template>
-  <div @click="getted = true" v-if="!getted">(...)</div>
-  <ConsoleField :data="value" v-else />
+  <span @click="getted = true" v-if="!getted">(...)</span>
+  <ConsoleField :data="value" v-else class="inline ml-0" />
 </template>
 
 <script lang="ts" setup>
