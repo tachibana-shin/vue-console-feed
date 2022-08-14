@@ -128,7 +128,6 @@ function createLinkObject(obj: object): Data.Link {
 }
 function readLinkObject(link: Data.Link) {
   const obj = linkStore.get(link["@link"])
-  console.log(obj)
   return Encode(obj)
 }
 function callFnLink(link: Data.Link) {
@@ -457,7 +456,6 @@ function encodeObject(
   receiver = data,
   proto: object | Function = Object.getPrototypeOf(data)
 ): Data.objReal {
-  console.log("encode object")
   const publics = Object.keys(data)
   const meta = Object.fromEntries(
     Object.entries(

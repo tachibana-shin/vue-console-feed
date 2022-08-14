@@ -1,12 +1,12 @@
 <template>
   <ConsoleField
-    :data="dataLoad"
+    :data="readLinkObject(link)"
     :flat="link['@type'] === 'function' || link['@type'] === 'object'"
   />
 </template>
 
 <script lang="ts" setup>
-import { shallowRef, DefineComponent } from "vue"
+import { DefineComponent } from "vue"
 import { Data, Encode, readLinkObject } from "../logic/Encode"
 import _ConsoleField from "./ConsoleField.vue"
 
@@ -16,12 +16,7 @@ const ConsoleField = _ConsoleField as unknown as DefineComponent<{
   flat?: boolean
 }>
 
-const props = defineProps<{
+defineProps<{
   link: Data.Link
 }>()
-
-const dataLoad = shallowRef()
-
-dataLoad.value = readLinkObject(props.link)
-console.log({ data: dataLoad.value })
 </script>

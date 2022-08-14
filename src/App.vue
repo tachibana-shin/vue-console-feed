@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Encode } from './logic/Encode';
-import ConsoleField from './components/ConsoleField.vue';
+import { Encode } from "./logic/Encode";
+import ConsoleField from "./components/ConsoleField.vue";
 
 const tt = {
   r: /script/,
@@ -58,10 +58,10 @@ const tt = {
   ],
   foo: { x: 245, y: 843 },
   year: 10,
-  name: 'Shin',
+  name: "Shin",
   b: 129n,
-  err: new Error('this message error'),
-  sym: Symbol('a'),
+  err: new Error("this message error"),
+  sym: Symbol("a"),
   map: new Map([[45, [789, 89]]]),
   get lusa() {
     return this.year ** 2;

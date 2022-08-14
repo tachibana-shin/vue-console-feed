@@ -4,24 +4,26 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import ConsoleField from './ConsoleField.vue';
+import { ref, watch } from "vue"
+import ConsoleField from "./ConsoleField.vue"
 
-import { Data, callFnLink } from '../logic/Encode';
+import { Data, callFnLink } from "../logic/Encode"
 
 const props = defineProps<{
-  getter: Data.Link;
-}>();
+  getter: Data.Link
+}>()
 
-const getted = ref(false);
-const value = ref();
+const getted = ref(false)
+const value = ref()
 const watcher = watch(getted, () => {
-  watcher();
+  watcher()
 
-  getted.value = true;
+  getted.value = true
 
-  value.value = callFnLink(props.getter);
+  value.value = callFnLink(props.getter)
 
-  console.log('valueof', value.value);
-});
+  if (import.meta.env.NODE_ENV !== "production") {
+    console.log("valueof", value.value)
+  }
+})
 </script>
