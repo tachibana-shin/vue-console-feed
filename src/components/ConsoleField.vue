@@ -1,47 +1,49 @@
 <template>
   <div
     v-if="
-      t === 'string' ||
-      t === 'number' ||
-      t === 'bint' ||
-      t === 'symbol' ||
-      t === 'nill'
+      data['@t'] === 'string' ||
+      data['@t'] === 'number' ||
+      data['@t'] === 'bint' ||
+      data['@t'] === 'symbol' ||
+      data['@t'] === 'nill'
     "
   >
     <slot />
     <ConsoleFieldPreview :data="data" />
   </div>
-  <Collapse v-else-if="t === 'function'" class="function" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'function'" class="function" :flat="flat">
     <slot />
     <div class="function">
       <span class="char-f">ƒ</span>
-      {{ data['@name'] }}
+      {{ data["@name"] }}
     </div>
 
     <template v-slot:content>
+      <ConsoleLink
+        v-if="data['@real']['@t'] === 'link'"
+        :link="(data['@real'] as Data.Link)"
+      />
       <ConsoleField
-        :data="
-          data['@real']['@t'] === 'link'
-            ? data['@real']
-            : {
-                '@t': 'object',
-                '@real': data['@real'],
-              }
-        "
+        v-else
+        :data="{
+          '@t': 'object',
+          '@name': null,
+          '@real': data['@real'],
+        }"
         flat
       />
     </template>
   </Collapse>
-  <Collapse v-else-if="t === 'collection'" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'collection'" :flat="flat">
     <slot />
     <span class="array-size">
-      {{ data['@name']
-      }}<template v-if="data['@size'] !== null">({{ data['@size'] }})</template>
+      {{ data["@name"]
+      }}<template v-if="data['@size'] !== null">({{ data["@size"] }})</template>
     </span>
     <template v-if="data['@size'] === 0">
-      {size: {{ data['@size'] }}}
+      {size: {{ data["@size"] }}}
     </template>
-    <template v-else>
+    <template v-else-if="data['@size'] !== null">
       {<span v-for="(item, index) in data['@entries']" :key="index">
         <span v-if="data['@name'].endsWith('Map')">
           <ConsoleFieldPreview :data="item[0]" /> =>
@@ -51,10 +53,11 @@
         ><template v-if="index < data['@size'] - 1">, </template></span
       >}</template
     >
+    <template v-else>{}</template>
 
     <template v-slot:summary-opened>
-      {{ data['@name']
-      }}<template v-if="data['@size'] !== null">({{ data['@size'] }})</template>
+      {{ data["@name"]
+      }}<template v-if="data['@size'] !== null">({{ data["@size"] }})</template>
     </template>
 
     <template v-slot:content>
@@ -81,6 +84,7 @@
               <ConsoleField
                 :data="{
                   '@t': 'object',
+                  '@name': null,
                   '@real': {
                     ...(data['@name'].endsWith('Map')
                       ? {
@@ -115,9 +119,9 @@
     <!-- {{ item }} -->
   </Collapse>
   <!-- object -->
-  <Collapse v-else-if="t === 'regexp'" class="regexp" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'regexp'" class="regexp" :flat="flat">
     <slot />
-    {{ data['@name'] }}
+    {{ data["@name"] }}
 
     <template v-slot:content>
       <ConsoleField
@@ -130,38 +134,38 @@
       />
     </template>
   </Collapse>
-  <Collapse v-else-if="t === 'object'" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'object'" :flat="flat">
     <slot />
-    <span class="array-size" v-if="!hideNameObject">{{ data['@name'] }}</span>
+    <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span>
     {
     <template v-for="(item, name) in data['@des']" :key="name">
-      <PropName :hidden="item['@hidden']" :name="name" />
-      <ConsoleFieldPreview
-        :data="item['@value']"
-        hide-name-object
-      />,
+      <PropName :hidden="item['@hidden']" :name="name + ''" />
+      <ConsoleFieldPreview :data="item['@value']" hide-name-object />,
     </template>
     }
 
     <template v-slot:summary-opened>
-      <template v-if="!hideNameObject">{{ data['@name'] }}</template>
+      <template v-if="!hideNameObject">{{ data["@name"] }}</template>
     </template>
 
     <template v-slot:content>
       <!-- @real is link -->
-      <ConsoleField
+      <ConsoleLink
         v-if="data['@real']?.['@t'] === 'link'"
-        :data="data['@real']"
-        flat
+        :link="(data['@real'] as Data.Link)"
       />
       <!-- /@real is link -->
 
-      <template v-else v-for="(item, name) in data['@real']" :key="name">
+      <template
+        v-else
+        v-for="(item, name) in (data['@real'] as Data.objReal)"
+        :key="name"
+      >
         <!-- get/set -->
         <template v-if="item['@value']['@t'] === 'gs'">
           <!-- @value -->
           <div class="flex">
-            <PropName :hidden="item['@hidden']" :name="name" />
+            <PropName :hidden="item['@hidden']" :name="name + ''" />
             <GetterField :getter="item['@value']['@value']" />
           </div>
           <!-- /@value -->
@@ -169,7 +173,7 @@
           <ConsoleField
             v-for="(encoded, actName) in item['@value']['@at']"
             :key="name"
-            :data="encoded"
+            :data="encoded!"
           >
             <PropName hidden :name="actName + ' ' + name" />
           </ConsoleField>
@@ -185,42 +189,43 @@
           v-else
           :data="item['@value']"
           :hide-name-object="
-            !name.startsWith('[[') && item['@value']['@name'] === 'Object'
+            typeof name === 'string' && !(name as string)?.startsWith('[[') && (item['@value'] as any)?.['@name'] === 'Object'
           "
         >
-          <PropName :hidden="item['@hidden']" :name="name" />
+          <PropName :hidden="item['@hidden']" :name="name + ''" />
         </ConsoleField>
       </template>
       <!-- /@real -->
     </template>
   </Collapse>
-  <Collapse v-else-if="t === 'error'">
+  <Collapse v-else-if="data['@t'] === 'error'">
     <slot />
     <div class="truncate">
-      {{ data['@stack'] }}
+      {{ data["@stack"] }}
     </div>
 
     <template v-slot:content>
       <ConsoleField
         :data="{
           '@t': 'object',
+          '@name': null,
           '@real': data['@real'],
         }"
         flat
       />
     </template>
   </Collapse>
-  <Collapse v-else-if="t === 'array'" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'array'" :flat="flat">
     <slot />
     <span class="array-size"
-      >({{ data['@real'].length['@value']['@value'] }})</span
+      >({{ data["@real"].length["@value"]["@value"] }})</span
     >
     [<template
       v-for="item in +data['@real'].length['@value']['@value']"
       :key="item"
     >
       <ConsoleFieldPreview
-        :data="data['@real'][item - 1]['@value']"
+        :data="(data['@real'][item - 1]['@value'] as Exclude<typeof data['@real'][0]['@value'], Data.GetSetter>)"
         hide-name-object
       /><template v-if="+data['@real'].length['@value']['@value'] > item"
         >,
@@ -228,20 +233,27 @@
     >]
 
     <template v-slot:summary-opened>
-      Array ({{ data['@real'].length['@value']['@value'] }})
+      Array ({{ data["@real"].length["@value"]["@value"] }})
     </template>
 
     <template v-slot:content>
-      <ConsoleField :data="{ '@t': 'object', '@real': data['@real'] }" flat />
+      <ConsoleField
+        :data="{
+          '@t': 'object',
+          '@name': null,
+          '@real': data['@real'],
+        }"
+        flat
+      />
     </template>
   </Collapse>
-  <Collapse v-else-if="t === 'link'" :flat="flat">
+  <Collapse v-else-if="data['@t'] === 'link'" :flat="flat">
     <slot />
     <template v-if="data['@type'] === 'object'">
-      fake:{{ data['@name'] }}{...}
+      fake:{{ data["@name"] }}{...}
     </template>
     <template v-else>
-      <span class="char-f">ƒ</span> {{ data['@name'] }}
+      <span class="char-f">ƒ</span> {{ data["@name"] }}
     </template>
 
     <template v-slot:content>
@@ -255,27 +267,29 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { Encode } from '../logic/Encode';
-import ConsoleField from './ConsoleField.vue';
-import ConsoleLink from './ConsoleLink.vue';
-import Collapse from './Collapse.vue';
-import GetterField from './GetterField.vue';
-import PropName from './PropName.vue';
-import ConsoleFieldPreview from './ConsoleFieldPreview.vue';
-import { Data } from '../logic/Encode';
+import { Data, Encode } from "../logic/Encode";
+import _ConsoleField from "./ConsoleField.vue";
+import ConsoleLink from "./ConsoleLink.vue";
+import Collapse from "./Collapse.vue";
+import PropName from "./PropName.vue";
+import ConsoleFieldPreview from "./ConsoleFieldPreview.vue";
+import { DefineComponent } from "vue";
 
-const props = defineProps<{
+const ConsoleField = _ConsoleField as unknown as DefineComponent<{
+  data: ReturnType<typeof Encode>;
+  hideNameObject?: boolean;
+  flat?: boolean;
+}>;
+
+defineProps<{
   data: ReturnType<typeof Encode>;
   flat?: boolean;
   hideNameObject?: boolean;
 }>();
-
-const t = computed(() => props.data['@t']);
 </script>
 
 <style lang="scss" scoped>
-@import './styles.scss';
+@import "./styles.scss";
 // color: rgb(85, 106, 242);
 
 div {

@@ -1,54 +1,54 @@
 namespace Data {
   export interface String {
-    '@t': 'string';
-    '@value': string;
+    "@t": "string";
+    "@value": string;
   }
   export interface Number {
-    '@t': 'number';
-    '@value': string;
+    "@t": "number";
+    "@value": string;
   }
   export interface BigInt {
-    '@t': 'bint';
-    '@value': string;
+    "@t": "bint";
+    "@value": string;
   }
   export interface Symbol {
-    '@t': 'symbol';
-    '@value': string;
+    "@t": "symbol";
+    "@value": string;
   }
   export interface Nill {
-    '@t': 'nill';
-    '@value': 'null' | 'undefined';
+    "@t": "nill";
+    "@value": "null" | "undefined";
   }
   export interface Function {
-    '@t': 'function';
-    '@name': string;
-    '@code': string;
-    '@real': objReal | Link;
+    "@t": "function";
+    "@name": string;
+    "@code": string;
+    "@real": objReal | Link;
   }
   //=============
-  export interface Collection extends Omit<Record, '@t' | '@de'> {
-    '@t': 'collection';
-    '@name': 'map' | 'weakmap' | 'set' | 'weakset';
-    '@size': number | null;
-    '@entries': unknown;
+  export interface Collection extends Omit<Record, "@t" | "@de"> {
+    "@t": "collection";
+    "@name": "map" | "weakmap" | "set" | "weakset";
+    "@size": number | null;
+    "@entries": unknown;
   }
   //==============
-  export interface RegExp extends Omit<Record, '@t' | '@de'> {
-    '@t': 'regexp';
-    '@flags': string;
-    '@source': string;
+  export interface RegExp extends Omit<Record, "@t" | "@de"> {
+    "@t": "regexp";
+    "@flags": string;
+    "@source": string;
   }
   export interface GetSetter {
-    '@t': 'gs';
-    '@value': unknown;
-    '@at': Partial<{
-      [name in 'get' | 'set']: Function;
+    "@t": "gs";
+    "@value": unknown;
+    "@at": Partial<{
+      [name in "get" | "set"]: Function;
     }>;
   }
   export interface objReal {
     [name: string | symbol | number]: {
-      '@hidden': boolean;
-      '@value':
+      "@hidden": boolean;
+      "@value":
         | GetSetter
         | String
         | Number
@@ -59,33 +59,39 @@ namespace Data {
         | RegExp
         | Record
         | Nill
-        | Link
+        // | Link
         | Error
         | Array;
     };
   }
-  export interface Record {
-    '@t': 'object';
-    '@name': string | null;
-    '@real': objReal | Link;
-    '@des'?: DataPreview.objReal;
-  }
   export interface Link {
-    '@t': 'link';
-    '@type': 'object' | 'function';
-    '@link': string;
-    '@name': string | null;
+    "@t": "link";
+    "@type": "object" | "function";
+    "@link": string;
+    "@name": string | null;
+  }
+  export interface Record {
+    "@t": "object";
+    "@name": string | null;
+    "@real": objReal | Link;
+    "@des"?: DataPreview.objReal;
   }
   export interface Error {
-    '@t': 'error';
-    '@name': string;
-    '@stack': string;
-    '@real': objReal;
+    "@t": "error";
+    "@name": string;
+    "@stack": string;
+    "@real": objReal;
   }
   export interface Array {
-    '@t': 'array';
-    '@size': number;
-    '@real': objReal;
+    "@t": "array";
+    "@size": number;
+    "@real": objReal & {
+      length: {
+        // TODO:いみわかない！
+        "@hidden": boolean;
+        "@value": Number;
+      };
+    };
   }
 }
 
@@ -93,15 +99,15 @@ namespace Data {
 const linkStore = new Map<string, object>();
 function createLinkObject(obj: object): Data.Link {
   const name =
-    typeof obj === 'function' ? obj.name : obj?.constructor.name ?? null;
+    typeof obj === "function" ? obj.name : obj?.constructor.name ?? null;
 
   for (const [link, tObj] of linkStore) {
     if (tObj === obj) {
       return {
-        '@t': 'link',
-        '@type': typeof obj as 'object' | 'function',
-        '@link': link,
-        '@name': name,
+        "@t": "link",
+        "@type": typeof obj as "object" | "function",
+        "@link": link,
+        "@name": name,
         // '@link':
       };
     }
@@ -112,24 +118,24 @@ function createLinkObject(obj: object): Data.Link {
   linkStore.set(uid, obj);
 
   return {
-    '@t': 'link',
-    '@type': typeof obj as 'object' | 'function',
-    '@link': uid,
-    '@name': name,
+    "@t": "link",
+    "@type": typeof obj as "object" | "function",
+    "@link": uid,
+    "@name": name,
   };
 }
 function readLinkObject(link: Data.Link) {
-  const obj = linkStore.get(link['@link']);
+  const obj = linkStore.get(link["@link"]);
   console.log(obj);
   return Encode(obj);
 }
 function callFnLink(link: Data.Link) {
-  const fn = linkStore.get(link['@link']);
+  const fn = linkStore.get(link["@link"]);
 
-  if (typeof fn !== 'function')
+  if (typeof fn !== "function")
     return {
-      '@t': 'error',
-      '@value': 'not found',
+      "@t": "error",
+      "@value": "not found",
     };
 
   return Encode(fn());
@@ -153,91 +159,91 @@ function Encode(
   | Data.Array {
   if (data instanceof Error) {
     const meta: Data.Error = {
-      '@t': 'error',
-      '@name': data.name,
-      '@stack': data.stack ?? '',
-      '@real': encodeObject(data),
+      "@t": "error",
+      "@name": data.name,
+      "@stack": data.stack ?? "",
+      "@real": encodeObject(data),
     };
     return meta;
   }
 
   switch (typeof data) {
-    case 'string': {
+    case "string": {
       const meta: Data.String = {
-        '@t': 'string',
-        '@value': data,
+        "@t": "string",
+        "@value": data,
       };
       return meta;
     }
-    case 'number':
-    case 'boolean': {
+    case "number":
+    case "boolean": {
       const meta: Data.Number = {
-        '@t': 'number',
-        '@value': data.toString(),
+        "@t": "number",
+        "@value": data.toString(),
       };
       return meta;
     }
-    case 'bigint': {
+    case "bigint": {
       const meta: Data.BigInt = {
-        '@t': 'bint',
-        '@value': data.toString() + 'n',
+        "@t": "bint",
+        "@value": data.toString() + "n",
       };
       return meta;
     }
-    case 'symbol': {
+    case "symbol": {
       const meta: Data.Symbol = {
-        '@t': 'symbol',
-        '@value': data.toString(),
+        "@t": "symbol",
+        "@value": data.toString(),
       };
       return meta;
     }
-    case 'undefined': {
+    case "undefined": {
       const meta: Data.Nill = {
-        '@t': 'nill',
-        '@value': 'undefined',
+        "@t": "nill",
+        "@value": "undefined",
       };
       return meta;
     }
-    case 'function': {
-      const code = data + '';
+    case "function": {
+      const code = data + "";
       const name = code.slice(
-        code.startsWith('function') ? 8 : 0,
-        code.indexOf('{') >>> 0
+        code.startsWith("function") ? 8 : 0,
+        code.indexOf("{") >>> 0
       );
       const meta: Data.Function = {
-        '@t': 'function',
-        '@code': first ? data.toString() : '',
-        '@name': name,
-        '@real': linkReal ? createLinkObject(data) : encodeObject(data, data),
+        "@t": "function",
+        "@code": first ? data.toString() : "",
+        "@name": name,
+        "@real": linkReal ? createLinkObject(data) : encodeObject(data, data),
       };
       return meta;
     }
-    case 'object': {
+    case "object": {
       if (data === null) {
         const meta: Data.Nill = {
-          '@t': 'nill',
-          '@value': 'null',
+          "@t": "nill",
+          "@value": "null",
         };
         return meta;
       }
 
       if (data instanceof RegExp) {
         const meta: Data.RegExp = {
-          '@t': 'regexp',
-          '@name': data + '',
-          '@flags': data.flags,
-          '@source': data.source,
+          "@t": "regexp",
+          "@name": data + "",
+          "@flags": data.flags,
+          "@source": data.source,
           // わかない。ぜんぜんわかない！
-          '@real': encodeObject(data, data),
+          "@real": encodeObject(data, data),
         };
         return meta;
       }
 
       if (data instanceof Array) {
         const meta: Data.Array = {
-          '@t': 'array',
-          '@size': data.length,
-          '@real': encodeObject(data, data),
+          "@t": "array",
+          "@size": data.length,
+          "@real": encodeObject(data, data) as Data.Array["@real"],
         };
 
         return meta;
@@ -245,16 +251,16 @@ function Encode(
 
       if (isCollection(data)) {
         const meta: Data.Collection = {
-          '@t': 'collection',
-          '@name': toString.call(data).slice(8, -1) as Data.Collection['@name'],
-          '@size': (data as Set<unknown>).size ?? null,
-          '@entries': Array.from(
+          "@t": "collection",
+          "@name": toString.call(data).slice(8, -1) as Data.Collection["@name"],
+          "@size": (data as Set<unknown>).size ?? null,
+          "@entries": Array.from(
             (data as unknown as Map<any, any>).entries?.() ?? []
           ).map(([key, val]) => [Encode(key), Encode(val)]),
-          '@real': {
+          "@real": {
             size: {
-              '@hidden': true,
-              '@value': Encode((data as unknown as any).size),
+              "@hidden": true,
+              "@value": Encode((data as unknown as any).size),
             },
             // わかない。ぜんぜんわかない！
             ...encodeObject(data, data),
@@ -265,11 +271,11 @@ function Encode(
 
       // getsyoubi no tawata
       const meta: Data.Record = {
-        '@t': 'object',
-        '@name': data.constructor.name,
+        "@t": "object",
+        "@name": data.constructor.name,
         // わかない。ぜんぜんわかない！
-        '@real': linkReal ? createLinkObject(data) : encodeObject(data, data),
-        '@des': createPreviewObject(data),
+        "@real": linkReal ? createLinkObject(data) : encodeObject(data, data),
+        "@des": createPreviewObject(data),
       };
       return meta;
     }
@@ -294,9 +300,9 @@ function getOwnDescriptorsRegExp(reg: RegExp) {
   Object.entries(Object.getOwnPropertyDescriptors(proto)).forEach(
     ([name, meta]) => {
       const { value } = meta;
-      if (name === 'lastIndex') return;
+      if (name === "lastIndex") return;
 
-      if (typeof value !== 'function')
+      if (typeof value !== "function")
         des[name] = {
           value: (reg as unknown as any)[name],
         };
@@ -307,18 +313,18 @@ function getOwnDescriptorsRegExp(reg: RegExp) {
 }
 
 export namespace DataPreview {
-  export interface Record extends Pick<Data.Record, '@t' | '@name'> {}
-  export interface Error extends Pick<Data.Error, '@t' | '@name' | '@stack'> {}
-  export interface RegExp extends Pick<Data.RegExp, '@t' | '@name'> {}
+  export interface Record extends Pick<Data.Record, "@t" | "@name"> {}
+  export interface Error extends Pick<Data.Error, "@t" | "@name" | "@stack"> {}
+  export interface RegExp extends Pick<Data.RegExp, "@t" | "@name"> {}
   export interface Collection
-    extends Pick<Data.Collection, '@t' | '@name' | '@size'> {}
-  export interface Array extends Pick<Data.Array, '@t' | '@size'> {}
-  export interface Function extends Pick<Data.Function, '@t'> {}
+    extends Pick<Data.Collection, "@t" | "@name" | "@size"> {}
+  export interface Array extends Pick<Data.Array, "@t" | "@size"> {}
+  export interface Function extends Pick<Data.Function, "@t" | "@name"> {}
 
   export interface objReal {
     [name: string]: {
-      '@hidden': boolean;
-      '@value':
+      "@hidden": boolean;
+      "@value":
         | Record
         | Error
         | RegExp
@@ -340,18 +346,18 @@ function createPreviewObject(data: object): DataPreview.objReal {
   const publics = Object.keys(data);
   const meta = Object.fromEntries(
     Object.entries(getOwnDescriptorsIn(data)).map(
-      ([name, meta]): [string, DataPreview.objReal['']] => {
+      ([name, meta]): [string, DataPreview.objReal[""]] => {
         const { value } = meta;
         if (value instanceof Error) {
           return [
             name,
             {
-              '@hidden': publics.includes(name) === false,
-              '@value': {
-                '@t': 'error',
-                '@name': value.name,
-                '@stack':
-                  value.stack?.split('\n', 3).slice(0, 3).join('\n') ?? '',
+              "@hidden": publics.includes(name) === false,
+              "@value": {
+                "@t": "error",
+                "@name": value.name,
+                "@stack":
+                  value.stack?.split("\n", 3).slice(0, 3).join("\n") ?? "",
               },
             },
           ];
@@ -360,10 +366,10 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             /* object */ {
-              '@hidden': publics.includes(name) === false,
-              '@value': {
-                '@t': 'regexp',
-                '@name': value + '',
+              "@hidden": publics.includes(name) === false,
+              "@value": {
+                "@t": "regexp",
+                "@name": value + "",
               },
             },
           ];
@@ -372,13 +378,13 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             /* object */ {
-              '@hidden': publics.includes(name) === false,
-              '@value': {
-                '@t': 'collection',
-                '@name': toString
+              "@hidden": publics.includes(name) === false,
+              "@value": {
+                "@t": "collection",
+                "@name": toString
                   .call(value)
-                  .slice(8, -1) as Data.Collection['@name'],
-                '@size': (value as Set<unknown>).size ?? null,
+                  .slice(8, -1) as Data.Collection["@name"],
+                "@size": (value as Set<unknown>).size ?? null,
               },
             },
           ];
@@ -387,37 +393,35 @@ function createPreviewObject(data: object): DataPreview.objReal {
           return [
             name,
             /* object */ {
-              '@hidden': publics.includes(name) === false,
-              '@value': {
-                '@t': 'array',
-                '@size': value.length,
+              "@hidden": publics.includes(name) === false,
+              "@value": {
+                "@t": "array",
+                "@size": value.length,
               },
             },
           ];
         }
-        
-        if (
-          value !== null &&
-          typeof value === 'object'
-        ) {
+
+        if (value !== null && typeof value === "object") {
           return [
             name,
             /* object */ {
-              '@hidden': publics.includes(name) === false,
-              '@value': {
-                '@t': 'object',
-                '@name': value.constructor.name,
+              "@hidden": publics.includes(name) === false,
+              "@value": {
+                "@t": "object",
+                "@name": value.constructor.name,
               },
             },
           ];
         }
-        if (typeof value === 'function') {
+        if (typeof value === "function") {
           return [
             name,
             {
-              '@hidden': publics.includes(name) === false,
-              '@value': {
-                '@t': 'function',
+              "@hidden": publics.includes(name) === false,
+              "@value": {
+                "@t": "function",
+                "@name": "",
               },
             },
           ];
@@ -426,8 +430,8 @@ function createPreviewObject(data: object): DataPreview.objReal {
         return [
           name,
           {
-            '@hidden': publics.includes(name) === false,
-            '@value': Encode(value, false),
+            "@hidden": publics.includes(name) === false,
+            "@value": Encode(value, false),
           },
         ];
       }
@@ -441,7 +445,7 @@ function encodeObject(
   receiver = data,
   proto: object | Function = Object.getPrototypeOf(data)
 ): Data.objReal {
-  console.log('encode object');
+  console.log("encode object");
   const publics = Object.keys(data);
   const meta = Object.fromEntries(
     Object.entries(
@@ -450,27 +454,27 @@ function encodeObject(
         Object.getOwnPropertyDescriptors(data),
         data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
       )
-    ).map(([name, meta]): [string, Data.objReal['']] => {
+    ).map(([name, meta]): [string, Data.objReal[""]] => {
       const { value } = meta;
-      if ('get' in meta || 'set' in meta) {
-        const at: Partial<Record<'get' | 'set', Data.Function>> = {};
+      if ("get" in meta || "set" in meta) {
+        const at: Partial<Record<"get" | "set", Data.Function>> = {};
         if (meta.get) at.get = Encode(meta.get) as Data.Function;
         if (meta.set) at.set = Encode(meta.set) as Data.Function;
         return [
           name,
           {
-            '@hidden': publics.includes(name) === false,
-            '@value': {
-              '@t': 'gs',
-              '@value': createLinkObject(() => getValue(data, name, receiver)), //meta.get?.(),
-              '@at': at,
+            "@hidden": publics.includes(name) === false,
+            "@value": {
+              "@t": "gs",
+              "@value": createLinkObject(() => getValue(data, name, receiver)), //meta.get?.(),
+              "@at": at,
             },
           },
         ];
       }
       if (
         value !== null &&
-        typeof value === 'object' &&
+        typeof value === "object" &&
         !(value instanceof RegExp) &&
         !isCollection(value) &&
         !(value instanceof Error) &&
@@ -479,17 +483,17 @@ function encodeObject(
         return [
           name,
           {
-            '@hidden': publics.includes(name) === false,
-            '@value': Encode(value, false, true), //createLinkObject(value),
+            "@hidden": publics.includes(name) === false,
+            "@value": Encode(value, false, true), //createLinkObject(value),
           },
         ];
       }
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         return [
           name,
           {
-            '@hidden': publics.includes(name) === false,
-            '@value': Encode(value, false, true), // createLinkObject(value),
+            "@hidden": publics.includes(name) === false,
+            "@value": Encode(value, false, true), // createLinkObject(value),
           },
         ];
       }
@@ -497,17 +501,17 @@ function encodeObject(
       return [
         name,
         {
-          '@hidden': publics.includes(name) === false,
-          '@value': Encode(value, false),
+          "@hidden": publics.includes(name) === false,
+          "@value": Encode(value, false),
         },
       ];
     })
   );
 
   return Object.assign(meta, {
-    '[[Prototype]]': {
-      '@hidden': true,
-      '@value': proto
+    "[[Prototype]]": {
+      "@hidden": true,
+      "@value": proto
         ? Encode(proto, false, true) /* createLinkObject(proto) */
         : Encode(proto, false),
     },
@@ -525,13 +529,13 @@ function isCollection(
 
   return (
     data !== null &&
-    typeof data === 'object' &&
+    typeof data === "object" &&
     // なんで？わかない。ぼくわかない。
     Object.getPrototypeOf(data) === data.constructor.prototype &&
-    (type === 'Map' ||
-      type === 'WeakMap' ||
-      type === 'Set' ||
-      type === 'WeakSet')
+    (type === "Map" ||
+      type === "WeakMap" ||
+      type === "Set" ||
+      type === "WeakSet")
   );
 }
 function getValue(data: object, name: string, receiver: object) {
