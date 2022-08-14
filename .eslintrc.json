@@ -2,5 +2,5 @@
    "env": {
       "browser": true
    },
-   "extends": "@tachibana-shin/eslint-config"
+   "extends": "@tachibana-shin/eslint-config-vue"
 }

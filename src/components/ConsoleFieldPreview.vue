@@ -41,7 +41,7 @@
 <script lang="ts" setup>
 import { DataPreview } from "../logic/Encode";
 
-const props = defineProps<{
+defineProps<{
   data: DataPreview.objReal[""]["@value"];
   hideNameObject?: boolean;
   showNameFn?: boolean;

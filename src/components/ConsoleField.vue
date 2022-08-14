@@ -172,7 +172,7 @@
 
           <ConsoleField
             v-for="(encoded, actName) in item['@value']['@at']"
-            :key="name"
+            :key="actName"
             :data="encoded!"
           >
             <PropName hidden :name="actName + ' ' + name" />

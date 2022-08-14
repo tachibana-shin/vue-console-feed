@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, useAttrs, watch } from 'vue';
+import { ref, useAttrs, watch } from "vue";
 
 const props = defineProps<{
   flat?: boolean;
@@ -42,7 +42,7 @@ const state = ref(props.show);
 
 const loaded = ref(false);
 
-const watcher = watch(state, (state) => {
+const watcher = watch(state, () => {
   loaded.value = true;
   watcher();
 });
