@@ -1,23 +1,72 @@
 {
-  "name": "vite-vue-typescript-starter",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "vue-console-feed",
+  "version": "0.0.1",
+  "description": "a repository npm package",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "format": "prettier -w src",
+    "build": "tsup",
+    "dev": "tsx ./src/index.ts",
+    "lint": "eslint src --ext=.ts",
+    "lint:fix": "pnpm lint --fix",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "release": "bumpp package.json --commit --push --tag && pnpm -r publish --access public",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
-  "dependencies": {
-    "vue": "^3.2.37"
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.mjs",
+  "jsdelivr": "dist/index.global.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
   "devDependencies": {
+    "@tachibana-shin/eslint-config": "^1.0.2",
+    "@types/node": "^17.0.36",
+    "bumpp": "^7.1.1",
+    "conventional-changelog-cli": "^2.2.2",
+    "cspell": "^6.0.0",
+    "eslint": "^8.16.0",
+    "husky": "^8.0.1",
+    "prettier": "^2.6.2",
+		"tsup": "^6.0.1",
+    "typescript": "^4.7.2",
+    "vitest": "^0.13.0",
     "@vitejs/plugin-vue": "^3.0.1",
     "sass": "^1.54.4",
-    "typescript": "^4.6.4",
     "vite": "^3.0.4",
     "vite-plugin-windicss": "^1.8.7",
     "vue-tsc": "^0.39.5",
     "windicss": "^3.5.6"
+  },
+  "license": "MIT",
+    "repository": {
+    "type": "git",
+    "url": "git://github.com/tachibana-shin/vue-console-feed.git"
+  },
+  "homepage": "https://tachibana-shin.github.io/vue-console-feed",
+  "keywords": [
+    "vue-console-feed",
+    "Tachibana Shin",
+    "tachibana-shin"
+  ],
+  "files": [
+    "dist" 
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "pnpm format"
+    }
+  },
+  "engines": {
+    "node": ">=10"
   }
 }
