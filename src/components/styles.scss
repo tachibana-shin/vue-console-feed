@@ -46,3 +46,22 @@
 .comma {
   margin-right: 4px;
 }
+
+.element {
+  &-tag {
+    color: #3aa3cc;
+  }
+  &-propName {
+    color: #7bbbb9;
+  }
+  &-propValue {
+    color: #f27739
+  }
+
+  &-comment {
+    color: #896d4b
+  }
+  &-doctype {
+    color: #b6b493
+  }
+}

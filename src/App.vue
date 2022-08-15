@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { Encode } from "./logic/Encode"
-import ConsoleField from "./components/ConsoleField.vue"
+import ConsoleItem from "./components/ConsoleItem.vue"
 
 const el = document.createElement("div")
-el.innerHTML = "<span>Hello </span>"
+el.style = "color: red;"
+el.dir = "ltr"
+el.innerHTML = "hkhkjhhu op<span>Hello<Span>jkfiwoejgoijerokg</span></span>"
+// el.innerHTML = "xss"
 const tt = {
+  el,
   nl: el.childNodes,
   r: /script/,
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),
-  c: new Map([[45, [789, 89]]]),
+  c: new Map([
+    [45, [789, 89]],
+    ["user", { name: "Shin" }]
+  ]),
   s: new Set([2, 54, 65, [123], () => 2]),
   ae: [
     /script/,
@@ -78,7 +85,8 @@ const tt = {
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(tt as unknown as any).tt = tt
-const data = Encode(tt)
+window.Encode = Encode
+const data = Encode(tt, true, true)
 console.log(tt)
 console.log(data)
 
@@ -86,7 +94,7 @@ console.log(document.body)
 </script>
 
 <template>
-  <ConsoleField :data="data" />
+  <ConsoleItem :data="data" />
   <!-- <div v-for="data" -->
 </template>
 

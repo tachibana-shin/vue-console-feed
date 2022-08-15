@@ -2,6 +2,8 @@
 import { entries } from "./entries"
 import { keys } from "./keys"
 import { isList } from "./isList"
+import { isDom } from "./isDom"
+import { shouldInline } from "./shouldInline"
 // eslint-disable-next-line @typescript-eslint/no-namespace
 namespace Data {
   export interface String {
@@ -27,11 +29,12 @@ namespace Data {
   export interface Function {
     "@t": "function"
     "@name": string
+    "@first": boolean
     "@code": string
     "@real": objReal | Link
   }
   //=============
-  export interface Collection extends Omit<Record, "@t" | "@de"> {
+  export interface Collection extends Omit<Record, "@t" | "@de" | "@first"> {
     "@t": "collection"
     "@name": "map" | "weakmap" | "set" | "weakset"
     "@size": number | null
@@ -67,6 +70,7 @@ namespace Data {
         // | Link
         | Error
         | Array
+        | Element
     }
   }
   export interface Link {
@@ -78,11 +82,12 @@ namespace Data {
   export interface Record {
     "@t": "object"
     "@name": string | null
+    "@first": boolean
     "@real": objReal | Link
     "@des"?: {
       "@value": DataPreview.objReal
       "@lastKey": string
-    }
+    } | null
   }
   export interface Error {
     "@t": "error"
@@ -94,6 +99,7 @@ namespace Data {
     "@t": "array"
     "@size": number
     "@name"?: string
+    "@first": boolean
     "@real": objReal & {
       length: {
         // TODO:いみわかない！
@@ -102,18 +108,25 @@ namespace Data {
       }
     }
   }
-}
-// ============= dom api ==============
-function isDom(el: any): el is HTMLElement {
-  try {
-    if (el instanceof HTMLElement) return el.childNodes !== undefined
-
-    return false
-  } catch {
-    return true
+  export interface Element {
+    "@t": "element"
+    "@name": string
+    "@first": boolean
+    "@attrs"?: [string, string][]
+    "@real"?: Link
+    "@childs"?: string | null | Link
   }
 }
-// ====================================
+
+const nameByNodeType = {
+  1: "ELEMENT_NODE",
+  3: "TEXT_NODE",
+  7: "PROCESSING_INSTRUCTION_NODE",
+  8: "COMMENT_NODE",
+  9: "DOCUMENT_NODE",
+  10: "DOCUMENT_TYPE_NODE", // http://stackoverflow.com/questions/6088972/get-doctype-of-an-html-as-string-with-javascript
+  11: "DOCUMENT_FRAGMENT_NODE"
+}
 
 // ============= link object ==============
 const linkStore = new Map<string, object>()
@@ -146,7 +159,10 @@ function createLinkObject(obj: object): Data.Link {
 }
 function readLinkObject(link: Data.Link) {
   const obj = linkStore.get(link["@link"])
-  return Encode(obj)
+
+  console.log("readLink: ", { obj })
+
+  return Encode(obj, false, false)
 }
 function callFnLink(link: Data.Link) {
   const fn = linkStore.get(link["@link"])
@@ -157,13 +173,18 @@ function callFnLink(link: Data.Link) {
       "@value": "not found"
     }
 
-  return Encode(fn())
+  return Encode(fn(), false, true)
+}
+export function _getListLink(link: Data.Link) {
+  const obj = linkStore.get(link["@link"])
+  console.log(obj)
+  return Array.from(obj).map((item) => Encode(item, true, true))
 }
 // ==========================================
 function Encode(
   data: unknown,
-  first = false,
-  linkReal = false
+  first: boolean, // false,
+  linkReal: boolean // false
 ):
   | Data.String
   | Data.Number
@@ -175,7 +196,8 @@ function Encode(
   | Data.Nill
   | Data.Record
   | Data.Error
-  | Data.Array {
+  | Data.Array
+  | Data.Element {
   if (data instanceof Error) {
     const meta: Data.Error = {
       "@t": "error",
@@ -233,6 +255,7 @@ function Encode(
         "@t": "function",
         "@code": first ? data.toString() : "",
         "@name": name,
+        "@first": first,
         "@real": linkReal ? createLinkObject(data) : encodeObject(data, data)
       }
       return meta
@@ -250,6 +273,7 @@ function Encode(
         const meta: Data.RegExp = {
           "@t": "regexp",
           "@name": data + "",
+          "@first": first,
           "@flags": data.flags,
           "@source": data.source,
           // わかない。ぜんぜんわかない！
@@ -263,6 +287,7 @@ function Encode(
           "@t": "array",
           "@size": data.length,
           "@name": data instanceof NodeList ? "NodeList" : undefined,
+          "@first": first,
           "@real": encodeObject(data, data) as ReturnType<
             typeof encodeObject
           > & {
@@ -283,12 +308,15 @@ function Encode(
           "@size": (data as Set<unknown>).size ?? null,
           "@entries": Array.from(
             (data as unknown as Map<unknown, unknown>).entries?.() ?? []
-          ).map(([key, val]) => [Encode(key), Encode(val)]),
+          ).map(([key, val]) => [
+            Encode(key, false, true),
+            Encode(val, false, true)
+          ]),
           "@real": {
             size: {
               "@hidden": true,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              "@value": Encode((data as unknown as any).size)
+              "@value": Encode((data as unknown as any).size, false, false)
             },
             // わかない。ぜんぜんわかない！
             ...encodeObject(data, data)
@@ -297,13 +325,106 @@ function Encode(
         return meta
       }
 
+      //なんで？
+      if (linkReal && isDom(data)) {
+        const attrs =
+          first && data.attributes
+            ? Array.from(data.attributes).map((item): [string, string] => [
+                item.name,
+                item.value
+              ])
+            : undefined
+        switch (data.nodeType) {
+          case Node.ELEMENT_NODE: {
+            return {
+              "@t": "element",
+              "@name": data.nodeName,
+              "@first": first,
+              "@attrs": attrs,
+              "@real": first ? undefined : createLinkObject(data),
+              "@childs": shouldInline(data)
+                ? data.textContent
+                : createLinkObject(data.childNodes)
+            }
+          }
+          case Node.TEXT_NODE:
+          case Node.CDATA_SECTION_NODE:
+          case Node.COMMENT_NODE: {
+            return {
+              "@t": "element", //  #text
+              "@name": data.nodeName,
+              "@first": first,
+              "@attrs": attrs,
+              "@childs": data.textContent
+            }
+          }
+          case Node.PROCESSING_INSTRUCTION_NODE:
+            return {
+              "@t": "element",
+              "@name": data.nodeName, // ?
+              "@first": first,
+              "@attrs": attrs,
+              "@real": first ? undefined : createLinkObject(data)
+            }
+          case Node.DOCUMENT_TYPE_NODE:
+            return {
+              "@t": "element",
+              "@name": data.nodeName, // html
+              "@first": first,
+              "@attrs": attrs,
+              "@real": first ? undefined : createLinkObject(data),
+              "@childs": `<!DOCTYPE ${(data as unknown as DocumentType).name} ${
+                (data as unknown as DocumentType).publicId
+                  ? ` PUBLIC "${(data as unknown as DocumentType).publicId}"`
+                  : ""
+              } ${
+                !(data as unknown as DocumentType).publicId &&
+                (data as unknown as DocumentType).systemId
+                  ? " SYSTEM"
+                  : ""
+              } ${
+                (data as unknown as DocumentType).systemId
+                  ? ` "${(data as unknown as DocumentType).systemId}"`
+                  : ""
+              } >`
+            }
+          case Node.DOCUMENT_NODE:
+            return {
+              "@t": "element",
+              "@name": data.nodeName, // #document
+              "@first": first,
+              "@attrs": attrs,
+              "@real": first ? undefined : createLinkObject(data)
+            }
+          case Node.DOCUMENT_FRAGMENT_NODE:
+            return {
+              "@t": "element",
+              "@name": data.nodeName, // #document-fragment
+              "@first": first,
+              "@attrs": attrs
+            }
+          default:
+            return {
+              "@t": "element",
+              "@name":
+                "#" +
+                  nameByNodeType[
+                    data.nodeType as keyof typeof nameByNodeType
+                  ] ?? "#unknown",
+              "@first": first,
+              "@real": first ? undefined : createLinkObject(data)
+            }
+        }
+      }
+
       // getsyoubi no tawata
       const meta: Data.Record = {
         "@t": "object",
         "@name": data.constructor?.name ?? null,
+        "@first": first,
         // わかない。ぜんぜんわかない！
         "@real": linkReal ? createLinkObject(data) : encodeObject(data, data),
-        "@des": createPreviewObject(data)
+        "@des": linkReal ? createPreviewObject(data) : null
       }
       return meta
     }
@@ -315,7 +436,8 @@ function getOwnDescriptorsIn(obj: object) {
   const des: Record<string, PropertyDescriptor> = {}
   for (const name in obj) {
     des[name] = {
-      value: getValue(obj, name, obj)
+      value: getValue(obj, name, obj),
+      enumerable: true
     }
   }
   return des
@@ -347,6 +469,7 @@ export namespace DataPreview {
   export type Collection = Pick<Data.Collection, "@t" | "@name" | "@size">
   export type Array = Pick<Data.Array, "@t" | "@size" | "@name">
   export type Function = Pick<Data.Function, "@t" | "@name">
+  export type Element = Pick<Data.Element, "@t" | "@name">
 
   export interface objReal {
     [name: string]: {
@@ -359,6 +482,7 @@ export namespace DataPreview {
         | Array
         // eslint-disable-next-line @typescript-eslint/ban-types
         | Function
+        | Element
         | Data.String
         | Data.Number
         | Data.BigInt
@@ -437,6 +561,19 @@ function createPreviewObject(data: object): {
           ]
         }
 
+        if (isDom(value)) {
+          return [
+            name,
+            {
+              "@hidden": !meta.enumerable,
+              "@value": {
+                "@t": "element",
+                "@name": value.nodeName
+              }
+            }
+          ]
+        }
+
         if (value !== null && typeof value === "object") {
           return [
             name,
@@ -466,7 +603,7 @@ function createPreviewObject(data: object): {
           name,
           {
             "@hidden": !meta.enumerable,
-            "@value": Encode(value, false)
+            "@value": Encode(value, false, true)
           }
         ]
       }
@@ -495,8 +632,8 @@ function encodeObject(
       const { value } = meta
       if ("get" in meta || "set" in meta) {
         const at: Partial<Record<"get" | "set", Data.Function>> = {}
-        if (meta.get) at.get = Encode(meta.get) as Data.Function
-        if (meta.set) at.set = Encode(meta.set) as Data.Function
+        if (meta.get) at.get = Encode(meta.get, false, false) as Data.Function
+        if (meta.set) at.set = Encode(meta.set, false, false) as Data.Function
         return [
           name.toString(),
           {
@@ -539,7 +676,7 @@ function encodeObject(
         name.toString(),
         {
           "@hidden": !meta.enumerable,
-          "@value": Encode(value, false)
+          "@value": Encode(value, false, true)
         }
       ]
     })
@@ -548,9 +685,9 @@ function encodeObject(
   return Object.assign(meta, {
     "[[Prototype]]": {
       "@hidden": true,
-      "@value": proto
-        ? Encode(proto, false, true) /* createLinkObject(proto) */
-        : Encode(proto, false)
+      "@value": Encode(proto, false, true) //proto
+      // ? Encode(proto, false, true) /* createLinkObject(proto) */
+      // : Encode(proto, false, true)
     }
   })
 }

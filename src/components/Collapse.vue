@@ -1,35 +1,40 @@
 <template>
-  <slot name="content" v-if="flat" />
+  <div v-if="onlyBtn" class="truncate">
+    <slot />
+  </div>
   <template v-else>
-    <div
-      @click="state = !state"
-      v-bind="attrs"
-      class="min-h-[1em] flex items-center collapse-summary"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        version="1.1"
-        x="0px"
-        y="0px"
-        viewBox="0 0 1000 1000"
-        enable-background="new 0 0 1000 1000"
-        xml:space="preserve"
-        :class="{
-          opened: state
-        }"
+    <slot name="content" v-if="flat" />
+    <template v-else>
+      <div
+        @click="state = !state"
+        v-bind="attrs"
+        class="min-h-[1em] flex items-center collapse-summary"
       >
-        <g><path d="M79.2,10l841.6,490.1L79.2,990V10z" /></g>
-      </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          version="1.1"
+          x="0px"
+          y="0px"
+          viewBox="0 0 1000 1000"
+          enable-background="new 0 0 1000 1000"
+          xml:space="preserve"
+          :class="{
+            opened: state
+          }"
+        >
+          <g><path d="M79.2,10l841.6,490.1L79.2,990V10z" /></g>
+        </svg>
 
-      <div class="truncate">
-        <slot v-if="$slots['summary-opened'] ? !state : true" />
-        <slot v-else name="summary-opened" />
+        <div class="truncate">
+          <slot v-if="disableMagic || ($slots['summary-opened'] ? !state : true)" />
+          <slot v-else name="summary-opened" />
+        </div>
       </div>
-    </div>
-    <div v-if="state || loaded" v-show="state" class="collapse-detail">
-      <slot name="content" :state="state" />
-    </div>
+      <div v-if="state || loaded" v-show="state" class="collapse-detail" :class="detailClass">
+        <slot name="content" :state="state" />
+      </div>
+    </template>
   </template>
 </template>
 
@@ -37,8 +42,13 @@
 import { ref, useAttrs, watch } from "vue"
 
 const props = defineProps<{
+  onlyBtn?: boolean
+  disableMagic?: boolean
+
   flat?: boolean
   show?: boolean
+
+  detailClass?: string;
 }>()
 
 const attrs = useAttrs()

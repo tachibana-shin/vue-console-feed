@@ -1,11 +1,11 @@
 <template>
   <span @click="getted = true" v-if="!getted">(...)</span>
-  <ConsoleField :data="value" v-else class="inline ml-0" />
+  <ConsoleValue :data="value" v-else class="inline ml-0" />
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import ConsoleField from "./ConsoleField.vue"
+import ConsoleValue from "./ConsoleValue.vue"
 
 import { Data, callFnLink } from "../logic/Encode"
 
