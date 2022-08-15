@@ -7,5 +7,4 @@ import GetterField from "./components/GetterField.vue"
 import PropName from "./components/PropName.vue"
 
 export * from "./logic/Encode"
-export { ConsoleValue }
 export { Collapse, ConsoleItem, ConsoleLink, ConsoleValue, ConsoleValueStatic, GetterField, PropName }
