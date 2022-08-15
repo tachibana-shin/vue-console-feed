@@ -5,11 +5,7 @@
   <template v-else>
     <slot name="content" v-if="flat" />
     <template v-else>
-      <div
-        @click="state = !state"
-        v-bind="attrs"
-        class="min-h-[1em] flex items-center collapse-summary"
-      >
+      <div @click="state = !state" v-bind="attrs" class="collapse-summary">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -27,11 +23,20 @@
         </svg>
 
         <div class="truncate">
-          <slot v-if="disableMagic || ($slots['summary-opened'] ? !state : true)" />
+          <slot
+            v-if="disableMagic || ($slots['summary-opened'] ? !state : true)"
+          />
           <slot v-else name="summary-opened" />
         </div>
       </div>
-      <div v-if="state || loaded" v-show="state" class="collapse-detail" :class="detailClass">
+      <div
+        v-if="state || loaded"
+        v-show="state"
+        class="collapse-detail"
+        :class="{
+          l7: detailL7
+        }"
+      >
         <slot name="content" :state="state" />
       </div>
     </template>
@@ -48,7 +53,7 @@ const props = defineProps<{
   flat?: boolean
   show?: boolean
 
-  detailClass?: string;
+  detailL7?: boolean
 }>()
 
 const attrs = useAttrs()
@@ -75,7 +80,21 @@ svg {
   }
 }
 
+.collapse-summary {
+  min-height: 1em;
+  display: flex;
+  align-items: center;
+}
 .collapse-detail {
   margin-left: 12px;
+  &.l7 {
+    margin-left: (4px * 7);
+  }
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

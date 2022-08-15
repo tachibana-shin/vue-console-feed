@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { entries } from "./entries"
-import { keys } from "./keys"
 import { isList } from "./isList"
 import { isDom } from "./isDom"
 import { shouldInline } from "./shouldInline"
@@ -48,7 +47,7 @@ namespace Data {
   }
   export interface GetSetter {
     "@t": "gs"
-    "@value": unknown
+    "@value": Link
     "@at": Partial<{
       [name in "get" | "set"]: Function
     }>
@@ -91,9 +90,9 @@ namespace Data {
   }
   export interface Error {
     "@t": "error"
-    "@name": string
-    "@stack": string
-    "@real": objReal
+    "@first": boolean
+    "@stack": string // use
+    "@real": objReal // use
   }
   export interface Array {
     "@t": "array"
@@ -164,21 +163,37 @@ function readLinkObject(link: Data.Link) {
 
   return Encode(obj, false, false)
 }
-function callFnLink(link: Data.Link) {
+function callFnLink(link: Data.Link): ReturnType<typeof Encode> | Data.Error {
   const fn = linkStore.get(link["@link"])
 
   if (typeof fn !== "function")
     return {
       "@t": "error",
-      "@value": "not found"
+      "@first": false,
+      "@stack": "Error: this memory freed.",
+      "@real": {}
     }
 
   return Encode(fn(), false, true)
 }
-export function _getListLink(link: Data.Link) {
+export function _getListLink(
+  link: Data.Link
+): (ReturnType<typeof Encode> | Data.Error)[] {
   const obj = linkStore.get(link["@link"])
-  console.log(obj)
-  return Array.from(obj).map((item) => Encode(item, true, true))
+
+  if (obj === undefined || !("length" in obj))
+    return [
+      {
+        "@t": "error",
+        "@first": false,
+        "@stack": "Error: this memory freed.",
+        "@real": {}
+      }
+    ]
+
+  return Array.from(obj as ArrayLike<Node>).map((item) =>
+    Encode(item, true, true)
+  )
 }
 // ==========================================
 function Encode(
@@ -201,7 +216,7 @@ function Encode(
   if (data instanceof Error) {
     const meta: Data.Error = {
       "@t": "error",
-      "@name": data.name,
+      "@first": first,
       "@stack": data.stack ?? "",
       "@real": encodeObject(data)
     }
@@ -328,7 +343,7 @@ function Encode(
       //なんで？
       if (linkReal && isDom(data)) {
         const attrs =
-          first && data.attributes
+          first && data instanceof Element
             ? Array.from(data.attributes).map((item): [string, string] => [
                 item.name,
                 item.value
@@ -464,7 +479,7 @@ function getOwnDescriptorsRegExp(reg: RegExp) {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace DataPreview {
   export type Record = Pick<Data.Record, "@t" | "@name">
-  export type Error = Pick<Data.Error, "@t" | "@name" | "@stack">
+  export type Error = Pick<Data.Error, "@t" | "@stack">
   export type RegExp = Pick<Data.RegExp, "@t" | "@name">
   export type Collection = Pick<Data.Collection, "@t" | "@name" | "@size">
   export type Array = Pick<Data.Array, "@t" | "@size" | "@name">
@@ -498,8 +513,6 @@ function createPreviewObject(data: object): {
   "@value": DataPreview.objReal
   "@lastKey": string
 } {
-  const publics = keys(data)
-
   let lastKey: string | number | symbol = ""
   const meta = Object.fromEntries(
     entries(getOwnDescriptorsIn(data)).map(
@@ -513,7 +526,6 @@ function createPreviewObject(data: object): {
               "@hidden": !meta.enumerable,
               "@value": {
                 "@t": "error",
-                "@name": value.name,
                 "@stack":
                   value.stack?.split("\n", 3).slice(0, 3).join("\n") ?? ""
               }
@@ -620,7 +632,6 @@ function encodeObject(
   receiver = data,
   proto: object | Function = Object.getPrototypeOf(data)
 ): Data.objReal {
-  const publics = keys(data)
   const meta = Object.fromEntries(
     entries(
       Object.assign(

@@ -76,9 +76,10 @@ describe("Encode", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(tt as unknown as any).tt = tt
 
-    const result = Encode(tt) as Data.Record
+    const result = Encode(tt, true, true) as Data.Record
 
-    expect(result["@des"]["@value"]).toEqual({
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(result["@des"]!["@value"]).toEqual({
       r: {
         "@hidden": false,
         "@value": { "@t": "regexp", "@name": "/script/" }

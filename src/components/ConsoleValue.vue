@@ -7,7 +7,7 @@
       data['@t'] === 'symbol' ||
       data['@t'] === 'nill'
     "
-    class="ml-[12px]"
+    class="ml-4"
   >
     <slot />
     <ConsoleValueStatic :data="data" full />
@@ -31,6 +31,7 @@
           :data="{
             '@t': 'object',
             '@name': null,
+            '@first': false,
             '@real': data['@real']
           }"
           flat
@@ -87,6 +88,7 @@
                 :data="{
                   '@t': 'object',
                   '@name': null,
+                  '@first': false,
                   '@real': {
                     ...(data['@name'].endsWith('Map')
                       ? {
@@ -113,6 +115,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
+          '@first': false,
           '@real': data['@real']
         }"
         flat
@@ -136,6 +139,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
+          '@first': false,
           '@real': data['@real']
         }"
         flat
@@ -149,10 +153,10 @@
   >
     <slot />
     <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span>
-    {<template v-for="(item, name) in data['@des']['@value']" :key="name">
+    {<template v-for="(item, name) in data['@des']?.['@value']" :key="name">
       <PropName :hidden="item['@hidden']" :name="name + ''" />
       <ConsoleValueStatic :data="item['@value']" hide-name-object />
-      <span class="comma" v-if="name !== data['@des']['@lastKey']"
+      <span class="comma" v-if="name !== data['@des']!['@lastKey']"
         >,</span
       > </template
     >}
@@ -178,7 +182,7 @@
         <!-- get/set -->
         <template v-if="item['@value']['@t'] === 'gs'">
           <!-- @value -->
-          <div class="ml-[12px]">
+          <div class="ml-4">
             <PropName :hidden="item['@hidden']" :name="name + ''" />
             <GetterField :getter="item['@value']['@value']" />
           </div>
@@ -221,6 +225,7 @@
         :data="{
           '@t': 'object',
           '@name': null,
+          '@first': false,
           '@real': data['@real']
         }"
         flat
@@ -264,23 +269,11 @@
         :data="{
           '@t': 'object',
           '@name': null,
+          '@first': false,
           '@real': data['@real']
         }"
         flat
       />
-    </template>
-  </Collapse>
-  <Collapse v-else-if="data['@t'] === 'link'" :flat="flat">
-    <slot />
-    <template v-if="data['@type'] === 'object'">
-      fake:{{ data["@name"] }}{...}
-    </template>
-    <template v-else>
-      <span class="char-f">ƒ</span> {{ data["@name"] }}
-    </template>
-
-    <template v-slot:content>
-      <ConsoleLink :link="data" />
     </template>
   </Collapse>
   <template v-else-if="data['@t'] === 'element'">
@@ -299,19 +292,19 @@
       }}</span>
       <Collapse
         v-else-if="data['@name'].startsWith('#')"
-        :only-btn="data['@real']"
+        :only-btn="data['@real'] !== undefined"
       >
         {{ data["@name"] }}
 
         <template v-slot:content>
-          <ConsoleLink :link="data['@real']" />
+          <ConsoleLink :link="data['@real']!" />
         </template>
       </Collapse>
 
       <Collapse
         v-else
-        :only-btn="typeof data['@childs'] === 'string'"
-        detail-class="!ml-7"
+        :only-btn="!data['@childs'] || typeof data['@childs'] === 'string'"
+        detail-l7
       >
         <span class="element-tag">
           &lt;{{ data["@name"].toLowerCase().replace(/^#/, "")
@@ -319,8 +312,8 @@
             v-for="([key, value], index) in data['@attrs']"
             :key="key"
             :class="{
-              'ml-[4px]': index === 0,
-              'mr-[4px]': index < data['@attrs'].length - 1
+              'ml-1': index === 0,
+              'mr-1': index < data['@attrs']!.length - 1
             }"
           >
             <span class="element-propName">{{ key }}="</span>
@@ -337,21 +330,25 @@
 
         <template v-slot:content>
           <ConsoleValue
-            v-for="(item, index) in _getListLink(data['@childs'])"
+            v-for="(item, index) in _getListLink(data['@childs'] as Data.Link)"
             :key="index"
             :data="item"
           />
         </template>
       </Collapse>
     </template>
-    <Collapse v-else :flat="flat">
+    <Collapse
+      v-else
+      :flat="flat"
+      :only-btn="!data['@childs'] || typeof data['@childs'] === 'string'"
+    >
       <slot />
       <span class="element-tag">{{
         data["@name"].toLowerCase().replace(/^#/, "")
       }}</span>
 
       <template v-slot:content>
-        <ConsoleLink :link="data['@real']" />
+        <ConsoleLink :link="(data['@real'] as Data.Link)" />
       </template>
     </Collapse>
   </template>
@@ -390,4 +387,17 @@ defineProps<{
 <style lang="scss" scoped>
 @import "./styles.scss";
 // color: rgb(85, 106, 242);
+
+.ml-4 {
+  margin-left: 12px;
+}
+.ml-1 {
+  margin-left: 4px;
+}
+.mr-1 {
+  margin-right: 4px;
+}
+.\!ml-7 {
+  margin-left: (4px * 7) !important;
+}
 </style>

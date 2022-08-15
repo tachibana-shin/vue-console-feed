@@ -3,7 +3,7 @@ import { Encode } from "./logic/Encode"
 import ConsoleItem from "./components/ConsoleItem.vue"
 
 const el = document.createElement("div")
-el.style = "color: red;"
+el.style.color = "red"
 el.dir = "ltr"
 el.innerHTML = "hkhkjhhu op<span>Hello<Span>jkfiwoejgoijerokg</span></span>"
 // el.innerHTML = "xss"
@@ -13,6 +13,8 @@ const tt = {
   r: /script/,
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   c: new Map([
     [45, [789, 89]],
     ["user", { name: "Shin" }]
@@ -78,6 +80,7 @@ const tt = {
     return this.year ** 2
   },
   matcher: /\<script\s+\>/,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   increment: function increment(value = 56) {
     this.year++
   },
@@ -85,7 +88,7 @@ const tt = {
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(tt as unknown as any).tt = tt
-window.Encode = Encode
+
 const data = Encode(tt, true, true)
 console.log(tt)
 console.log(data)
