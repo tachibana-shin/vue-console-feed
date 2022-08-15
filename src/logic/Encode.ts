@@ -3,8 +3,12 @@ import { entries } from "./entries"
 import { isList } from "./isList"
 import { isDom } from "./isDom"
 import { shouldInline } from "./shouldInline"
+import { isCollection } from "./isCollection"
+import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
+import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
+import { getValue } from "./getValue"
 // eslint-disable-next-line @typescript-eslint/no-namespace
-namespace Data {
+export namespace Data {
   export interface String {
     "@t": "string"
     "@value": string
@@ -156,14 +160,16 @@ function createLinkObject(obj: object): Data.Link {
     "@name": name
   }
 }
-function readLinkObject(link: Data.Link) {
+export function readLinkObject(link: Data.Link) {
   const obj = linkStore.get(link["@link"])
 
   console.log("readLink: ", { obj })
 
   return Encode(obj, false, false)
 }
-function callFnLink(link: Data.Link): ReturnType<typeof Encode> | Data.Error {
+export function callFnLink(
+  link: Data.Link
+): ReturnType<typeof Encode> | Data.Error {
   const fn = linkStore.get(link["@link"])
 
   if (typeof fn !== "function")
@@ -195,8 +201,11 @@ export function _getListLink(
     Encode(item, true, true)
   )
 }
+export function clearLinkStore() {
+  linkStore.clear()
+}
 // ==========================================
-function Encode(
+export function Encode(
   data: unknown,
   first: boolean, // false,
   linkReal: boolean // false
@@ -447,35 +456,6 @@ function Encode(
   }
 }
 
-function getOwnDescriptorsIn(obj: object) {
-  const des: Record<string, PropertyDescriptor> = {}
-  for (const name in obj) {
-    des[name] = {
-      value: getValue(obj, name, obj),
-      enumerable: true
-    }
-  }
-  return des
-}
-function getOwnDescriptorsRegExp(reg: RegExp) {
-  const des: Record<string, PropertyDescriptor> = {}
-
-  const proto = Object.getPrototypeOf(/a/)
-
-  entries(Object.getOwnPropertyDescriptors(proto)).forEach(([name, meta]) => {
-    const { value } = meta
-    if (name === "lastIndex") return
-
-    if (typeof value !== "function")
-      des[name.toString()] = {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        value: (reg as unknown as any)[name]
-      }
-  })
-
-  return des
-}
-
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace DataPreview {
   export type Record = Pick<Data.Record, "@t" | "@name">
@@ -702,44 +682,4 @@ function encodeObject(
     }
   })
 }
-const toString = Object.prototype.toString
-function isCollection(
-  data: object
-): data is
-  | Map<unknown, unknown>
-  | WeakMap<object, unknown>
-  | Set<unknown>
-  | WeakSet<object> {
-  const type = toString.call(data).slice(8, -1)
-
-  return (
-    data !== null &&
-    typeof data === "object" &&
-    // なんで？わかない。ぼくわかない。
-    Object.getPrototypeOf(data) === data.constructor?.prototype &&
-    (type === "Map" ||
-      type === "WeakMap" ||
-      type === "Set" ||
-      type === "WeakSet")
-  )
-}
-function getValue(
-  data: object,
-  name: string | symbol | number,
-  receiver: object
-) {
-  try {
-    return Reflect.get(data, name, receiver)
-  } catch (e) {
-    return e
-  }
-}
-
-console.time()
-// console.log(JSON.stringify(Encode(global)))
-console.timeEnd()
-export { Encode }
-export { readLinkObject }
-export { callFnLink }
-export type { Data }
-/// ===================== Decode =====================
+/// ===================== On The Road! たのたぴたぢたの。さなたびさにどさ =====================
