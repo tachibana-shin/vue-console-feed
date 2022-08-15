@@ -39,6 +39,7 @@
     "eslint": "^8.16.0",
     "eslint-plugin-vue": "^9.3.0",
     "husky": "^8.0.1",
+    "jsdom": "^20.0.0",
     "prettier": "^2.6.2",
     "sass": "^1.54.4",
     "tsup": "^6.0.1",

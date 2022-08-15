@@ -15,7 +15,12 @@ defineProps<{
 
 <style lang="scss" scoped>
 .console-item {
-  font-family: monospace;
+  font-family: monospace, sans-serif;
   white-space: pre-wrap;
+
+  // theme
+  background-color: #202124;
+  color: #ffffff;
+  font-size: 14px;
 }
 </style>
