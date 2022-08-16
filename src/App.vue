@@ -11,6 +11,9 @@ const tt = {
   el,
   nl: el.childNodes,
   r: /script/,
+  pro: Promise.resolve(),
+  buffer: new Uint8Array([312,432,5435]).arrayBuffer,
+  date: new Date(),
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

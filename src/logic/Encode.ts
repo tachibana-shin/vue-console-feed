@@ -7,6 +7,7 @@ import { isCollection } from "./isCollection"
 import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
 import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
 import { getValue } from "./getValue"
+import { isPromise } from "./isPromise"
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Data {
   export interface String {
@@ -74,6 +75,7 @@ export namespace Data {
         | Error
         | Array
         | Element
+        | Promise
     }
   }
   export interface Link {
@@ -118,6 +120,18 @@ export namespace Data {
     "@attrs"?: [string, string][]
     "@real"?: Link
     "@childs"?: string | null | Link
+  }
+  export interface Promise {
+    "@t": "promise"
+    "@first": boolean
+    "@state": "pending" | "fulfilled" | "rejected"
+    "@real": objReal
+  }
+  export interface Date {
+    "@t": "date"
+    "@first": boolean
+    "@value": string
+    "@real": objReal
   }
 }
 
@@ -221,7 +235,9 @@ export function Encode(
   | Data.Record
   | Data.Error
   | Data.Array
-  | Data.Element {
+  | Data.Element
+  | Data.Promise 
+  | Data.Date {
   if (data instanceof Error) {
     const meta: Data.Error = {
       "@t": "error",
@@ -306,6 +322,17 @@ export function Encode(
         return meta
       }
 
+      if (data instanceof Date) {
+        const meta: Data.Date = {
+          "@t": "date",
+          "@first": first,
+          "@value": data.toString(),
+          "@real": encodeObject(data)
+        }
+
+        return meta
+      }
+
       if (isList(data)) {
         const meta: Data.Array = {
           "@t": "array",
@@ -346,6 +373,23 @@ export function Encode(
             ...encodeObject(data, data)
           }
         }
+        return meta
+      }
+
+      if (isPromise(data)) {
+        // const { state, value } = await getStatePromise(data)
+
+        const meta: Data.Promise = {
+          "@t": "promise",
+          "@first": first,
+          "@state": "pending", //state,
+          "@real": {
+            ...encodeObject(data)
+            // "[[PromiseState]]" : Encode(state),
+            // "[[PromiseResult]]": Encode(value)
+          }
+        }
+
         return meta
       }
 
@@ -465,6 +509,8 @@ export namespace DataPreview {
   export type Array = Pick<Data.Array, "@t" | "@size" | "@name">
   export type Function = Pick<Data.Function, "@t" | "@name">
   export type Element = Pick<Data.Element, "@t" | "@name">
+  export type Promise = Pick<Data.Promise, "@t">
+  export type Date = Pick<Data.Date, "@t" | "@value">
 
   export interface objReal {
     [name: string]: {
@@ -478,6 +524,8 @@ export namespace DataPreview {
         // eslint-disable-next-line @typescript-eslint/ban-types
         | Function
         | Element
+        | Promise
+        | Date
         | Data.String
         | Data.Number
         | Data.BigInt
@@ -524,6 +572,18 @@ function createPreviewObject(data: object): {
             }
           ]
         }
+        if (value instanceof Date) {
+          return [
+            name,
+            {
+              "@hidden": !meta.enumerable,
+              "@value": {
+                "@t": "date",
+                "@value": value.toString()
+              }
+            }
+          ]
+        }
         if (isCollection(value)) {
           return [
             name,
@@ -561,6 +621,18 @@ function createPreviewObject(data: object): {
               "@value": {
                 "@t": "element",
                 "@name": value.nodeName
+              }
+            }
+          ]
+        }
+
+        if (isPromise(value)) {
+          return [
+            name,
+            {
+              "@hidden": !meta.enumerable,
+              "@value": {
+                "@t": "promise"
               }
             }
           ]

@@ -1,5 +1,5 @@
 <template>
-  <span @click="getted = true" v-if="!getted && value">(...)</span>
+  <span @click="getted = true" v-if="!getted || !value">(...)</span>
   <ConsoleValue :data="value!" v-else class="inline ml-0" />
 </template>
 

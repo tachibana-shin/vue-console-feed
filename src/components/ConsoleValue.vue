@@ -152,8 +152,8 @@
     :disable-magic="data['@first']"
   >
     <slot />
-    <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span>
-    {<template v-for="(item, name) in data['@des']?.['@value']" :key="name">
+    <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span
+    >{<template v-for="(item, name) in data['@des']?.['@value']" :key="name">
       <PropName :hidden="item['@hidden']" :name="name + ''" />
       <ConsoleValueStatic :data="item['@value']" hide-name-object />
       <span class="comma" v-if="name !== data['@des']!['@lastKey']"
@@ -351,6 +351,21 @@
         <ConsoleLink :link="(data['@real'] as Data.Link)" />
       </template>
     </Collapse>
+  </template>
+  <template v-else-if="data['@t'] === 'promise'"> <slot />Promise {} </template>
+  <template v-else-if="data['@t'] === 'date'">
+    <template v-if="data['@first']"><slot />{{ data["@value"] }}</template>
+    <ConsoleValue
+      v-else
+      :data="{
+        '@t': 'object',
+        '@name': data['@value'],
+        '@real': data['@real']
+      }"
+      :flat="flat"
+    >
+      <slot />
+    </ConsoleValue>
   </template>
   <div v-else>
     <slot />
