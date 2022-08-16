@@ -76,6 +76,7 @@ export namespace Data {
         | Array
         | Element
         | Promise
+        | Date
     }
   }
   export interface Link {
@@ -423,6 +424,7 @@ export function Encode(
               "@name": data.nodeName,
               "@first": first,
               "@attrs": attrs,
+              "@real": first ? undefined : createLinkObject(data),
               "@childs": data.textContent
             }
           }

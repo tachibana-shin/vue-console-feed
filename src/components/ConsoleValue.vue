@@ -8,6 +8,7 @@
       data['@t'] === 'nill'
     "
     class="ml-4"
+    v-bind="attrs"
   >
     <slot />
     <ConsoleValueStatic :data="data" full />
@@ -48,8 +49,8 @@
     <template v-if="data['@size'] === 0">
       {size: {{ data["@size"] }}}
     </template>
-    <template v-else-if="data['@size'] !== null">
-      {<span v-for="(item, index) in data['@entries']" :key="index">
+    <template v-else-if="data['@size'] !== null"
+      >{<span v-for="(item, index) in data['@entries']" :key="index">
         <span v-if="data['@name'].endsWith('Map')">
           <ConsoleValueStatic :data="item[0]" hide-name-object /> =>
           <ConsoleValueStatic :data="item[1]" hide-name-object />
@@ -63,8 +64,7 @@
     <template v-else>{}</template>
 
     <template v-slot:summary-opened>
-      <slot />
-      {{ data["@name"]
+      <slot />{{ data["@name"]
       }}<template v-if="data['@size'] !== null">({{ data["@size"] }})</template>
     </template>
 
@@ -127,12 +127,10 @@
 
   <Collapse
     v-else-if="data['@t'] === 'regexp'"
-    class="regexp"
     :flat="flat"
     :only-btn="data['@first']"
   >
-    <slot />
-    {{ data["@name"] }}
+    <slot /><span class="regexp">{{ data["@name"] }}</span>
 
     <template v-slot:content>
       <ConsoleValue
@@ -184,7 +182,7 @@
           <!-- @value -->
           <div class="ml-4">
             <PropName :hidden="item['@hidden']" :name="name + ''" />
-            <GetterField :getter="item['@value']['@value']" />
+            <GetterField :getter="item['@value']['@value']" class="truncate" />
           </div>
           <!-- /@value -->
 
@@ -192,6 +190,7 @@
             v-for="(encoded, actName) in item['@value']['@at']"
             :key="actName"
             :data="encoded!"
+            class="truncate"
           >
             <PropName hidden :name="actName + ' ' + name" />
           </ConsoleValue>
@@ -209,6 +208,7 @@
           :hide-name-object="
             typeof name === 'string' && !(name as string)?.startsWith('[[') && (item['@value'] as any)?.['@name'] === 'Object'
           "
+          class="truncate"
         >
           <PropName :hidden="item['@hidden']" :name="name + ''" />
         </ConsoleValue>
@@ -217,8 +217,7 @@
     </template>
   </Collapse>
   <Collapse v-else-if="data['@t'] === 'error'" :only-btn="data['@first']">
-    <slot />
-    {{ data["@stack"] }}
+    <slot />{{ data["@stack"] }}
 
     <template v-slot:content>
       <ConsoleValue
@@ -241,8 +240,7 @@
     <span class="array-size" v-if="data['@name']">{{ data["@name"] }}</span>
     <span class="array-size"
       >({{ data["@real"].length["@value"]["@value"] }})</span
-    >
-    [<template
+    >[<template
       v-for="item in +data['@real'].length['@value']['@value']"
       :key="item"
     >
@@ -258,8 +256,7 @@
     >]
 
     <template v-slot:summary-opened>
-      <slot />
-      {{ data["@name"] ?? "Array" }} ({{
+      <slot />{{ data["@name"] ?? "Array" }} ({{
         data["@real"].length["@value"]["@value"]
       }})
     </template>
@@ -337,11 +334,7 @@
         </template>
       </Collapse>
     </template>
-    <Collapse
-      v-else
-      :flat="flat"
-      :only-btn="!data['@childs'] || typeof data['@childs'] === 'string'"
-    >
+    <Collapse v-else :flat="flat">
       <slot />
       <span class="element-tag">{{
         data["@name"].toLowerCase().replace(/^#/, "")
@@ -373,6 +366,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  inheritAttrs: false
+}
+</script>
+
 <script lang="ts" setup>
 import { Data, Encode, _getListLink } from "../logic/Encode"
 import _ConsoleValue from "./ConsoleValue.vue"
@@ -381,7 +380,9 @@ import Collapse from "./Collapse.vue"
 import PropName from "./PropName.vue"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import _GetterField from "./GetterField.vue"
-import { DefineComponent } from "vue"
+import { DefineComponent, useAttrs } from "vue"
+
+const attrs = useAttrs()
 
 const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
   data: ReturnType<typeof Encode>

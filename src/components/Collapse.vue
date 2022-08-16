@@ -68,6 +68,8 @@ const watcher = watch(state, () => {
 </script>
 
 <style lang="scss" scoped>
+@import "./styles.scss";
+
 svg {
   width: 0.5rem;
   height: 0.5rem;
@@ -90,11 +92,5 @@ svg {
   &.l7 {
     margin-left: (4px * 7);
   }
-}
-
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 </style>

@@ -23,8 +23,8 @@
     data["@value"]
   }}</span>
   <template v-else-if="data['@t'] === 'object'">
-    <template v-if="!hideNameObject">{{ data["@name"] }}</template>
-    {...}</template
+    <template v-if="!hideNameObject">{{ data["@name"] }}</template
+    >{...}</template
   >
   <template v-else-if="data['@t'] === 'error'">{{ data["@stack"] }}</template>
   <template v-else-if="data['@t'] === 'regexp'">

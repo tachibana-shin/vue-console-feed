@@ -12,7 +12,7 @@ const tt = {
   nl: el.childNodes,
   r: /script/,
   pro: Promise.resolve(),
-  buffer: new Uint8Array([312,432,5435]).arrayBuffer,
+  buffer: new Uint8Array([312,432,5435]),
   date: new Date(),
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),

@@ -59,3 +59,18 @@
     color: #b6b493
   }
 }
+
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.\!ml-0 {
+  margin-left: 0 !important;
+}
+
+.inline {
+  display: inline
+}
