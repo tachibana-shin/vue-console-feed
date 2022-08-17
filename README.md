@@ -19,4 +19,4 @@ This is the plugin that is almost identical to the [console-feed](https://github
 - [x] Date
 - [x] Buffer
 - [x] TypedArray
-- [ ] DataView
+- [x] DataView

@@ -327,8 +327,8 @@
       <slot />
     </ConsoleValue>
   </template>
-  <Collapse v-else-if="data['@t'] === 'buffer'">
-    <slot />{{ data["@name"] }}({{ data["@size"] }})
+  <Collapse v-else-if="data['@t'] === 'buffer' || data['@t'] === 'dataview'">
+    <slot />{{ data["@name"] ?? "DataView" }}({{ data["@size"] }})
 
     <template v-slot:content>
       <ConsoleLink v-if="data['@real']['@t']" :link="data['@real']" />

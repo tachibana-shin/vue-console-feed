@@ -14,6 +14,8 @@ import { isBuffer } from "./isBuffer"
 import { getOwnDescriptorsTypedArray } from "./getOwnDescriptorsTypedArray"
 import { getObjectName } from "./getObjectName"
 import { createRealItem } from "./createRealItem"
+import { isDataView } from "./isDataView"
+import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
 
 interface RealItem<T> {
   "@hidden": boolean
@@ -163,15 +165,14 @@ export namespace Data {
       "[[Int32Array]]": RealItem<TypedArray>
 
       "[[ArrayBufferByteLength]]": RealItem<Number>
-      /*
-[[Int8Array]]: Int8Array(4)
-[[Uint8Array]]: Uint8Array(4)
-[[Int16Array]]: Int16Array(2)
-[[Int32Array]]: Int32Array(1)
-
-[[ArrayBufferByteLength]]: 4
-[[ArrayBufferData]]: 8349
-      */
+    }
+  }
+  export interface DataView extends Omit<Array, "@t" | "@name"> {
+    "@t": "dataview"
+    "@real": Array["@real"] & {
+      buffer: RealItem<Buffer>
+      byteLength: RealItem<Number>
+      byteOffset: RealItem<Number>
     }
   }
 }
@@ -280,7 +281,8 @@ export function Encode(
   | Data.Promise
   | Data.Date
   | Data.TypedArray
-  | Data.Buffer {
+  | Data.Buffer 
+  | Data.DataView {
   switch (typeof data) {
     case "string": {
       const meta: Data.String = {
@@ -490,7 +492,7 @@ export function Encode(
         }
 
         return createFakeRecord({
-          ...encodeObject(data,   getOwnDescriptorsBuffer(data)),
+          ...encodeObject(data, getOwnDescriptorsBuffer(data)),
           "[[Int8Array]]": createRealItem(
             Encode(new Int8Array(data), false, false) as Data.TypedArray,
             true
@@ -514,6 +516,26 @@ export function Encode(
             true
           )
         } as Data.Buffer["@real"])
+      }
+
+      if (isDataView(data)) {
+        if (linkReal) {
+          const meta: Data.DataView = {
+            "@t": "dataview",
+            "@first": first,
+            "@size": data.byteLength,
+            "@real": createLinkObject(data)
+          }
+
+          return meta
+        }
+
+        return createFakeRecord(
+          encodeObject(
+            data,
+            getOwnDescriptorsDataView(data)
+          ) as Data.DataView["@real"]
+        )
       }
 
       if (isPromise(data)) {
@@ -673,6 +695,7 @@ export namespace DataPreview {
   export type Date = Pick<Data.Date, "@t" | "@value">
   export type TypedArray = Pick<Data.TypedArray, "@t" | "@size" | "@name">
   export type Buffer = Pick<Data.Buffer, "@t" | "@size" | "@name">
+  export type DataView = Pick<Data.DataView, "@t" | "@size">
 
   export interface objReal {
     [name: string]: RealItem<
@@ -688,6 +711,7 @@ export namespace DataPreview {
       | Date
       | TypedArray
       | Buffer
+      | DataView
       | Data.String
       | Data.Number
       | Data.BigInt
@@ -803,6 +827,18 @@ function createPreviewObject(
             {
               "@t": "buffer",
               "@name": getObjectName(value),
+              "@size": value.byteLength
+            },
+            !meta.enumerable
+          )
+        ]
+      }
+      if (isDataView(value)) {
+        return [
+          name,
+          createRealItem(
+            {
+              "@t": "dataview",
               "@size": value.byteLength
             },
             !meta.enumerable

@@ -1,7 +1,11 @@
 import { getValue } from "./getValue"
 
-const keys = ["byteLength"]
-export function getOwnDescriptorsBuffer(typed: ArrayBuffer) {
+const keys = [
+  "buffer",
+  "byteLength",
+  "byteOffset"
+]
+export function getOwnDescriptorsDataView(typed: DataView) {
   const des: Record<string, PropertyDescriptor> = {}
 
   keys.forEach((name) => {
