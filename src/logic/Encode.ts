@@ -9,7 +9,15 @@ import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
 import { getValue } from "./getValue"
 import { isPromise } from "./isPromise"
 import { isTypedArray } from "./isTypedArray"
+import { isBuffer } from "./isBuffer"
 import { getOwnDescriptorsTypedArray } from "./getOwnDescriptorsTypedArray"
+import { getObjectName } from "./getObjectName"
+import { createRealItem } from "./createRealItem"
+
+interface RealItem<T> {
+  "@hidden": boolean
+  "@value": T
+}
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Data {
   export interface String {
@@ -60,27 +68,25 @@ export namespace Data {
     }>
   }
   export interface objReal {
-    [name: string]: {
-      "@hidden": boolean
-      "@value":
-        | GetSetter
-        | String
-        | Number
-        | BigInt
-        | Symbol
-        | Function
-        | Collection
-        | RegExp
-        | Record
-        | Nill
-        // | Link
-        | Error
-        | Array
-        | Element
-        | Promise
-        | Date
-        | TypedArray
-    }
+    [name: string]: RealItem<
+      | GetSetter
+      | String
+      | Number
+      | BigInt
+      | Symbol
+      | Function
+      | Collection
+      | RegExp
+      | Record
+      | Nill
+      // | Link
+      | Error
+      | Array
+      | Element
+      | Promise
+      | Date
+      | TypedArray
+    >
   }
   export interface Link {
     "@t": "link"
@@ -110,11 +116,8 @@ export namespace Data {
     "@name"?: string
     "@first": boolean
     "@real": objReal & {
-      length: {
-        // TODO:いみわかない！
-        "@hidden": boolean
-        "@value": Number
-      }
+      // TODO:いみわかない！
+      length: RealItem<Number>
     }
   }
   export interface Element {
@@ -140,16 +143,33 @@ export namespace Data {
   export interface TypedArray extends Omit<Array, "@t"> {
     "@t": "typedarray"
     "@real": Array["@real"] & {
-      buffer: {
-        "@hidden": true
-        "@value": unknown // Buffer
-      }
-      byteLength: Array["@real"]["length"]
-      byteOffset: Array["@real"]["length"]
-      [Symbol.toStringTag]: {
-        "@hidden": true
-        "@value": string
-      }
+      buffer: RealItem<Buffer>
+      byteLength: RealItem<Number>
+      byteOffset: RealItem<Number>
+      [Symbol.toStringTag]: RealItem<String>
+    }
+  }
+  export interface Buffer extends Omit<Array, "@t"> {
+    "@t": "buffer"
+    // size is equal byteLength
+    "@real": Omit<Array["@real"], "length"> & {
+      byteLength: RealItem<Number>
+      "[[Int8Array]]": RealItem<TypedArray>
+      "[[Uint8Array]]": RealItem<TypedArray>
+
+      "[[Int16Array]]": RealItem<TypedArray>
+      "[[Int32Array]]": RealItem<TypedArray>
+
+      "[[ArrayBufferByteLength]]": RealItem<Number>
+      /*
+[[Int8Array]]: Int8Array(4)
+[[Uint8Array]]: Uint8Array(4)
+[[Int16Array]]: Int16Array(2)
+[[Int32Array]]: Int32Array(1)
+
+[[ArrayBufferByteLength]]: 4
+[[ArrayBufferData]]: 8349
+      */
     }
   }
 }
@@ -360,10 +380,7 @@ export function Encode(
           "@name": data instanceof NodeList ? "NodeList" : undefined,
           "@first": first,
           "@real": encodeObject(data) as ReturnType<typeof encodeObject> & {
-            length: {
-              "@hidden": boolean
-              "@value": Data.Number
-            }
+            length: RealItem<Data.Number>
           }
         }
 
@@ -376,7 +393,10 @@ export function Encode(
           "@first": first,
           "@size": data.length,
           "@name": (data as unknown as any)[Symbol.toStringTag],
-          "@real": encodeObject(data, getOwnDescriptorsTypedArray(data)) as Data.TypedArray["@real"]
+          "@real": encodeObject(
+            data,
+            getOwnDescriptorsTypedArray(data)
+          ) as Data.TypedArray["@real"]
         }
 
         return meta
@@ -394,15 +414,47 @@ export function Encode(
             Encode(val, false, true)
           ]),
           "@real": {
-            size: {
-              "@hidden": true,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              "@value": Encode((data as unknown as any).size, false, false)
-            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            size: createRealItem(
+              Encode((data as unknown as any).size, false, false),
+              true
+            ),
             // わかない。ぜんぜんわかない！
             ...encodeObject(data)
           }
         }
+        return meta
+      }
+
+      if (isBuffer(data)) {
+        const meta: Data.Buffer = {
+          "@t": "buffer",
+          "@first": first,
+          "@size": data.byteLength,
+          "@name": getObjectName(data),
+          "@real": {
+            ...encodeObject(data),
+            "[Int8Array]": createRealItem(
+              Encode(new Int8Array(data), false, true),
+              true
+            ),
+            "[Uint8Array]": createRealItem(
+              Encode(new Uint8Array(data), false, true)
+            ),
+
+            "[Int16Array]": createRealItem(
+              Encode(new Int16Array(data), false, true)
+            ),
+            "[Int32Array]": createRealItem(
+              Encode(new Int32Array(data), false, true)
+            ),
+
+            "[[ArrayBufferByteLength]]": createRealItem(
+              Encode(data.byteLength, false, true)
+            )
+          }
+        }
+
         return meta
       }
 
@@ -545,26 +597,24 @@ export namespace DataPreview {
   export type TypedArray = Pick<Data.TypedArray, "@t" | "@size" | "@name">
 
   export interface objReal {
-    [name: string]: {
-      "@hidden": boolean
-      "@value":
-        | Record
-        | Error
-        | RegExp
-        | Collection
-        | Array
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        | Function
-        | Element
-        | Promise
-        | Date
-        | TypedArray
-        | Data.String
-        | Data.Number
-        | Data.BigInt
-        | Data.Symbol
-        | Data.Nill
-    }
+    [name: string]: RealItem<
+      | Record
+      | Error
+      | RegExp
+      | Collection
+      | Array
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      | Function
+      | Element
+      | Promise
+      | Date
+      | TypedArray
+      | Data.String
+      | Data.Number
+      | Data.BigInt
+      | Data.Symbol
+      | Data.Nill
+    >
   }
 }
 /**
@@ -583,138 +633,135 @@ function createPreviewObject(data: object): {
         if (value instanceof Error) {
           return [
             name,
-            {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "error",
                 "@stack":
                   value.stack?.split("\n", 3).slice(0, 3).join("\n") ?? ""
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
         if (value instanceof RegExp) {
           return [
             name,
-            /* object */ {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "regexp",
                 "@name": value + ""
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
         if (value instanceof Date) {
           return [
             name,
-            {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "date",
                 "@value": value.toString()
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
         if (isCollection(value)) {
           return [
             name,
-            /* object */ {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "collection",
                 "@name": toString
                   .call(value)
                   .slice(8, -1) as Data.Collection["@name"],
                 "@size": (value as Set<unknown>).size ?? null
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
         if (isList(value)) {
           return [
             name,
-            /* object */ {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "array",
                 "@name": value instanceof NodeList ? "NodeList" : undefined,
                 "@size": value.length
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
         if (isTypedArray(value)) {
           return [
             name,
-            /* object */ {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "typedarray",
                 "@name": (value as unknown as any)[Symbol.toStringTag],
                 "@size": value.length
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
 
         if (isDom(value)) {
           return [
             name,
-            {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "element",
                 "@name": value.nodeName
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
 
         if (isPromise(value)) {
           return [
             name,
-            {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "promise"
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
 
         if (value !== null && typeof value === "object") {
           return [
             name,
-            /* object */ {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "object",
                 "@name": value.constructor?.name ?? null
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
         if (typeof value === "function") {
           return [
             name,
-            {
-              "@hidden": !meta.enumerable,
-              "@value": {
+            createRealItem(
+              {
                 "@t": "function",
                 "@name": ""
-              }
-            }
+              },
+              !meta.enumerable
+            )
           ]
         }
 
         return [
           name,
-          {
-            "@hidden": !meta.enumerable,
-            "@value": Encode(value, false, true)
-          }
+          createRealItem(Encode(value, false, true), !meta.enumerable)
         ]
       }
     )
@@ -745,14 +792,14 @@ function encodeObject(
         if (meta.set) at.set = Encode(meta.set, false, false) as Data.Function
         return [
           name.toString(),
-          {
-            "@hidden": !meta.enumerable,
-            "@value": {
+          createRealItem(
+            {
               "@t": "gs",
               "@value": createLinkObject(() => getValue(data, name, data)), //meta.get?.(),
               "@at": at
-            }
-          }
+            },
+            !meta.enumerable
+          )
         ]
       }
       if (
@@ -765,39 +812,31 @@ function encodeObject(
       ) {
         return [
           name.toString(),
-          {
-            "@hidden": !meta.enumerable,
-            "@value": Encode(value, false, true) //createLinkObject(value),
-          }
+          createRealItem(
+            Encode(value, false, true), //createLinkObject(value),
+            !meta.enumerable
+          )
         ]
       }
       if (typeof value === "function") {
         return [
           name.toString(),
-          {
-            "@hidden": !meta.enumerable,
-            "@value": Encode(value, false, true) // createLinkObject(value),
-          }
+          createRealItem(
+            Encode(value, false, true), //createLinkObject(value),
+            !meta.enumerable
+          )
         ]
       }
 
       return [
         name.toString(),
-        {
-          "@hidden": !meta.enumerable,
-          "@value": Encode(value, false, true)
-        }
+        createRealItem(Encode(value, false, true), !meta.enumerable)
       ]
     })
   )
 
   return Object.assign(meta, {
-    "[[Prototype]]": {
-      "@hidden": true,
-      "@value": Encode(proto, false, true) //proto
-      // ? Encode(proto, false, true) /* createLinkObject(proto) */
-      // : Encode(proto, false, true)
-    }
+    "[[Prototype]]": createRealItem(Encode(proto, false, true), true)
   })
 }
 /// ===================== On The Road! たのたぴたぢたの。さなたびさにどさ =====================

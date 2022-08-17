@@ -1,4 +1,4 @@
-const toString = Object.prototype.toString
+import { getObjectName } from "./getObjectName"
 
 export function isCollection(
   data: object
@@ -7,7 +7,7 @@ export function isCollection(
   | WeakMap<object, unknown>
   | Set<unknown>
   | WeakSet<object> {
-  const type = toString.call(data).slice(8, -1)
+  const type = getObjectName(data)
 
   return (
     data !== null &&
