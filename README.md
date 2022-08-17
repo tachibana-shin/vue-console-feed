@@ -23,4 +23,4 @@ This is the plugin that is almost identical to the [console-feed](https://github
 - [x] Buffer
 - [x] TypedArray
 - [x] DataView
-- [ ] address `http` in `string` and `Error`
+- [x] address `http` in `string` and `Error`

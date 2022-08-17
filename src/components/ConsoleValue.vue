@@ -11,7 +11,7 @@
     v-bind="attrs"
   >
     <slot />
-    <ConsoleValueStatic :data="data" full />
+    <ConsoleValueStatic :data="data" :is-log="isLog" full first />
   </div>
   <template v-else-if="data['@t'] === 'function'">
     <template v-if="data['@first']">{{ data["@code"] }}</template>
@@ -189,7 +189,7 @@
     </template>
   </Collapse>
   <Collapse v-else-if="data['@t'] === 'error'" :only-btn="data['@first']">
-    <slot /><span v-html='parseLink(data["@stack"])' />
+    <slot /><span v-html="parseLink(data['@stack'], { minifyLink: true })" />
 
     <template v-slot:content>
       <ConsoleLink :link="data['@real']!" />
@@ -378,6 +378,8 @@ defineProps<{
   data: ReturnType<typeof Encode>
   flat?: boolean
   hideNameObject?: boolean
+
+  isLog?: boolean
 }>()
 </script>
 

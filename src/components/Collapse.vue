@@ -86,11 +86,16 @@ svg {
   min-height: 1em;
   display: flex;
   align-items: center;
+  font-style: italic;
 }
 .collapse-detail {
   margin-left: 12px;
   &.l7 {
     margin-left: (4px * 7);
+  }
+
+  :deep(.collapse-summary) {
+    font-style: normal;
   }
 }
 </style>

@@ -108,7 +108,8 @@ try {
 const data = Encode(tt, true, true)
 console.log(tt)
 console.log(data)
-// console.error(a)
+console.error(a)
+console.error({a})
 // console.log(document.body)
 </script>
 

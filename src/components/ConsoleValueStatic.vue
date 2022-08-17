@@ -1,6 +1,9 @@
 <template>
-  <span v-if="data['@t'] === 'string'" class="string">
-    <template v-if="full"
+  <span v-if="data['@t'] === 'string'" :class="isLog ? undefined : 'string'">
+    <template v-if="first">
+      <span v-html="parseLink(data['@value'], { classes: 'color-white' })" />
+    </template>
+    <template v-else-if="full"
       >"{{
         data["@value"].replace(/"/g, '\\"').replace(/\\n/g, "\\\n")
       }}"</template
@@ -62,12 +65,15 @@
 
 <script lang="ts" setup>
 import { Data, DataPreview } from "../logic/Encode"
+import { parseLink } from "../logic/parseLink"
 
 defineProps<{
   data: DataPreview.objReal[""]["@value"] | Data.GetSetter
   hideNameObject?: boolean
   showNameFn?: boolean
   full?: boolean
+  isLog?: boolean
+  first?: boolean
 }>()
 </script>
 

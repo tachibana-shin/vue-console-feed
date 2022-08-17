@@ -1,6 +1,6 @@
 <template>
   <div class="console-item">
-    <ConsoleValue :data="data" />
+    <ConsoleValue :data="data" is-lg />
   </div>
 </template>
 
@@ -22,5 +22,13 @@ defineProps<{
   background-color: #202124;
   color: #ffffff;
   font-size: 14px;
+
+  :deep(.console-link) {
+    color: rgb(177, 177, 177);
+    text-decoration: underline;
+  }
+  :deep(.color-white) {
+    color: white;
+  }
 }
 </style>
