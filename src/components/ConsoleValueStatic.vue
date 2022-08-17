@@ -40,7 +40,8 @@
     v-else-if="
       data['@t'] === 'array' ||
       data['@t'] === 'typedarray' ||
-      data['@t'] === 'buffer'
+      data['@t'] === 'buffer' ||
+      data['@t'] === 'dataview'
     "
     >{{ data["@name"] ?? "Array" }}({{ data["@size"] }})</template
   >

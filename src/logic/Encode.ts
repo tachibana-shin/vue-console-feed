@@ -51,7 +51,8 @@ export namespace Data {
     "@real": Link | null
   }
   //=============
-  export interface Collection extends Omit<Record, "@t" | "@des" | "@first" | "@real"> {
+  export interface Collection
+    extends Omit<Record, "@t" | "@des" | "@first" | "@real"> {
     "@t": "collection"
     "@name": "map" | "weakmap" | "set" | "weakset"
     "@size": number | null
@@ -176,6 +177,7 @@ export namespace Data {
   }
   export interface DataView extends Omit<Array, "@t" | "@des" | "@name"> {
     "@t": "dataview"
+    "@name": "DataView"
     "@real": Link
   }
   export type DataViewReal = ArrayReal & {
@@ -526,6 +528,7 @@ export function Encode(
         if (linkReal) {
           const meta: Data.DataView = {
             "@t": "dataview",
+            "@name": "DataView",
             "@first": first,
             "@size": data.byteLength,
             "@real": createLinkObject(data)
@@ -700,7 +703,7 @@ export namespace DataPreview {
   export type Date = Pick<Data.Date, "@t" | "@value">
   export type TypedArray = Pick<Data.TypedArray, "@t" | "@size" | "@name">
   export type Buffer = Pick<Data.Buffer, "@t" | "@size" | "@name">
-  export type DataView = Pick<Data.DataView, "@t" | "@size">
+  export type DataView = Pick<Data.DataView, "@t" | "@size" | "@name">
 
   export interface objReal {
     [name: string]: RealItem<
@@ -844,6 +847,7 @@ function createPreviewObject(
           createRealItem(
             {
               "@t": "dataview",
+              "@name": "DataView",
               "@size": value.byteLength
             },
             !meta.enumerable
