@@ -244,7 +244,7 @@
       :key="item"
     >
       <ConsoleValueStatic
-        :data="(data['@real'][item - 1]['@value'] as Exclude<typeof data['@real'][0]['@value'], Data.GetSetter>)"
+        :data="data['@real'][item - 1]['@value']"
         hide-name-object
       />
       <span v-if="data['@size'] > item" class="comma">,</span>
@@ -363,6 +363,7 @@
       v-else
       :data="{
         '@t': 'object',
+        '@first': false,
         '@name': data['@value'],
         '@real': data['@real']
       }"

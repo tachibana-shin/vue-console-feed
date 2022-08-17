@@ -36,7 +36,12 @@
     {{ data["@name"]
     }}<template v-if="data['@size'] !== null">({{ data["@size"] }})</template>
   </template>
-  <template v-else-if="data['@t'] === 'array'"
+  <template
+    v-else-if="
+      data['@t'] === 'array' ||
+      data['@t'] === 'typedarray' ||
+      data['@t'] === 'buffer'
+    "
     >{{ data["@name"] ?? "Array" }}({{ data["@size"] }})</template
   >
   <template v-else-if="data['@t'] === 'function'">
@@ -50,14 +55,15 @@
   </template>
   <template v-else-if="data['@t'] === 'promise'"> Promise {} </template>
   <template v-else-if="data['@t'] === 'date'">{{ data["@value"] }}</template>
+  <template v-else-if="data['@t'] === 'gs'">(...)</template>
   <template v-else>nothing</template>
 </template>
 
 <script lang="ts" setup>
-import { DataPreview } from "../logic/Encode"
+import { Data, DataPreview } from "../logic/Encode"
 
 defineProps<{
-  data: DataPreview.objReal[""]["@value"]
+  data: DataPreview.objReal[""]["@value"] | Data.GetSetter
   hideNameObject?: boolean
   showNameFn?: boolean
   full?: boolean

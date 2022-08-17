@@ -86,6 +86,7 @@ export namespace Data {
       | Promise
       | Date
       | TypedArray
+      | Buffer
     >
   }
   export interface Link {
@@ -149,10 +150,10 @@ export namespace Data {
       [Symbol.toStringTag]: RealItem<String>
     }
   }
-  export interface Buffer extends Omit<Array, "@t"> {
+  export interface Buffer extends Omit<Array, "@t" | "@real"> {
     "@t": "buffer"
     // size is equal byteLength
-    "@real": Omit<Array["@real"], "length"> & {
+    "@real": objReal & {
       byteLength: RealItem<Number>
       "[[Int8Array]]": RealItem<TypedArray>
       "[[Uint8Array]]": RealItem<TypedArray>
@@ -277,7 +278,8 @@ export function Encode(
   | Data.Element
   | Data.Promise
   | Data.Date
-  | Data.TypedArray {
+  | Data.TypedArray
+  | Data.Buffer {
   if (data instanceof Error) {
     const meta: Data.Error = {
       "@t": "error",
@@ -392,6 +394,7 @@ export function Encode(
           "@t": "typedarray",
           "@first": first,
           "@size": data.length,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           "@name": (data as unknown as any)[Symbol.toStringTag],
           "@real": encodeObject(
             data,
@@ -414,9 +417,13 @@ export function Encode(
             Encode(val, false, true)
           ]),
           "@real": {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             size: createRealItem(
-              Encode((data as unknown as any).size, false, false),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              Encode(
+                (data as unknown as any).size,
+                false,
+                false
+              ) as Data.Number,
               true
             ),
             // わかない。ぜんぜんわかない！
@@ -434,25 +441,29 @@ export function Encode(
           "@name": getObjectName(data),
           "@real": {
             ...encodeObject(data),
-            "[Int8Array]": createRealItem(
-              Encode(new Int8Array(data), false, true),
+            "[[Int8Array]]": createRealItem(
+              Encode(new Int8Array(data), false, true) as Data.TypedArray,
               true
             ),
-            "[Uint8Array]": createRealItem(
-              Encode(new Uint8Array(data), false, true)
+            "[[Uint8Array]]": createRealItem(
+              Encode(new Uint8Array(data), false, true) as Data.TypedArray,
+              true
             ),
 
-            "[Int16Array]": createRealItem(
-              Encode(new Int16Array(data), false, true)
+            "[[Int16Array]]": createRealItem(
+              Encode(new Int16Array(data), false, true) as Data.TypedArray,
+              true
             ),
-            "[Int32Array]": createRealItem(
-              Encode(new Int32Array(data), false, true)
+            "[[Int32Array]]": createRealItem(
+              Encode(new Int32Array(data), false, true) as Data.TypedArray,
+              true
             ),
 
             "[[ArrayBufferByteLength]]": createRealItem(
-              Encode(data.byteLength, false, true)
+              Encode(data.byteLength, false, true) as Data.Number,
+              true
             )
-          }
+          } as Data.Buffer["@real"]
         }
 
         return meta
@@ -595,6 +606,7 @@ export namespace DataPreview {
   export type Promise = Pick<Data.Promise, "@t">
   export type Date = Pick<Data.Date, "@t" | "@value">
   export type TypedArray = Pick<Data.TypedArray, "@t" | "@size" | "@name">
+  export type Buffer = Pick<Data.Buffer, "@t" | "@size" | "@name">
 
   export interface objReal {
     [name: string]: RealItem<
@@ -609,6 +621,7 @@ export namespace DataPreview {
       | Promise
       | Date
       | TypedArray
+      | Buffer
       | Data.String
       | Data.Number
       | Data.BigInt
@@ -701,8 +714,22 @@ function createPreviewObject(data: object): {
             createRealItem(
               {
                 "@t": "typedarray",
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 "@name": (value as unknown as any)[Symbol.toStringTag],
                 "@size": value.length
+              },
+              !meta.enumerable
+            )
+          ]
+        }
+        if (isBuffer(value)) {
+          return [
+            name,
+            createRealItem(
+              {
+                "@t": "buffer",
+                "@name": getObjectName(value),
+                "@size": value.byteLength
               },
               !meta.enumerable
             )
