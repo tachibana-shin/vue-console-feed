@@ -23,7 +23,7 @@
       </span>
 
       <template v-slot:content>
-        <ConsoleLink :link="data['@real']" />
+        <ConsoleLink :link="data['@real']!" />
       </template>
     </Collapse>
   </template>
@@ -76,6 +76,7 @@
                   '@t': 'object',
                   '@name': null,
                   '@first': false,
+                  '@des': null,
                   '@real': {
                     ...(data['@name'].endsWith('Map')
                       ? {
@@ -98,7 +99,7 @@
         </template>
       </Collapse>
 
-      <ConsoleLink :link="data['@real']" />
+      <ConsoleLink :link="data['@real']!" />
     </template>
     <!-- {{ item }} -->
   </Collapse>
@@ -112,7 +113,7 @@
     <slot /><span class="regexp">{{ data["@name"] }}</span>
 
     <template v-slot:content>
-      <ConsoleLink :link="data['@real']" />
+      <ConsoleLink :link="data['@real']!" />
     </template>
   </Collapse>
   <Collapse
@@ -191,7 +192,7 @@
     <slot />{{ data["@stack"] }}
 
     <template v-slot:content>
-      <ConsoleLink :link="data['@real']" />
+      <ConsoleLink :link="data['@real']!" />
     </template>
   </Collapse>
   <Collapse
@@ -207,7 +208,7 @@
       :key="item"
     >
       <ConsoleValueStatic
-        :data="data['@des']['@value'][item - 1]['@value']"
+        :data="data['@des']!['@value'][item - 1]['@value']"
         hide-name-object
       />
       <span v-if="data['@size'] > item" class="comma">,</span>
@@ -217,13 +218,13 @@
       >,
       <template v-for="key in extendsKeysTypedArray" :key="key">
         <PropName
-          :hidden="data['@des']['@value'][key.toString()]['@hidden']"
+          :hidden="data['@des']!['@value'][key.toString()]['@hidden']"
           :name="key.toString()"
           preview
         />
         <!-- {{item}} -->
         <ConsoleValueStatic
-          :data="data['@des']['@value'][key.toString()]['@value']"
+          :data="data['@des']!['@value'][key.toString()]['@value']"
           hide-name-object
         />
         <span class="comma">,</span>
@@ -319,8 +320,9 @@
       :data="{
         '@t': 'object',
         '@first': false,
+        '@des': null,
         '@name': data['@value'],
-        '@real': data['@real']
+        '@real': data['@real']!
       }"
       :flat="flat"
     >
@@ -328,7 +330,9 @@
     </ConsoleValue>
   </template>
   <Collapse v-else-if="data['@t'] === 'buffer' || data['@t'] === 'dataview'">
-    <slot />{{ data["@name"] ?? "DataView" }}({{ data["@size"] }})
+    <slot />{{ data["@t"] === "dataview" ? "DataView" : data["@name"] }}({{
+      data["@size"]
+    }})
 
     <template v-slot:content>
       <ConsoleLink v-if="data['@real']['@t']" :link="data['@real']" />

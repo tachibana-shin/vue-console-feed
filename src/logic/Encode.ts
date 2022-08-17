@@ -51,17 +51,20 @@ export namespace Data {
     "@real": Link | null
   }
   //=============
-  export interface Collection extends Omit<Record, "@t" | "@de" | "@first"> {
+  export interface Collection extends Omit<Record, "@t" | "@des" | "@first" | "@real"> {
     "@t": "collection"
     "@name": "map" | "weakmap" | "set" | "weakset"
     "@size": number | null
     "@entries": unknown
+    "@real": Link
   }
   //==============
-  export interface RegExp extends Omit<Record, "@t" | "@de"> {
+  export interface RegExp
+    extends Omit<Record, "@t" | "@de" | "@real" | "@des"> {
     "@t": "regexp"
     "@flags": string
     "@source": string
+    "@real": Link | null
   }
   export interface GetSetter {
     "@t": "gs"
@@ -90,6 +93,7 @@ export namespace Data {
       | Date
       | TypedArray
       | Buffer
+      | DataView
     >
   }
   export interface Link {
@@ -112,17 +116,18 @@ export namespace Data {
     "@t": "error"
     "@first": boolean
     "@stack": string // use
-    "@real": objReal // use
+    "@real": Link | null // use
   }
-  export interface Array {
+  export interface Array extends Pick<Record, "@des"> {
     "@t": "array"
     "@size": number
     "@name": string | null
     "@first": boolean
-    "@real": objReal & {
-      // TODO:いみわかない！
-      length: RealItem<Number>
-    }
+    "@real": Link
+  }
+  export type ArrayReal = objReal & {
+    // TODO:いみわかない！
+    length: RealItem<Number>
   }
   export interface Element {
     "@t": "element"
@@ -142,38 +147,41 @@ export namespace Data {
     "@t": "date"
     "@first": boolean
     "@value": string
-    "@real": objReal
+    "@real": Link | null
   }
   export interface TypedArray extends Omit<Array, "@t"> {
     "@t": "typedarray"
-    "@real": Array["@real"] & {
-      buffer: RealItem<Buffer>
-      byteLength: RealItem<Number>
-      byteOffset: RealItem<Number>
-      [Symbol.toStringTag]: RealItem<String>
-    }
+    "@real": Link
   }
-  export interface Buffer extends Omit<Array, "@t" | "@real"> {
+  export type TypedArrayReal = ArrayReal & {
+    buffer: RealItem<Buffer>
+    byteLength: RealItem<Number>
+    byteOffset: RealItem<Number>
+    [Symbol.toStringTag]: RealItem<String>
+  }
+  export interface Buffer extends Omit<Array, "@t" | "@des" | "@real"> {
     "@t": "buffer"
     // size is equal byteLength
-    "@real": objReal & {
-      byteLength: RealItem<Number>
-      "[[Int8Array]]": RealItem<TypedArray>
-      "[[Uint8Array]]": RealItem<TypedArray>
-
-      "[[Int16Array]]": RealItem<TypedArray>
-      "[[Int32Array]]": RealItem<TypedArray>
-
-      "[[ArrayBufferByteLength]]": RealItem<Number>
-    }
+    "@real": Link
   }
-  export interface DataView extends Omit<Array, "@t" | "@name"> {
+  export type BufferReal = objReal & {
+    byteLength: RealItem<Number>
+    "[[Int8Array]]": RealItem<TypedArray>
+    "[[Uint8Array]]": RealItem<TypedArray>
+
+    "[[Int16Array]]": RealItem<TypedArray>
+    "[[Int32Array]]": RealItem<TypedArray>
+
+    "[[ArrayBufferByteLength]]": RealItem<Number>
+  }
+  export interface DataView extends Omit<Array, "@t" | "@des" | "@name"> {
     "@t": "dataview"
-    "@real": Array["@real"] & {
-      buffer: RealItem<Buffer>
-      byteLength: RealItem<Number>
-      byteOffset: RealItem<Number>
-    }
+    "@real": Link
+  }
+  export type DataViewReal = ArrayReal & {
+    buffer: RealItem<Buffer>
+    byteLength: RealItem<Number>
+    byteOffset: RealItem<Number>
   }
 }
 
@@ -233,7 +241,7 @@ export function callFnLink(
       "@t": "error",
       "@first": false,
       "@stack": "Error: this memory freed.",
-      "@real": {}
+      "@real": null
     }
 
   return Encode(fn(), false, true)
@@ -249,7 +257,7 @@ export function _getListLink(
         "@t": "error",
         "@first": false,
         "@stack": "Error: this memory freed.",
-        "@real": {}
+        "@real": null
       }
     ]
 
@@ -281,7 +289,7 @@ export function Encode(
   | Data.Promise
   | Data.Date
   | Data.TypedArray
-  | Data.Buffer 
+  | Data.Buffer
   | Data.DataView {
   switch (typeof data) {
     case "string": {
@@ -402,7 +410,7 @@ export function Encode(
             "@t": "array",
             "@first": first,
             "@size": data.length,
-            "@name": data instanceof NodeList ? "NodeList" : undefined,
+            "@name": data instanceof NodeList ? "NodeList" : null,
             "@des": createPreviewObject(data),
             "@real": createLinkObject(data) //encodeObject(data) as ReturnType<typeof encodeObject> & {
             // length: RealItem<Data.Number>
@@ -412,11 +420,7 @@ export function Encode(
           return meta
         }
 
-        return createFakeRecord(
-          encodeObject(data) as ReturnType<typeof encodeObject> & {
-            length: RealItem<Data.Number>
-          }
-        )
+        return createFakeRecord(encodeObject(data) as Data.ArrayReal)
       }
 
       if (isTypedArray(data)) {
@@ -444,7 +448,7 @@ export function Encode(
           encodeObject(
             data,
             getOwnDescriptorsTypedArray(data)
-          ) as Data.TypedArray["@real"]
+          ) as Data.TypedArrayReal
         )
       }
 
@@ -515,7 +519,7 @@ export function Encode(
             Encode(data.byteLength, false, true) as Data.Number,
             true
           )
-        } as Data.Buffer["@real"])
+        } as Data.BufferReal)
       }
 
       if (isDataView(data)) {
@@ -534,7 +538,7 @@ export function Encode(
           encodeObject(
             data,
             getOwnDescriptorsDataView(data)
-          ) as Data.DataView["@real"]
+          ) as Data.DataViewReal
         )
       }
 
@@ -572,7 +576,7 @@ export function Encode(
                 "@name": data.nodeName,
                 "@first": first,
                 "@attrs": attrs,
-                "@real": first ? undefined : createLinkObject(data),
+                "@real": first ? null : createLinkObject(data),
                 "@childs": shouldInline(data)
                   ? data.textContent
                   : createLinkObject(data.childNodes)
@@ -586,7 +590,7 @@ export function Encode(
                 "@name": data.nodeName,
                 "@first": first,
                 "@attrs": attrs,
-                "@real": first ? undefined : createLinkObject(data),
+                "@real": first ? null : createLinkObject(data),
                 "@childs": data.textContent
               }
             }
@@ -596,7 +600,7 @@ export function Encode(
                 "@name": data.nodeName, // ?
                 "@first": first,
                 "@attrs": attrs,
-                "@real": first ? undefined : createLinkObject(data)
+                "@real": first ? null : createLinkObject(data)
               }
             case Node.DOCUMENT_TYPE_NODE:
               return {
@@ -604,7 +608,7 @@ export function Encode(
                 "@name": data.nodeName, // html
                 "@first": first,
                 "@attrs": attrs,
-                "@real": first ? undefined : createLinkObject(data),
+                "@real": first ? null : createLinkObject(data),
                 "@childs": `<!DOCTYPE ${
                   (data as unknown as DocumentType).name
                 } ${
@@ -628,14 +632,15 @@ export function Encode(
                 "@name": data.nodeName, // #document
                 "@first": first,
                 "@attrs": attrs,
-                "@real": first ? undefined : createLinkObject(data)
+                "@real": first ? null : createLinkObject(data)
               }
             case Node.DOCUMENT_FRAGMENT_NODE:
               return {
                 "@t": "element",
                 "@name": data.nodeName, // #document-fragment
                 "@first": first,
-                "@attrs": attrs
+                "@attrs": attrs,
+                "@real": null
               }
             default:
               return {
@@ -646,7 +651,7 @@ export function Encode(
                       data.nodeType as keyof typeof nameByNodeType
                     ] ?? "#unknown",
                 "@first": first,
-                "@real": first ? undefined : createLinkObject(data)
+                "@real": first ? null : createLinkObject(data)
               }
           }
         }
@@ -669,8 +674,8 @@ export function Encode(
   }
 }
 
-function createFakeRecord(
-  value: Data.objReal,
+function createFakeRecord<T extends Data.objReal>(
+  value: T,
   name: string | null = null
 ): Data.Record {
   return {
