@@ -7,11 +7,10 @@
       data['@t'] === 'symbol' ||
       data['@t'] === 'nill'
     "
-    class="ml-4"
     v-bind="attrs"
   >
     <slot />
-    <ConsoleValueStatic :data="data" :is-log="isLog" full first />
+    <ConsoleValueStatic :data="data" :is-log="isLog" full :first="data['@first']" />
   </div>
   <template v-else-if="data['@t'] === 'function'">
     <template v-if="data['@first']">{{ data["@code"] }}</template>

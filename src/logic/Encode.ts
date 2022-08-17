@@ -25,6 +25,7 @@ interface RealItem<T> {
 export namespace Data {
   export interface String {
     "@t": "string"
+    "@first": boolean
     "@value": string
   }
   export interface Number {
@@ -298,6 +299,7 @@ export function Encode(
     case "string": {
       const meta: Data.String = {
         "@t": "string",
+        "@first": first,
         "@value": data
       }
       return meta

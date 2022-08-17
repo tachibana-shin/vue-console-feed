@@ -114,7 +114,7 @@ console.error({a})
 </script>
 
 <template>
-  <ConsoleItem :data="data" />
+  <ConsoleItem :data="data" type="log" />
   <!-- <div v-for="data" -->
 </template>
 
