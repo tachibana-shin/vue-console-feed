@@ -14,9 +14,10 @@ This is the plugin that is almost identical to the [console-feed](https://github
 - [x] function, function full `full support`
 - [x] regexp `full support`
 - [x] element, DOM `full support`
-- [-] Promise
+- [x] Promise `limit`
 - [ ] console.table
 - [x] Date
 - [x] Buffer
 - [x] TypedArray
 - [x] DataView
+- [ ] address `http` in `string` and `Error`

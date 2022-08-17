@@ -54,7 +54,7 @@
       data["@name"].toLowerCase().replace(/^#/, "")
     }}</span>
   </template>
-  <template v-else-if="data['@t'] === 'promise'"> Promise {} </template>
+  <template v-else-if="data['@t'] === 'promise'">Promise</template>
   <template v-else-if="data['@t'] === 'date'">{{ data["@value"] }}</template>
   <template v-else-if="data['@t'] === 'gs'">(...)</template>
   <template v-else>nothing</template>

@@ -7,16 +7,19 @@ el.style.color = "red"
 el.dir = "ltr"
 el.innerHTML = "hkhkjhhu op<span>Hello<Span>jkfiwoejgoijerokg</span></span>"
 // el.innerHTML = "xss"
-const uint = new Uint8Array([312,432,5435])
+const uint = new Uint8Array([312, 432, 5435])
+const pro = Promise.resolve()
+const date = new Date()
+date.status = "ok"
 const tt = {
   el,
   nl: el.childNodes,
   r: /script/,
-  pro: Promise.resolve(),
+  pro,
   uint,
-  buffer:uint.buffer,
+  buffer: uint.buffer,
   view: new DataView(uint.buffer),
-  date: new Date(),
+  date,
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -92,14 +95,21 @@ const tt = {
   },
   abort: new AbortController()
 }
+pro.asjfiopeg = tt
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(tt as unknown as any).tt = tt
 
+let a
+try {
+  foeojgr()
+} catch (err) {
+  a = err
+}
 const data = Encode(tt, true, true)
 console.log(tt)
 console.log(data)
-
-console.log(document.body)
+// console.error(a)
+// console.log(document.body)
 </script>
 
 <template>

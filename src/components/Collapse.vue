@@ -1,5 +1,5 @@
 <template>
-  <div v-if="onlyBtn" class="truncate">
+  <div v-if="onlyBtn">
     <slot />
   </div>
   <template v-else>

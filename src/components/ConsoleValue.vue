@@ -312,16 +312,15 @@
       </template>
     </Collapse>
   </template>
-  <template v-else-if="data['@t'] === 'promise'"> <slot />Promise {} </template>
-  <template v-else-if="data['@t'] === 'date'">
-    <template v-if="data['@first']"><slot />{{ data["@value"] }}</template>
+  <template v-else-if="data['@t'] === 'date' || data['@t'] === 'promise'">
+    <template v-if="data['@first']"><slot />{{ data["@value"] ?? "Promise" }}</template>
     <ConsoleValue
       v-else
       :data="{
         '@t': 'object',
         '@first': false,
-        '@des': null,
-        '@name': data['@value'],
+        '@des': data['@des'],
+        '@name': data['@value'] ?? 'Promise',
         '@real': data['@real']!
       }"
       :flat="flat"

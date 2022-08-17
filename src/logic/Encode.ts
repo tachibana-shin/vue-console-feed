@@ -142,9 +142,10 @@ export namespace Data {
     "@t": "promise"
     "@first": boolean
     "@state": "pending" | "fulfilled" | "rejected"
-    "@real": objReal
+    "@real": Link
+    "@des": objReal
   }
-  export interface Date {
+  export interface Date extends Pick<Record, "@des"> {
     "@t": "date"
     "@first": boolean
     "@value": string
@@ -397,7 +398,8 @@ export function Encode(
             "@t": "date",
             "@first": first,
             "@value": data.toString(),
-            "@real": first ? null : createLinkObject(data) // encodeObject(data)
+            "@real": first ? null : createLinkObject(data), // encodeObject(data)
+            "@des": first ? null : createPreviewObject(data),
           }
 
           return meta
@@ -546,20 +548,25 @@ export function Encode(
       }
 
       if (isPromise(data)) {
-        // const { state, value } = await getStatePromise(data)
+        if (linkReal) {
+          // const { state, value } = await getStatePromise(data)
 
-        const meta: Data.Promise = {
-          "@t": "promise",
-          "@first": first,
-          "@state": "pending", //state,
-          "@real": {
-            ...encodeObject(data)
-            // "[[PromiseState]]" : Encode(state),
-            // "[[PromiseResult]]": Encode(value)
+          const meta: Data.Promise = {
+            "@t": "promise",
+            "@first": first,
+            "@state": "pending", //state,
+            "@real": createLinkObject(data) ,
+            "@des": createPreviewObject(data)// {
+            //   ...encodeObject(data)
+            //   // "[[PromiseState]]" : Encode(state),
+            //   // "[[PromiseResult]]": Encode(value)
+            // }
           }
+
+          return meta
         }
 
-        return meta
+        return createFakeRecord(encodeObject(data))
       }
 
       //なんで？

@@ -33,7 +33,7 @@
   color: #45778f;
 }
 .propPreview {
-  color:#9aa0a6
+  color: #9aa0a6;
 }
 .is {
   color: #fff;
@@ -52,17 +52,16 @@
     color: #7bbbb9;
   }
   &-propValue {
-    color: #f27739
+    color: #f27739;
   }
 
   &-comment {
-    color: #896d4b
+    color: #896d4b;
   }
   &-doctype {
-    color: #b6b493
+    color: #b6b493;
   }
 }
-
 
 .truncate {
   overflow: hidden;
@@ -75,9 +74,13 @@
 }
 
 .inline {
-  display: inline
+  display: inline;
 }
 
 .mr-0 {
   margin-right: 0;
+}
+
+a {
+  color: rgb(177, 177, 177);
 }
