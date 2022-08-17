@@ -189,7 +189,7 @@
     </template>
   </Collapse>
   <Collapse v-else-if="data['@t'] === 'error'" :only-btn="data['@first']">
-    <slot />{{ data["@stack"] }}
+    <slot /><span v-html='parseLink(data["@stack"])' />
 
     <template v-slot:content>
       <ConsoleLink :link="data['@real']!" />
@@ -361,6 +361,7 @@ import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import _GetterField from "./GetterField.vue"
 import { DefineComponent, useAttrs } from "vue"
 import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
+import { parseLink } from "../logic/parseLink"
 
 const attrs = useAttrs()
 

@@ -74,6 +74,8 @@
   },
   "dependencies": {
     "linkify": "^0.2.1",
+    "linkify-html": "^3.0.5",
+    "linkifyjs": "^3.0.5",
     "vue": "^3.2.37"
   }
 }

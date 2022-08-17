@@ -1,3 +1,3 @@
 import linkify from "linkify-html"
 
-linkify.format()
+export const parseLink = linkify
