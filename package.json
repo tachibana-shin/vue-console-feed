@@ -73,6 +73,7 @@
     "node": ">=10"
   },
   "dependencies": {
+    "linkify": "^0.2.1",
     "vue": "^3.2.37"
   }
 }
