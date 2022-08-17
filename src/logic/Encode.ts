@@ -143,7 +143,7 @@ export namespace Data {
     "@first": boolean
     "@state": "pending" | "fulfilled" | "rejected"
     "@real": Link
-    "@des": objReal
+    "@des": Exclude<Record["@des"], null>
   }
   export interface Date extends Pick<Record, "@des"> {
     "@t": "date"
