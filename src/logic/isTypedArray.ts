@@ -18,6 +18,7 @@ const types = [
 
 export type TypedArray = typeof types[0]
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isTypedArray(arr: any): arr is TypedArray {
   return types.some((item) => arr instanceof item)
 }

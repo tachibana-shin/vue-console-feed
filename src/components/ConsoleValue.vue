@@ -23,20 +23,7 @@
       </span>
 
       <template v-slot:content>
-        <ConsoleLink
-          v-if="data['@real']['@t'] === 'link'"
-          :link="(data['@real'] as Data.Link)"
-        />
-        <ConsoleValue
-          v-else
-          :data="{
-            '@t': 'object',
-            '@name': null,
-            '@first': false,
-            '@real': data['@real']
-          }"
-          flat
-        />
+        <ConsoleLink :link="data['@real']" />
       </template>
     </Collapse>
   </template>
@@ -111,15 +98,8 @@
         </template>
       </Collapse>
 
-      <ConsoleValue
-        :data="{
-          '@t': 'object',
-          '@name': null,
-          '@first': false,
-          '@real': data['@real']
-        }"
-        flat
-      />
+
+      <ConsoleLink :link="data['@real']" />
     </template>
     <!-- {{ item }} -->
   </Collapse>
@@ -133,15 +113,7 @@
     <slot /><span class="regexp">{{ data["@name"] }}</span>
 
     <template v-slot:content>
-      <ConsoleValue
-        :data="{
-          '@t': 'object',
-          '@name': null,
-          '@first': false,
-          '@real': data['@real']
-        }"
-        flat
-      />
+      <ConsoleLink :link="data['@real']" />
     </template>
   </Collapse>
   <Collapse
@@ -220,15 +192,7 @@
     <slot />{{ data["@stack"] }}
 
     <template v-slot:content>
-      <ConsoleValue
-        :data="{
-          '@t': 'object',
-          '@name': null,
-          '@first': false,
-          '@real': data['@real']
-        }"
-        flat
-      />
+      <ConsoleLink :link="data['@real']" />
     </template>
   </Collapse>
   <Collapse
@@ -244,7 +208,7 @@
       :key="item"
     >
       <ConsoleValueStatic
-        :data="(data['@real'][item - 1]['@value'] as Exclude<typeof data['@real'][0]['@value'], Data.GetSetter>)"
+        :data="data['@des']['@value'][item - 1]['@value']"
         hide-name-object
       />
       <span v-if="data['@size'] > item" class="comma">,</span>
@@ -254,13 +218,13 @@
       >,
       <template v-for="key in extendsKeysTypedArray" :key="key">
         <PropName
-          :hidden="data['@real'][key.toString()]['@hidden']"
+          :hidden="data['@des']['@value'][key.toString()]['@hidden']"
           :name="key.toString()"
           preview
         />
         <!-- {{item}} -->
         <ConsoleValueStatic
-          :data="data['@real'][key.toString()]['@value']"
+          :data="data['@des']['@value'][key.toString()]['@value']"
           hide-name-object
         />
         <span class="comma">,</span>
@@ -273,15 +237,7 @@
     </template>
 
     <template v-slot:content>
-      <ConsoleValue
-        :data="{
-          '@t': 'object',
-          '@name': null,
-          '@first': false,
-          '@real': data['@real']
-        }"
-        flat
-      />
+      <ConsoleLink :link="data['@real']" />
     </template>
   </Collapse>
   <template v-else-if="data['@t'] === 'element'">
@@ -363,6 +319,7 @@
       v-else
       :data="{
         '@t': 'object',
+        '@first': false,
         '@name': data['@value'],
         '@real': data['@real']
       }"
@@ -371,6 +328,14 @@
       <slot />
     </ConsoleValue>
   </template>
+  <Collapse v-else-if="data['@t'] === 'buffer'">
+    <slot />
+    {{ data }}
+
+    <template v-slot:content>
+      <ConsoleLink v-if="data['@real']['@t']" :link="data['@real']" />
+    </template>
+  </Collapse>
   <div v-else>
     <slot />
     Nothing {{ data }}

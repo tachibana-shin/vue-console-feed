@@ -7,12 +7,14 @@ el.style.color = "red"
 el.dir = "ltr"
 el.innerHTML = "hkhkjhhu op<span>Hello<Span>jkfiwoejgoijerokg</span></span>"
 // el.innerHTML = "xss"
+const uint = new Uint8Array([312,432,5435])
 const tt = {
   el,
   nl: el.childNodes,
   r: /script/,
   pro: Promise.resolve(),
-  buffer: new Uint8Array([312,432,5435]),
+  uint,
+  buffer:uint.buffer, 
   date: new Date(),
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),
