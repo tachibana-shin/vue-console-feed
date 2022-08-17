@@ -6,6 +6,7 @@ import { shouldInline } from "./shouldInline"
 import { isCollection } from "./isCollection"
 import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
 import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
+import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
 import { getValue } from "./getValue"
 import { isPromise } from "./isPromise"
 import { isTypedArray } from "./isTypedArray"
@@ -489,7 +490,7 @@ export function Encode(
         }
 
         return createFakeRecord({
-          ...encodeObject(data),
+          ...encodeObject(data,   getOwnDescriptorsBuffer(data)),
           "[[Int8Array]]": createRealItem(
             Encode(new Int8Array(data), false, false) as Data.TypedArray,
             true

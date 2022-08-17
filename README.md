@@ -17,6 +17,6 @@ This is the plugin that is almost identical to the [console-feed](https://github
 - [-] Promise
 - [ ] console.table
 - [x] Date
-- [ ] Buffer
+- [x] Buffer
 - [x] TypedArray
 - [ ] DataView

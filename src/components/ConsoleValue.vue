@@ -62,10 +62,10 @@
         <template v-slot:content>
           <Collapse v-for="(item, index) in data['@entries']" :key="index">
             <PropName :hidden="false" :name="index + ''" />
-            <span v-if="data['@name'].endsWith('Map')">
-              {<ConsoleValueStatic :data="item[0]" full /> =>
-              <ConsoleValueStatic :data="item[1]" show-name-fn full />}
-            </span>
+            <span v-if="data['@name'].endsWith('Map')"
+              >{<ConsoleValueStatic :data="item[0]" full /> =>
+              <ConsoleValueStatic :data="item[1]" show-name-fn full />}</span
+            >
             <span v-else>
               <ConsoleValueStatic :data="item[0]" show-name-fn full />
             </span>
@@ -97,7 +97,6 @@
           </Collapse>
         </template>
       </Collapse>
-
 
       <ConsoleLink :link="data['@real']" />
     </template>
@@ -329,8 +328,7 @@
     </ConsoleValue>
   </template>
   <Collapse v-else-if="data['@t'] === 'buffer'">
-    <slot />
-    {{ data }}
+    <slot />{{ data["@name"] }}({{ data["@size"] }})
 
     <template v-slot:content>
       <ConsoleLink v-if="data['@real']['@t']" :link="data['@real']" />
