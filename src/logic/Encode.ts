@@ -8,6 +8,8 @@ import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
 import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
 import { getValue } from "./getValue"
 import { isPromise } from "./isPromise"
+import { isTypedArray } from "./isTypedArray"
+import { getOwnDescriptorsTypedArray } from "./getOwnDescriptorsTypedArray"
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Data {
   export interface String {
@@ -77,6 +79,7 @@ export namespace Data {
         | Element
         | Promise
         | Date
+        | TypedArray
     }
   }
   export interface Link {
@@ -133,6 +136,21 @@ export namespace Data {
     "@first": boolean
     "@value": string
     "@real": objReal
+  }
+  export interface TypedArray extends Omit<Array, "@t"> {
+    "@t": "typedarray"
+    "@real": Array["@real"] & {
+      buffer: {
+        "@hidden": true
+        "@value": unknown // Buffer
+      }
+      byteLength: Array["@real"]["length"]
+      byteOffset: Array["@real"]["length"]
+      [Symbol.toStringTag]: {
+        "@hidden": true
+        "@value": string
+      }
+    }
   }
 }
 
@@ -237,8 +255,9 @@ export function Encode(
   | Data.Error
   | Data.Array
   | Data.Element
-  | Data.Promise 
-  | Data.Date {
+  | Data.Promise
+  | Data.Date
+  | Data.TypedArray {
   if (data instanceof Error) {
     const meta: Data.Error = {
       "@t": "error",
@@ -297,7 +316,7 @@ export function Encode(
         "@code": first ? data.toString() : "",
         "@name": name,
         "@first": first,
-        "@real": linkReal ? createLinkObject(data) : encodeObject(data, data)
+        "@real": linkReal ? createLinkObject(data) : encodeObject(data)
       }
       return meta
     }
@@ -318,7 +337,7 @@ export function Encode(
           "@flags": data.flags,
           "@source": data.source,
           // わかない。ぜんぜんわかない！
-          "@real": encodeObject(data, data)
+          "@real": encodeObject(data, getOwnDescriptorsRegExp(data))
         }
         return meta
       }
@@ -340,14 +359,24 @@ export function Encode(
           "@size": data.length,
           "@name": data instanceof NodeList ? "NodeList" : undefined,
           "@first": first,
-          "@real": encodeObject(data, data) as ReturnType<
-            typeof encodeObject
-          > & {
+          "@real": encodeObject(data) as ReturnType<typeof encodeObject> & {
             length: {
               "@hidden": boolean
               "@value": Data.Number
             }
           }
+        }
+
+        return meta
+      }
+
+      if (isTypedArray(data)) {
+        const meta: Data.TypedArray = {
+          "@t": "typedarray",
+          "@first": first,
+          "@size": data.length,
+          "@name": (data as unknown as any)[Symbol.toStringTag],
+          "@real": encodeObject(data, getOwnDescriptorsTypedArray(data)) as Data.TypedArray["@real"]
         }
 
         return meta
@@ -371,7 +400,7 @@ export function Encode(
               "@value": Encode((data as unknown as any).size, false, false)
             },
             // わかない。ぜんぜんわかない！
-            ...encodeObject(data, data)
+            ...encodeObject(data)
           }
         }
         return meta
@@ -493,7 +522,7 @@ export function Encode(
         "@name": data.constructor?.name ?? null,
         "@first": first,
         // わかない。ぜんぜんわかない！
-        "@real": linkReal ? createLinkObject(data) : encodeObject(data, data),
+        "@real": linkReal ? createLinkObject(data) : encodeObject(data),
         "@des": linkReal ? createPreviewObject(data) : null
       }
       return meta
@@ -513,6 +542,7 @@ export namespace DataPreview {
   export type Element = Pick<Data.Element, "@t" | "@name">
   export type Promise = Pick<Data.Promise, "@t">
   export type Date = Pick<Data.Date, "@t" | "@value">
+  export type TypedArray = Pick<Data.TypedArray, "@t" | "@size" | "@name">
 
   export interface objReal {
     [name: string]: {
@@ -528,6 +558,7 @@ export namespace DataPreview {
         | Element
         | Promise
         | Date
+        | TypedArray
         | Data.String
         | Data.Number
         | Data.BigInt
@@ -614,6 +645,19 @@ function createPreviewObject(data: object): {
             }
           ]
         }
+        if (isTypedArray(value)) {
+          return [
+            name,
+            /* object */ {
+              "@hidden": !meta.enumerable,
+              "@value": {
+                "@t": "typedarray",
+                "@name": (value as unknown as any)[Symbol.toStringTag],
+                "@size": value.length
+              }
+            }
+          ]
+        }
 
         if (isDom(value)) {
           return [
@@ -683,7 +727,7 @@ function createPreviewObject(data: object): {
 }
 function encodeObject(
   data: object | Function | RegExp,
-  receiver = data,
+  extendsPropertyDescriptors?: Record<string, PropertyDescriptor>,
   proto: object | Function = Object.getPrototypeOf(data)
 ): Data.objReal {
   const meta = Object.fromEntries(
@@ -691,7 +735,7 @@ function encodeObject(
       Object.assign(
         getOwnDescriptorsIn(data),
         Object.getOwnPropertyDescriptors(data),
-        data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
+        extendsPropertyDescriptors //data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
       )
     ).map(([name, meta]): [string, Data.objReal[""]] => {
       const { value } = meta
@@ -705,7 +749,7 @@ function encodeObject(
             "@hidden": !meta.enumerable,
             "@value": {
               "@t": "gs",
-              "@value": createLinkObject(() => getValue(data, name, receiver)), //meta.get?.(),
+              "@value": createLinkObject(() => getValue(data, name, data)), //meta.get?.(),
               "@at": at
             }
           }

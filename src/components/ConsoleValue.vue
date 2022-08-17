@@ -152,7 +152,7 @@
     <slot />
     <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span
     >{<template v-for="(item, name) in data['@des']?.['@value']" :key="name">
-      <PropName :hidden="item['@hidden']" :name="name + ''" />
+      <PropName :hidden="item['@hidden']" :name="name + ''" preview />
       <ConsoleValueStatic :data="item['@value']" hide-name-object />
       <span class="comma" v-if="name !== data['@des']!['@lastKey']"
         >,</span
@@ -232,33 +232,44 @@
     </template>
   </Collapse>
   <Collapse
-    v-else-if="data['@t'] === 'array'"
+    v-else-if="data['@t'] === 'array' || data['@t'] === 'typedarray'"
     :flat="flat"
     :disable-magic="data['@first']"
   >
-    <slot />
-    <span class="array-size" v-if="data['@name']">{{ data["@name"] }}</span>
-    <span class="array-size"
-      >({{ data["@real"].length["@value"]["@value"] }})</span
-    >[<template
-      v-for="item in +data['@real'].length['@value']['@value']"
+    <slot /><span class="array-size mr-0" v-if="data['@name']">{{
+      data["@name"]
+    }}</span
+    ><span class="array-size">({{ data["@size"] }})</span>[<template
+      v-for="item in data['@size']"
       :key="item"
     >
       <ConsoleValueStatic
         :data="(data['@real'][item - 1]['@value'] as Exclude<typeof data['@real'][0]['@value'], Data.GetSetter>)"
         hide-name-object
       />
-      <span
-        v-if="+data['@real'].length['@value']['@value'] > item"
-        class="comma"
-        >,</span
-      > </template
+      <span v-if="data['@size'] > item" class="comma">,</span>
+    </template>
+    <!-- addons for TypedArray -->
+    <template v-if="data['@t'] === 'typedarray'"
+      >,
+      <template v-for="key in extendsKeysTypedArray" :key="key">
+        <PropName
+          :hidden="data['@real'][key.toString()]['@hidden']"
+          :name="key.toString()"
+          preview
+        />
+        <!-- {{item}} -->
+        <ConsoleValueStatic
+          :data="data['@real'][key.toString()]['@value']"
+          hide-name-object
+        />
+        <span class="comma">,</span>
+      </template> </template
     >]
+    <!-- //addons for TypedArray -->
 
     <template v-slot:summary-opened>
-      <slot />{{ data["@name"] ?? "Array" }} ({{
-        data["@real"].length["@value"]["@value"]
-      }})
+      <slot />{{ data["@name"] ?? "Array" }}({{ data["@size"] }})
     </template>
 
     <template v-slot:content>
@@ -381,6 +392,7 @@ import PropName from "./PropName.vue"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import _GetterField from "./GetterField.vue"
 import { DefineComponent, useAttrs } from "vue"
+import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
 
 const attrs = useAttrs()
 

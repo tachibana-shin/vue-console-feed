@@ -18,4 +18,4 @@ This is the plugin that is almost identical to the [console-feed](https://github
 - [ ] console.table
 - [x] Date
 - [ ] Buffer
-- [ ] TypedArray
+- [x] TypedArray

@@ -4,6 +4,7 @@
     :class="{
       propHidden: hidden,
       proto: name.startsWith('[['),
+      propPreview: preview
     }"
     >{{ name }}<span class="is">:</span>
   </span>
@@ -13,6 +14,8 @@
 defineProps<{
   hidden: boolean;
   name: string;
+
+  preview?: boolean
 }>();
 </script>
 
