@@ -10,7 +10,7 @@
     v-bind="attrs"
   >
     <slot />
-    <ConsoleValueStatic :data="data" :is-log="isLog" full :first="data['@first']" />
+    <ConsoleValueStatic :data="data" :is-log="isLog" full :first="data['@t'] === 'string' ? data['@first'] : false" />
   </div>
   <template v-else-if="data['@t'] === 'function'">
     <template v-if="data['@first']">{{ data["@code"] }}</template>
