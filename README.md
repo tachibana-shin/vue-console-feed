@@ -15,12 +15,13 @@ This is the plugin that is almost identical to the [console-feed](https://github
 - [x] regexp `full support`
 - [x] element, DOM `full support`
 - [x] Promise `limit`
-- [ ] console.table
-- [ ] console.warn
-- [ ] console.info
-- [ ] console.error
+- [x] console.table
+- [x] console.warn
+- [x] console.info
+- [x] console.error
 - [x] Date
 - [x] Buffer
 - [x] TypedArray
 - [x] DataView
 - [x] address `http` in `string` and `Error`
+- [ ] Group console

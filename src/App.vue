@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Encode } from "./logic/Encode"
 import ConsoleItem from "./components/ConsoleItem.vue"
+import ConsoleTable from "./components/ConsoleTable.vue"
 
 const el = document.createElement("div")
 el.style.color = "red"
@@ -114,7 +115,8 @@ console.error({a})
 </script>
 
 <template>
-  <ConsoleItem :data="data" type="log" />
+  <!-- <ConsoleItem :data="data" type="log" /> -->
+  <ConsoleTable />
   <!-- <div v-for="data" -->
 </template>
 

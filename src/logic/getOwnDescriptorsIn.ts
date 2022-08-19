@@ -1,7 +1,7 @@
 import { getValue } from "./getValue"
 import { isList } from "./isList"
 
-export function getOwnDescriptorsIn(obj: object) {
+export function getOwnDescriptorsIn<T extends object>(obj: T) {
   const des: Record<string, PropertyDescriptor> = {}
 
   const list = isList(obj)

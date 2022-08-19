@@ -1,5 +1,8 @@
 <template>
-  <div class="console-item" :class="type ? `console-${type}` : undefined">
+  <div
+    class="console-wrap console-item"
+    :class="type ? `console-${type}` : undefined"
+  >
     <span class="console-icon" />
     <div class="console-value">
       <ConsoleValue :data="data" :is-log="type !== undefined" />
@@ -18,16 +21,9 @@ defineProps<{
 </script>
 
 <style lang="scss" scoped>
+@import "./wrap.scss";
+
 .console-item {
-  font-family: Consolas, Lucida Console, Courier New, monospace, sans-serif;
-  white-space: pre-wrap;
-
-  // theme
-  background-color: #202124;
-  color: #ffffff;
-  font-size: 13px;
-  line-height: 1.2;
-
   border-top: 1px solid #3a3a3a;
   border-bottom: 1px solid #3a3a3a;
   padding: {

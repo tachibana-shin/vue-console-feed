@@ -10,7 +10,7 @@
     v-bind="attrs"
   >
     <slot />
-    <ConsoleValueStatic :data="data" :is-log="isLog" full :first="data['@first']" />
+    <ConsoleValueStatic :data="data" :is-log="isLog" full :first="data['@t'] === 'string' ? data['@first'] : false" />
   </div>
   <template v-else-if="data['@t'] === 'function'">
     <template v-if="data['@first']">{{ data["@code"] }}</template>
@@ -285,7 +285,7 @@
           >&gt;</span
         >
         <span v-if="data['@childs']">{{
-          typeof data["@childs"] === "string" ? data["@childs"] : "..."
+          typeof data["@childs"] === "string" ? data["@childs"] : "…"
         }}</span>
         <span class="element-tag"
           >&lt;/{{ data["@name"].toLowerCase().replace(/^#/, "") }}&gt;

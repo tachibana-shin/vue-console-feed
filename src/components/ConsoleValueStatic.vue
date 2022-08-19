@@ -27,7 +27,7 @@
   }}</span>
   <template v-else-if="data['@t'] === 'object'">
     <template v-if="!hideNameObject">{{ data["@name"] }}</template
-    >{...}</template
+    >{…}</template
   >
   <template v-else-if="data['@t'] === 'error'">{{ data["@stack"] }}</template>
   <template v-else-if="data['@t'] === 'regexp'">
@@ -59,7 +59,7 @@
   </template>
   <template v-else-if="data['@t'] === 'promise'">Promise</template>
   <template v-else-if="data['@t'] === 'date'">{{ data["@value"] }}</template>
-  <template v-else-if="data['@t'] === 'gs'">(...)</template>
+  <template v-else-if="data['@t'] === 'gs'">(…)</template>
   <template v-else>nothing</template>
 </template>
 

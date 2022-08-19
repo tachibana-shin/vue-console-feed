@@ -16,6 +16,8 @@ import { getObjectName } from "./getObjectName"
 import { createRealItem } from "./createRealItem"
 import { isDataView } from "./isDataView"
 import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
+import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
+import { isRegExp } from "./isRegExp"
 
 interface RealItem<T> {
   "@hidden": boolean
@@ -375,7 +377,7 @@ export function Encode(
         return createFakeRecord(encodeObject(data))
       }
 
-      if (data instanceof RegExp) {
+      if (isRegExp(data)) {
         if (linkReal) {
           const meta: Data.RegExp = {
             "@t": "regexp",
@@ -401,7 +403,7 @@ export function Encode(
             "@first": first,
             "@value": data.toString(),
             "@real": first ? null : createLinkObject(data), // encodeObject(data)
-            "@des": first ? null : createPreviewObject(data),
+            "@des": first ? null : createPreviewObject(data)
           }
 
           return meta
@@ -477,15 +479,10 @@ export function Encode(
           return meta
         }
 
-        return createFakeRecord({
-          size: createRealItem(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            Encode((data as unknown as any).size, false, false) as Data.Number,
-            true
-          ),
+        return createFakeRecord(
           // わかない。ぜんぜんわかない！
-          ...encodeObject(data)
-        })
+          encodeObject(data, getOwnDescriptorsCollection(data))
+        )
       }
 
       if (isBuffer(data)) {
@@ -512,14 +509,22 @@ export function Encode(
             true
           ),
 
-          // "[[Int16Array]]": createRealItem(
-          //   Encode(new Int16Array(data), false, false) as Data.TypedArray,
-          //   true
-          // ),
-          // "[[Int32Array]]": createRealItem(
-          //   Encode(new Int32Array(data), false, false) as Data.TypedArray,
-          //   true
-          // ),
+          "[[Int16Array]]": createRealItem(
+            Encode(
+              new Int16Array(data, 0, ~~(data.byteLength / 2)),
+              false,
+              false
+            ) as Data.TypedArray,
+            true
+          ),
+          "[[Int32Array]]": createRealItem(
+            Encode(
+              new Int32Array(data, 0, ~~(data.byteLength / 4)),
+              false,
+              false
+            ) as Data.TypedArray,
+            true
+          ),
 
           "[[ArrayBufferByteLength]]": createRealItem(
             Encode(data.byteLength, false, true) as Data.Number,
@@ -557,8 +562,8 @@ export function Encode(
             "@t": "promise",
             "@first": first,
             "@state": "pending", //state,
-            "@real": createLinkObject(data) ,
-            "@des": createPreviewObject(data)// {
+            "@real": createLinkObject(data),
+            "@des": createPreviewObject(data) // {
             //   ...encodeObject(data)
             //   // "[[PromiseState]]" : Encode(state),
             //   // "[[PromiseResult]]": Encode(value)
@@ -737,6 +742,92 @@ export namespace DataPreview {
     >
   }
 }
+export function createPreviewValue(
+  value: unknown
+): DataPreview.objReal[""]["@value"] {
+  if (value !== null && typeof value === "object") {
+    if (value instanceof Error) {
+      return {
+        "@t": "error",
+        "@stack": value.stack?.split("\n", 3).slice(0, 3).join("\n") ?? ""
+      }
+    }
+    if (isRegExp(value)) {
+      return {
+        "@t": "regexp",
+        "@name": value + ""
+      }
+    }
+    if (value instanceof Date) {
+      return {
+        "@t": "date",
+        "@value": value.toString()
+      }
+    }
+    if (isCollection(value)) {
+      return {
+        "@t": "collection",
+        "@name": toString.call(value).slice(8, -1) as Data.Collection["@name"],
+        "@size": (value as Set<unknown>).size ?? null
+      }
+    }
+    if (isList(value)) {
+      return {
+        "@t": "array",
+        "@name": value instanceof NodeList ? "NodeList" : null,
+        "@size": value.length
+      }
+    }
+    if (isTypedArray(value)) {
+      return {
+        "@t": "typedarray",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        "@name": (value as unknown as any)[Symbol.toStringTag],
+        "@size": value.length
+      }
+    }
+    if (isBuffer(value)) {
+      return {
+        "@t": "buffer",
+        "@name": getObjectName(value),
+        "@size": value.byteLength
+      }
+    }
+    if (isDataView(value)) {
+      return {
+        "@t": "dataview",
+        "@name": "DataView",
+        "@size": value.byteLength
+      }
+    }
+
+    if (isDom(value)) {
+      return {
+        "@t": "element",
+        "@name": value.nodeName
+      }
+    }
+
+    if (isPromise(value)) {
+      return {
+        "@t": "promise"
+      }
+    }
+
+    return {
+      "@t": "object",
+      "@name": value.constructor?.name ?? null
+    }
+  }
+  if (typeof value === "function") {
+    return {
+      "@t": "function",
+      "@name": ""
+    }
+  }
+
+  return Encode(value, false, true)
+}
 /**
  * @description show prototype public
  */
@@ -759,165 +850,8 @@ function createPreviewObject(
       name = name.toString()
       lastKey = name
       const { value } = meta
-      if (value instanceof Error) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "error",
-              "@stack": value.stack?.split("\n", 3).slice(0, 3).join("\n") ?? ""
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (value instanceof RegExp) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "regexp",
-              "@name": value + ""
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (value instanceof Date) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "date",
-              "@value": value.toString()
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (isCollection(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "collection",
-              "@name": toString
-                .call(value)
-                .slice(8, -1) as Data.Collection["@name"],
-              "@size": (value as Set<unknown>).size ?? null
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (isList(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "array",
-              "@name": value instanceof NodeList ? "NodeList" : null,
-              "@size": value.length
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (isTypedArray(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "typedarray",
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              "@name": (value as unknown as any)[Symbol.toStringTag],
-              "@size": value.length
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (isBuffer(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "buffer",
-              "@name": getObjectName(value),
-              "@size": value.byteLength
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (isDataView(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "dataview",
-              "@name": "DataView",
-              "@size": value.byteLength
-            },
-            !meta.enumerable
-          )
-        ]
-      }
 
-      if (isDom(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "element",
-              "@name": value.nodeName
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-
-      if (isPromise(value)) {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "promise"
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-
-      if (value !== null && typeof value === "object") {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "object",
-              "@name": value.constructor?.name ?? null
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-      if (typeof value === "function") {
-        return [
-          name,
-          createRealItem(
-            {
-              "@t": "function",
-              "@name": ""
-            },
-            !meta.enumerable
-          )
-        ]
-      }
-
-      return [
-        name,
-        createRealItem(Encode(value, false, true), !meta.enumerable)
-      ]
+      return [name, createRealItem(createPreviewValue(value), !meta.enumerable)]
     })
   )
 
@@ -959,7 +893,7 @@ function encodeObject(
       if (
         value !== null &&
         typeof value === "object" &&
-        !(value instanceof RegExp) &&
+        !isRegExp(value) &&
         !isCollection(value) &&
         !(value instanceof Error) &&
         !isList(value)
