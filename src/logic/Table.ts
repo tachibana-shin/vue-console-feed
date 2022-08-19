@@ -1,4 +1,4 @@
-import { createPreviewValue } from "./Encode"
+import { createPreviewValue, DataPreview } from "./Encode"
 import { entries } from "./entries"
 import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
 import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
@@ -36,7 +36,10 @@ function getDescriptors<T extends object>(data: T) {
 }
 
 export function Table<T extends object>(data: T) {
-  const table: Record<string, Record<string, unknown>> = {}
+  const table: Record<
+    string,
+    Record<string, DataPreview.objReal[""]["@value"]>
+  > = {}
   const nameCols = new Set<string>()
 
   entries(getDescriptors(data)).forEach(([name, meta]) => {

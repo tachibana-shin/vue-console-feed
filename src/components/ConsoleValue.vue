@@ -360,7 +360,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { Data, Encode, _getListLink } from "../logic/Encode"
+import { Data, DataPreview, Encode, _getListLink } from "../logic/Encode"
 import _ConsoleValue from "./ConsoleValue.vue"
 import ConsoleLink from "./ConsoleLink.vue"
 import Collapse from "./Collapse.vue"

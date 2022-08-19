@@ -1,7 +1,7 @@
 <template>
   <table class="console-wrap">
     <tr>
-      <th @click="changeSorter(KEY_INDEX)">(Index)</th>
+      <th @click="changeSorter(KEY_INDEX as any)">(Index)</th>
       <th
         v-for="name in data.cols.slice(0, MAX_COUNT_COLDS)"
         :key="name"
@@ -34,7 +34,7 @@ import { reactive, ref } from "vue"
 const MAX_COUNT_COLDS = 20
 
 // 20 x 24
-const props = defineProps<{
+defineProps<{
   data: ReturnType<typeof Table>
   dataValue?: ReturnType<typeof Encode>
 }>()
@@ -45,11 +45,16 @@ enum StateSorter {
 }
 const KEY_INDEX = Symbol("(Index)")
 const sorters = reactive<
-  Record<string | KEY_INDEX, StateSorter.ASC | StateSorter.DESC | undefined>
+  Partial<
+    Record<
+      string | typeof KEY_INDEX,
+      StateSorter.ASC | StateSorter.DESC | undefined
+    >
+  >
 >({})
-const usedSorter = ref(KEY_INDEX)
+const usedSorter = ref<string | typeof KEY_INDEX>(KEY_INDEX)
 
-function changeSorter(name: string | KEY_INDEX) {
+function changeSorter(name: string | typeof KEY_INDEX) {
   switch (sorters[name]) {
     case undefined:
       sorters[name] = StateSorter.ASC
@@ -65,8 +70,6 @@ function changeSorter(name: string | KEY_INDEX) {
   usedSorter.value = name
 }
 function sortTable(table: ReturnType<typeof Table>["table"]) {
-  const newTable: typeof table = {}
-
   const sortBy = sorters[usedSorter.value]
 
   if (sortBy === undefined) return Object.entries(table)
@@ -80,21 +83,21 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
     })
 
   return Object.entries(table).sort((a, b) => {
-    const isNum =
-      !Number.isNaN(+a[1][usedSorter.value]["@value"]) &&
-      !Number.isNaN(+b[1][usedSorter.value]["@value"])
+    const valA = (a[1][usedSorter.value as never] as unknown as never)?.[
+      "@value"
+    ] as string | undefined
+    const valB = (b[1][usedSorter.value as never] as unknown as never)?.[
+      "@value"
+    ] as string | undefined
+    const isNum = valA && valB && !Number.isNaN(+valA) && !Number.isNaN(+valB)
 
     if (isNum) {
-      return (
-        (sortBy === StateSorter.ASC ? 1 : -1) *
-        (a[1][usedSorter.value]["@value"] - b[1][usedSorter.value]["@value"])
-      )
+      return (sortBy === StateSorter.ASC ? 1 : -1) * (+valA - +valB)
     }
 
     return (
       (sortBy === StateSorter.ASC ? 1 : -1) *
-      (a[1][usedSorter.value]["@value"]?.charCodeAt(0) -
-        b[1][usedSorter.value]["@value"]?.charCodeAt(0))
+      ((valA as string)?.charCodeAt(0) - (valB as string)?.charCodeAt(0))
     )
   })
 }
