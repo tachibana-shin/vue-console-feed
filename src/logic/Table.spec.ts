@@ -3,6 +3,6 @@ import { Table } from "./Table"
 
 describe("Table", () => {
   test("basic", () => {
-    expect(Table([1, 2])).not.toThrow()
+    expect(() => Table([1, 2])).not.toThrow()
   })
 })

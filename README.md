@@ -1,6 +1,6 @@
 # vue-console-feed
 
-This is the plugin that is almost identical to the [console-feed](https://github.com/tachibana-shin/vue-console-feed) but for Vue. This plugin moves closer to `Console Chrome Devtools` than `console-feed`
+This is the plugin that is almost identical to the [console-feed](https://github.com/samdenty/console-feed) but for Vue. This plugin moves closer to `Console Chrome Devtools` than `console-feed`
 
 ** this plugin is still being deployed and is about to release **
 

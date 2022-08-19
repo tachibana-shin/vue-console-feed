@@ -233,7 +233,8 @@ function createLinkObject(obj: object): Data.Link {
 export function readLinkObject(link: Data.Link) {
   const obj = linkStore.get(link["@link"])
 
-  console.log("readLink: ", { obj })
+  if (import.meta.env.NODE_ENV !== "production")
+    console.log("readLink: ", { obj })
 
   return Encode(obj, false, false)
 }

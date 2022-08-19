@@ -43,7 +43,7 @@ export function Table<T extends object>(data: T) {
   const nameCols = new Set<string>()
 
   entries(getDescriptors(data)).forEach(([name, meta]) => {
-    console.log({ name, meta })
+    if (import.meta.env.NODE_ENV !== "production") console.log({ name, meta })
     name = name.toString()
     const { value } = meta
 
