@@ -12,7 +12,8 @@ el.innerHTML = "hkhkjhhu op<span>Hello<Span>jkfiwoejgoijerokg</span></span>"
 const uint = new Uint8Array([312, 432, 5435])
 const pro = Promise.resolve()
 const date = new Date()
-date.status = "ok"
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(date as unknown as any).status = "ok"
 const tt = {
   el,
   nl: el.childNodes,
@@ -98,14 +99,18 @@ const tt = {
   },
   abort: new AbortController()
 }
-pro.asjfiopeg = tt
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(pro as unknown as any).asjfiopeg = tt
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(tt as unknown as any).tt = tt
 
 let a
 try {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   foeojgr()
 } catch (err) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   a = err
 }
 const data = Encode(tt, true, true)
@@ -116,7 +121,7 @@ console.log(data)
 
 <template>
   <ConsoleItem :data="data" type="log" />
-  <ConsoleTable :data="Table([1,432,54,2])" />
+  <ConsoleTable :data="Table([1, 432, 54, 2])" />
   <!-- <div v-for="data" -->
 </template>
 
