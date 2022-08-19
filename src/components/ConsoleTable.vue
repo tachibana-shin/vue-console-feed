@@ -1,17 +1,18 @@
 <template>
-  <table
-    class="console-wrap"
-    :style="{
-      '--width': `${100 / (data.cols.length + 1)}%`
-    }"
-  >
+  <table class="console-wrap">
     <tr>
-      <th>(Index)</th>
-      <th v-for="name in data.cols" :key="name">{{ name }}</th>
+      <th @click="changeSorter(KEY_INDEX)">(Index)</th>
+      <th
+        v-for="name in data.cols.slice(0, MAX_COUNT_COLDS)"
+        :key="name"
+        @click="changeSorter(name)"
+      >
+        {{ name }}
+      </th>
     </tr>
-    <tr v-for="(row, name) in data.table" :key="name">
+    <tr v-for="[name, row] in sortTable(data.table)" :key="name">
       <th>{{ name }}</th>
-      <td v-for="colName in data.cols" :key="colName">
+      <td v-for="colName in data.cols.slice(0, MAX_COUNT_COLDS)" :key="colName">
         <ConsoleValueStatic
           v-if="row[colName]"
           hide-name-object
@@ -20,35 +21,83 @@
       </td>
     </tr>
   </table>
+  <ConsoleItem v-if="dataValue" :data="dataValue" />
 </template>
 
 <script lang="ts" setup>
 import { Table } from "../logic/Table"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
+import ConsoleItem from "./ConsoleItem.vue"
+import { Encode } from "../logic/Encode"
+import { reactive, ref } from "vue"
 
-const tt = {
-  min: new Set([12, 23, 43]),
-  ut: new Uint8Array([2, 33, 4354]),
-  // cc: /a/,
-  zu: new Array(1),
-  soci3al: {
-    twttier: {
-      username: "tachib_shin"
-    },
-    facebook: false
-  },
-  name: "Shin",
-  permissionspermissionspermissionspermissionspermissionspermissionspermissionspermissionspermissionspermissions:
-    ["admin"],
-  social: {
-    twttier: {
-      username: "tachib_shin"
-    },
-    facebook: false
-  }
+const MAX_COUNT_COLDS = 20
+
+// 20 x 24
+const props = defineProps<{
+  data: ReturnType<typeof Table>
+  dataValue?: ReturnType<typeof Encode>
+}>()
+
+enum StateSorter {
+  ASC = "asc",
+  DESC = "desc"
 }
-console.table(tt)
-const data = Table(tt)
+const KEY_INDEX = Symbol("(Index)")
+const sorters = reactive<
+  Record<string | KEY_INDEX, StateSorter.ASC | StateSorter.DESC | undefined>
+>({})
+const usedSorter = ref(KEY_INDEX)
+
+function changeSorter(name: string | KEY_INDEX) {
+  switch (sorters[name]) {
+    case undefined:
+      sorters[name] = StateSorter.ASC
+      break
+    case StateSorter.ASC:
+      sorters[name] = StateSorter.DESC
+      break
+    case StateSorter.DESC:
+      delete sorters[name]
+      break
+  }
+
+  usedSorter.value = name
+}
+function sortTable(table: ReturnType<typeof Table>["table"]) {
+  const newTable: typeof table = {}
+
+  const sortBy = sorters[usedSorter.value]
+
+  if (sortBy === undefined) return Object.entries(table)
+
+  if (usedSorter.value === KEY_INDEX)
+    return Object.entries(table).sort((a, b) => {
+      return (
+        (sortBy === StateSorter.ASC ? 1 : -1) *
+        (a[0].charCodeAt(0) - b[0].charCodeAt(0))
+      )
+    })
+
+  return Object.entries(table).sort((a, b) => {
+    const isNum =
+      !Number.isNaN(+a[1][usedSorter.value]["@value"]) &&
+      !Number.isNaN(+b[1][usedSorter.value]["@value"])
+
+    if (isNum) {
+      return (
+        (sortBy === StateSorter.ASC ? 1 : -1) *
+        (a[1][usedSorter.value]["@value"] - b[1][usedSorter.value]["@value"])
+      )
+    }
+
+    return (
+      (sortBy === StateSorter.ASC ? 1 : -1) *
+      (a[1][usedSorter.value]["@value"]?.charCodeAt(0) -
+        b[1][usedSorter.value]["@value"]?.charCodeAt(0))
+    )
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -59,7 +108,11 @@ table {
   text-align: left;
   border-spacing: 0;
   width: 100%;
-  table-layout: fixed;
+  table-layout: fixed; // fixed
+
+  th {
+    font-weight: 400;
+  }
 
   td,
   th {
@@ -85,8 +138,8 @@ table {
     }
   }
 
-  tr:first-child > th,
-  tr:first-child > td {
+  tr:first-child > th {
+    cursor: pointer;
     border: {
       top: $border;
       bottom: $border;

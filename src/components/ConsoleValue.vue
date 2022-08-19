@@ -10,7 +10,12 @@
     v-bind="attrs"
   >
     <slot />
-    <ConsoleValueStatic :data="data" :is-log="isLog" full :first="data['@t'] === 'string' ? data['@first'] : false" />
+    <ConsoleValueStatic
+      :data="data"
+      :is-log="isLog"
+      full
+      :first="data['@t'] === 'string' ? data['@first'] : false"
+    />
   </div>
   <template v-else-if="data['@t'] === 'function'">
     <template v-if="data['@first']">{{ data["@code"] }}</template>
@@ -203,16 +208,20 @@
       data["@name"]
     }}</span
     ><span class="array-size">({{ data["@size"] }})</span>[<template
-      v-for="item in data['@size']"
-      :key="item"
+      v-for="(item, index) in generateDescriptorArray(data['@des']!['@value'], data['@size'])"
+      :key="index"
     >
+      <span class="array-size mr-0" v-if="item.empty"
+        >&lt;empty&gt; x {{ item.count }}</span
+      >
       <ConsoleValueStatic
-        :data="data['@des']!['@value'][item - 1]['@value']"
+        v-else
+        :data="item.value['@value']"
         hide-name-object
       />
-      <span v-if="data['@size'] > item" class="comma">,</span>
+      <span v-if="data['@size'] - 1 > item.index" class="comma">,</span>
     </template>
-    <!-- addons for TypedArray -->
+    <!-- addons for TypedArray, TypedArray never empty value -->
     <template v-if="data['@t'] === 'typedarray'"
       >,
       <template v-for="key in extendsKeysTypedArray" :key="key">
@@ -380,6 +389,55 @@ defineProps<{
 
   isLog?: boolean
 }>()
+
+function generateDescriptorArray(des: DataPreview.objReal, size: number) {
+  const newDes: (
+    | {
+        empty: true
+        index: number
+        count: number
+      }
+    | {
+        empty: false
+        index: number
+        value: DataPreview.objReal[""]
+      }
+  )[] = []
+
+  let countEmpty = 0
+  for (let i = 0; i < size; i++) {
+    if (!des[i]) {
+      countEmpty++
+      continue
+    }
+
+    if (countEmpty) {
+      newDes.push({
+        empty: true,
+        index: i,
+        count: countEmpty
+      })
+      countEmpty = 0
+    }
+
+    newDes.push({
+      empty: false,
+      index: i,
+      value: des[i]
+    })
+  }
+
+  if (countEmpty) {
+    newDes.push({
+      empty: true,
+      index: size - 1,
+      count: countEmpty
+    })
+    countEmpty = 0
+  }
+
+  return newDes
+}
 </script>
 
 <style lang="scss" scoped>

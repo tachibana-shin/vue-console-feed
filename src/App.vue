@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Encode } from "./logic/Encode"
+import { Table } from "./logic/Table"
 import ConsoleItem from "./components/ConsoleItem.vue"
 import ConsoleTable from "./components/ConsoleTable.vue"
 
@@ -16,6 +17,7 @@ const tt = {
   el,
   nl: el.childNodes,
   r: /script/,
+  aep: new Array(99),
   pro,
   uint,
   buffer: uint.buffer,
@@ -107,16 +109,14 @@ try {
   a = err
 }
 const data = Encode(tt, true, true)
-console.log(tt)
+console.table(tt)
 console.log(data)
-console.error(a)
-console.error({a})
 // console.log(document.body)
 </script>
 
 <template>
-  <!-- <ConsoleItem :data="data" type="log" /> -->
-  <ConsoleTable />
+  <ConsoleItem :data="data" type="log" />
+  <ConsoleTable :data="Table([1,432,54,2])" />
   <!-- <div v-for="data" -->
 </template>
 

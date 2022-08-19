@@ -3,7 +3,7 @@
     class="console-wrap console-item"
     :class="type ? `console-${type}` : undefined"
   >
-    <span class="console-icon" />
+    <span v-if="type" class="console-icon" />
     <div class="console-value">
       <ConsoleValue :data="data" :is-log="type !== undefined" />
     </div>
@@ -24,7 +24,7 @@ defineProps<{
 @import "./wrap.scss";
 
 .console-item {
-  border-top: 1px solid #3a3a3a;
+  // border-top: 1px solid #3a3a3a;
   border-bottom: 1px solid #3a3a3a;
   padding: {
     top: 5px;
@@ -57,6 +57,12 @@ defineProps<{
     display: inline-block;
     margin-left: 7px;
     margin-right: 7px;
+    & + .console-value {
+      margin-left: 0;
+    }
+  }
+  .console-value {
+    margin-left: (10px + 7px * 2);
   }
 
   &.console-output {
