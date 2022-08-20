@@ -11,7 +11,7 @@ export default defineConfig({
       entry: resolve(__dirname, "src/index.ts"),
       name: "VueConsoleFeed",
       // the proper extensions will be added
-      fileName: "main",
+      fileName: "index",
       formats: ["cjs", "es", "iife", "umd"]
     },
     rollupOptions: {

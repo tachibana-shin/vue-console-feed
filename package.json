@@ -4,7 +4,7 @@
   "description": "a repository npm package",
   "scripts": {
     "format": "prettier -w src",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build && vue-tsc --emitDeclarationOnly",
     "dev": "vite dev",
     "lint": "eslint src --ext=.ts",
     "lint:fix": "pnpm lint --fix",
@@ -20,7 +20,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "unpkg": "./dist/index.mjs",
-  "jsdelivr": "dist/index.global.js",
+  "jsdelivr": "dist/index.umd.js",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
