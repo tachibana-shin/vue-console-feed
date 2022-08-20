@@ -26,7 +26,8 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./style.css": "./dist/style.css"
   },
   "devDependencies": {
     "@tachibana-shin/eslint-config": "^1.0.2",
@@ -62,7 +63,8 @@
     "tachibana-shin"
   ],
   "files": [
-    "dist"
+    "dist",
+    "dist/*"
   ],
   "husky": {
     "hooks": {
@@ -72,10 +74,7 @@
   "engines": {
     "node": ">=10"
   },
-  "dependencies": {
-    "linkify": "^0.2.1",
-    "linkify-html": "^3.0.5",
-    "linkifyjs": "^3.0.5",
+  "peerDependencies": {
     "vue": "^3.2.37"
   }
 }
