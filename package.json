@@ -41,6 +41,12 @@
       "types": "./dist/Table.d.ts"
     }
   },
+  "typesVersions": {
+    "*": {
+      "encode": ["dist/Encode.d.ts"],
+      "table": ["dist/Table.d.ts"]
+    }
+  },
   "devDependencies": {
     "@tachibana-shin/eslint-config": "^1.0.2",
     "@tachibana-shin/eslint-config-vue": "^1.0.5",
