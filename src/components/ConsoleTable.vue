@@ -21,23 +21,43 @@
       </td>
     </tr>
   </table>
-  <ConsoleItem v-if="dataValue" :data="dataValue" />
+  <ConsoleItem
+    v-if="dataValue"
+    :data="dataValue"
+    :_get-list-link-async="_getListLinkAsync"
+    :read-link-object-async="readLinkObjectAsync"
+  />
 </template>
 
 <script lang="ts" setup>
 import { Table } from "../logic/Table"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import ConsoleItem from "./ConsoleItem.vue"
-import { Encode } from "../logic/Encode"
+import {
+  readLinkObjectAsync as readLinkObjectAsyncDefault,
+  _getListLinkAsync as _getListLinkAsyncDefault
+} from "./api-async-defaults"
+import { Encode, readLinkObject, _getListLink } from "../logic/Encode"
 import { reactive, ref } from "vue"
+import { Promisy } from "./Promisy"
 
 const MAX_COUNT_COLDS = 20
 
 // 20 x 24
-defineProps<{
-  data: ReturnType<typeof Table>
-  dataValue?: ReturnType<typeof Encode>
-}>()
+withDefaults(
+  defineProps<{
+    data: ReturnType<typeof Table>
+    dataValue?: ReturnType<typeof Encode>
+
+    // api get lazy data
+    _getListLinkAsync: Promisy<typeof _getListLink>
+    readLinkObjectAsync: Promisy<typeof readLinkObject>
+  }>(),
+  {
+    _getListLinkAsync: _getListLinkAsyncDefault,
+    readLinkObjectAsync: readLinkObjectAsyncDefault
+  }
+)
 
 enum StateSorter {
   ASC = "asc",

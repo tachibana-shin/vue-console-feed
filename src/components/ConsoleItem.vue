@@ -5,19 +5,39 @@
   >
     <span v-if="type" class="console-icon" />
     <div class="console-value">
-      <ConsoleValue :data="data" :is-log="type !== undefined" />
+      <ConsoleValue
+        :data="data"
+        :is-log="type !== undefined"
+        :_get-list-link-async="_getListLinkAsync"
+        :read-link-object-async="readLinkObjectAsync"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Encode } from "../logic/Encode"
+import { Encode, readLinkObject, _getListLink } from "../logic/Encode"
+import {
+  readLinkObjectAsync as readLinkObjectAsyncDefault,
+  _getListLinkAsync as _getListLinkAsyncDefault
+} from "./api-async-defaults"
 import ConsoleValue from "./ConsoleValue.vue"
+import { Promisy } from "./Promisy"
 
-defineProps<{
-  data: ReturnType<typeof Encode>
-  type?: "warn" | "info" | "debug" | "error" | "output" | "log"
-}>()
+withDefaults(
+  defineProps<{
+    data: ReturnType<typeof Encode>
+    type?: "warn" | "info" | "debug" | "error" | "output" | "log"
+
+    // api
+    _getListLinkAsync: Promisy<typeof _getListLink>
+    readLinkObjectAsync: Promisy<typeof readLinkObject>
+  }>(),
+  {
+    _getListLinkAsync: _getListLinkAsyncDefault,
+    readLinkObjectAsync: readLinkObjectAsyncDefault
+  }
+)
 </script>
 
 <style lang="scss" scoped>

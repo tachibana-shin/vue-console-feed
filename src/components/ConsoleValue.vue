@@ -27,7 +27,10 @@
       </span>
 
       <template v-slot:content>
-        <ConsoleLink :link="data['@real']!" />
+        <ConsoleLink
+          :link="data['@real']!"
+          :read-link-object-async="readLinkObjectAsync"
+        />
       </template>
     </Collapse>
   </template>
@@ -103,7 +106,10 @@
         </template>
       </Collapse>
 
-      <ConsoleLink :link="data['@real']!" />
+      <ConsoleLink
+        :link="data['@real']!"
+        :read-link-object-async="readLinkObjectAsync"
+      />
     </template>
     <!-- {{ item }} -->
   </Collapse>
@@ -117,7 +123,10 @@
     <slot /><span class="regexp">{{ data["@name"] }}</span>
 
     <template v-slot:content>
-      <ConsoleLink :link="data['@real']!" />
+      <ConsoleLink
+        :link="data['@real']!"
+        :read-link-object-async="readLinkObjectAsync"
+      />
     </template>
   </Collapse>
   <Collapse
@@ -145,6 +154,7 @@
       <ConsoleLink
         v-if="data['@real']?.['@t'] === 'link'"
         :link="(data['@real'] as Data.Link)"
+        :read-link-object-async="readLinkObjectAsync"
       />
       <!-- /@real is link -->
 
@@ -196,7 +206,10 @@
     <slot /><span v-html="parseLink(data['@stack'], { minifyLink: true })" />
 
     <template v-slot:content>
-      <ConsoleLink :link="data['@real']!" />
+      <ConsoleLink
+        :link="data['@real']!"
+        :read-link-object-async="readLinkObjectAsync"
+      />
     </template>
   </Collapse>
   <Collapse
@@ -245,7 +258,10 @@
     </template>
 
     <template v-slot:content>
-      <ConsoleLink :link="data['@real']" />
+      <ConsoleLink
+        :link="data['@real']"
+        :read-link-object-async="readLinkObjectAsync"
+      />
     </template>
   </Collapse>
   <template v-else-if="data['@t'] === 'element'">
@@ -269,7 +285,10 @@
         {{ data["@name"] }}
 
         <template v-slot:content>
-          <ConsoleLink :link="data['@real']!" />
+          <ConsoleLink
+            :link="data['@real']!"
+            :read-link-object-async="readLinkObjectAsync"
+          />
         </template>
       </Collapse>
 
@@ -302,7 +321,7 @@
 
         <template v-slot:content>
           <ConsoleValue
-            v-for="(item, index) in _getListLink(data['@childs'] as Data.Link)"
+            v-for="(item, index) in (refreshListLinkAsync(data['@childs'] as Data.Link), listLinkAsync)"
             :key="index"
             :data="item"
           />
@@ -316,7 +335,10 @@
       }}</span>
 
       <template v-slot:content>
-        <ConsoleLink :link="(data['@real'] as Data.Link)" />
+        <ConsoleLink
+          :link="(data['@real'] as Data.Link)"
+          :read-link-object-async="readLinkObjectAsync"
+        />
       </template>
     </Collapse>
   </template>
@@ -344,7 +366,11 @@
     <slot />{{ data["@name"] ?? "DataView" }}({{ data["@size"] }})
 
     <template v-slot:content>
-      <ConsoleLink v-if="data['@real']['@t']" :link="data['@real']" />
+      <ConsoleLink
+        v-if="data['@real']['@t']"
+        :link="data['@real']"
+        :read-link-object-async="readLinkObjectAsync"
+      />
     </template>
   </Collapse>
   <div v-else>
@@ -360,16 +386,23 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { Data, DataPreview, Encode, _getListLink } from "../logic/Encode"
+import {
+  Data,
+  DataPreview,
+  Encode,
+  readLinkObject,
+  _getListLink
+} from "../logic/Encode"
 import _ConsoleValue from "./ConsoleValue.vue"
 import ConsoleLink from "./ConsoleLink.vue"
 import Collapse from "./Collapse.vue"
 import PropName from "./PropName.vue"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import _GetterField from "./GetterField.vue"
-import { DefineComponent, useAttrs } from "vue"
+import { DefineComponent, shallowRef, useAttrs } from "vue"
 import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
 import { parseLink } from "../logic/parseLink"
+import { Promisy } from "./Promisy"
 
 const attrs = useAttrs()
 
@@ -382,12 +415,16 @@ const GetterField = _GetterField as unknown as DefineComponent<{
   getter: Data.Link
 }>
 
-defineProps<{
+const props = defineProps<{
   data: ReturnType<typeof Encode>
   flat?: boolean
   hideNameObject?: boolean
 
   isLog?: boolean
+
+  // api
+  _getListLinkAsync: Promisy<typeof _getListLink>
+  readLinkObjectAsync: Promisy<typeof readLinkObject>
 }>()
 
 function generateDescriptorArray(des: DataPreview.objReal, size: number) {
@@ -437,6 +474,18 @@ function generateDescriptorArray(des: DataPreview.objReal, size: number) {
   }
 
   return newDes
+}
+
+const listLinkAsync = shallowRef<Awaited<ReturnType<typeof _getListLink>>>()
+
+function refreshListLinkAsync(link: Data.Link) {
+  if (listLinkAsync.value) return
+
+  props._getListLinkAsync(link).then((response) => {
+    listLinkAsync.value = response
+  })
+
+  // return listLinkAsyn
 }
 </script>
 
