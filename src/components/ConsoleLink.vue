@@ -2,7 +2,7 @@
   <ConsoleValue
     v-if="data"
     :data="data"
-    :flat="link['@type'] === 'function' || link['@type'] === 'object'"
+    flat
     :_get-list-link-async="_getListLinkAsync"
     :read-link-object-async="readLinkObjectAsync"
     :call-fn-link-async="callFnLinkAsync"
@@ -42,5 +42,6 @@ watchEffect(() => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 if (import.meta.env.NODE_ENV !== "production")
-  console.log(props.readLinkObjectAsync(props.link))
+  props.readLinkObjectAsync(props.link)
+  .then(res => console.log(res))
 </script>

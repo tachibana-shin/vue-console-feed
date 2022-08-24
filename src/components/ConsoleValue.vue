@@ -22,8 +22,17 @@
     <Collapse v-else :flat="flat">
       <slot />
       <span class="function">
-        <span class="char-f">ƒ</span>
-        {{ data["@name"] }}
+        <template v-if="data['@header'].typeFn !== 1">
+          <span class="char-f"
+            >{{ data["@header"].isAsync ? "async " : "" }}ƒ{{
+              data["@header"].isStar ? "*" : ""
+            }}</span
+          >
+          {{ data["@header"].name }}{{ data["@header"].args }}
+        </template>
+        <template v-else>
+          {{ data["@header"].args }} => {{ data["@header"].content ?? "…" }}
+        </template>
       </span>
 
       <template v-slot:content>
@@ -182,9 +191,9 @@
             <GetterField
               :getter="item['@value']['@value']"
               class="truncate"
-            :_get-list-link-async="_getListLinkAsync"
-            :read-link-object-async="readLinkObjectAsync"
-            :call-fn-link-async="callFnLinkAsync"
+              :_get-list-link-async="_getListLinkAsync"
+              :read-link-object-async="readLinkObjectAsync"
+              :call-fn-link-async="callFnLinkAsync"
             />
           </div>
           <!-- /@value -->

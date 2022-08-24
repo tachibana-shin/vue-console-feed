@@ -21,6 +21,10 @@ const tt = {
   aep: new Array(99),
   pro,
   uint,
+  asn: async function asn(v, vv, ...vvv) {},
+  *iwjfgew() {},
+  cvv: () => {alert;window},
+  gttt: () => 12423543,
   buffer: uint.buffer,
   view: new DataView(uint.buffer),
   date,
@@ -114,7 +118,7 @@ try {
   a = err
 }
 const data = Encode(tt, true, true)
-console.table(tt)
+// console.table(tt)
 console.log(data)
 // console.log(document.body)
 </script>

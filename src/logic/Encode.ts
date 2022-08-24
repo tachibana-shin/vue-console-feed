@@ -18,6 +18,7 @@ import { isDataView } from "./isDataView"
 import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
 import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
 import { isRegExp } from "./isRegExp"
+import { getHeaderFn } from "./getHeaderFn"
 
 interface RealItem<T> {
   "@hidden": boolean
@@ -48,8 +49,8 @@ export namespace Data {
   }
   export interface Function {
     "@t": "function"
-    "@name": string
     "@first": boolean
+    "@header": ReturnType<typeof getHeaderFn>
     "@code": string
     "@real": Link | null
   }
@@ -339,14 +340,12 @@ export function Encode(
     case "function": {
       if (linkReal) {
         const code = data + ""
-        const name = code.slice(
-          code.startsWith("function") ? 8 : 0,
-          code.indexOf("{") >>> 0
-        )
+
+        const header = getHeaderFn(code)
         const meta: Data.Function = {
           "@t": "function",
           "@code": first ? data.toString() : "",
-          "@name": name,
+          "@header": header,
           "@first": first,
           "@real": first ? null : createLinkObject(data)
         }

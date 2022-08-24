@@ -127,6 +127,8 @@ table {
   text-align: left;
   border-spacing: 0;
   width: 100%;
+  margin-left: (10px + 7 * 2);
+  margin-top: 10px;
   table-layout: fixed; // fixed
 
   th {

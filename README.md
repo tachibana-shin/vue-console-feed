@@ -42,6 +42,8 @@ or with CDN:
 - [x] array `full support`
 - [x] Map, Set, WeakMap, WeakSet `full support`
 - [x] function, function full `full support`
+- [x] function async
+- [x] function star, prop
 - [x] regexp `full support`
 - [x] element, DOM `full support`
 - [x] Promise `limit`
@@ -277,4 +279,5 @@ function _getListLink(link: Data.Link): (ReturnType<typeof Encode> | Data.Error)
 ```
 
 #### clearLinkStore()
+
 This is the memory release function. while you call the `Encode` functions, there will be some `object in object`, but the objects in are not immediately used so `Encode` will not analyze it but create a `link` by clicking on `object in object` that the `_getLinkObject` function will work to parse it

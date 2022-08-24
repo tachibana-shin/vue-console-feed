@@ -49,7 +49,11 @@
     >{{ data["@name"] ?? "Array" }}({{ data["@size"] }})</template
   >
   <template v-else-if="data['@t'] === 'function'">
-    <template v-if="showNameFn"> {{ data["@name"] }}</template>
+    <template v-if="showNameFn"
+      >{{ data["@header"].isAsync ? "async " : "" }}ƒ{{
+        data["@header"].isStar ? "*" : ""
+      }}{{ data["@header"].args }}</template
+    >
     <template v-else>ƒ</template>
   </template>
   <template v-else-if="data['@t'] === 'element'">
