@@ -8,36 +8,33 @@
       <ConsoleValue
         :data="data"
         :is-log="type !== undefined"
-        :_get-list-link-async="_getListLinkAsync"
-        :read-link-object-async="readLinkObjectAsync"
+        :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
+        :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
+        :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Encode, readLinkObject, _getListLink } from "../logic/Encode"
+import { Encode, readLinkObject, _getListLink , callFnLink} from "../logic/Encode"
 import {
   readLinkObjectAsync as readLinkObjectAsyncDefault,
-  _getListLinkAsync as _getListLinkAsyncDefault
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault
 } from "./api-async-defaults"
 import ConsoleValue from "./ConsoleValue.vue"
 import { Promisy } from "./Promisy"
 
-withDefaults(
-  defineProps<{
-    data: ReturnType<typeof Encode>
-    type?: "warn" | "info" | "debug" | "error" | "output" | "log"
+defineProps<{
+  data: ReturnType<typeof Encode>
+  type?: "warn" | "info" | "debug" | "error" | "output" | "log"
 
-    // api
-    _getListLinkAsync: Promisy<typeof _getListLink>
-    readLinkObjectAsync: Promisy<typeof readLinkObject>
-  }>(),
-  {
-    _getListLinkAsync: _getListLinkAsyncDefault,
-    readLinkObjectAsync: readLinkObjectAsyncDefault
-  }
-)
+  // api
+  _getListLinkAsync?: Promisy<typeof _getListLink>
+  readLinkObjectAsync?: Promisy<typeof readLinkObject>
+  callFnLinkAsync?: Promisy<typeof callFnLink>
+}>()
 </script>
 
 <style lang="scss" scoped>

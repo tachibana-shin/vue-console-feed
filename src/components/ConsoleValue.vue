@@ -29,7 +29,9 @@
       <template v-slot:content>
         <ConsoleLink
           :link="data['@real']!"
+          :_get-list-link-async="_getListLinkAsync"
           :read-link-object-async="readLinkObjectAsync"
+          :call-fn-link-async="callFnLinkAsync"
         />
       </template>
     </Collapse>
@@ -100,6 +102,9 @@
                   }
                 }"
                 flat
+                :_get-list-link-async="_getListLinkAsync"
+                :read-link-object-async="readLinkObjectAsync"
+                :call-fn-link-async="callFnLinkAsync"
               />
             </template>
           </Collapse>
@@ -108,7 +113,9 @@
 
       <ConsoleLink
         :link="data['@real']!"
+        :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
+        :call-fn-link-async="callFnLinkAsync"
       />
     </template>
     <!-- {{ item }} -->
@@ -125,7 +132,9 @@
     <template v-slot:content>
       <ConsoleLink
         :link="data['@real']!"
+        :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
+        :call-fn-link-async="callFnLinkAsync"
       />
     </template>
   </Collapse>
@@ -154,7 +163,9 @@
       <ConsoleLink
         v-if="data['@real']?.['@t'] === 'link'"
         :link="(data['@real'] as Data.Link)"
+        :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
+        :call-fn-link-async="callFnLinkAsync"
       />
       <!-- /@real is link -->
 
@@ -168,7 +179,13 @@
           <!-- @value -->
           <div class="ml-4">
             <PropName :hidden="item['@hidden']" :name="name + ''" />
-            <GetterField :getter="item['@value']['@value']" class="truncate" />
+            <GetterField
+              :getter="item['@value']['@value']"
+              class="truncate"
+            :_get-list-link-async="_getListLinkAsync"
+            :read-link-object-async="readLinkObjectAsync"
+            :call-fn-link-async="callFnLinkAsync"
+            />
           </div>
           <!-- /@value -->
 
@@ -177,6 +194,9 @@
             :key="actName"
             :data="encoded!"
             class="truncate"
+            :_get-list-link-async="_getListLinkAsync"
+            :read-link-object-async="readLinkObjectAsync"
+            :call-fn-link-async="callFnLinkAsync"
           >
             <PropName hidden :name="actName + ' ' + name" />
           </ConsoleValue>
@@ -195,6 +215,9 @@
             typeof name === 'string' && !(name as string)?.startsWith('[[') && (item['@value'] as any)?.['@name'] === 'Object'
           "
           class="truncate"
+          :_get-list-link-async="_getListLinkAsync"
+          :read-link-object-async="readLinkObjectAsync"
+          :call-fn-link-async="callFnLinkAsync"
         >
           <PropName :hidden="item['@hidden']" :name="name + ''" />
         </ConsoleValue>
@@ -208,7 +231,9 @@
     <template v-slot:content>
       <ConsoleLink
         :link="data['@real']!"
+        :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
+        :call-fn-link-async="callFnLinkAsync"
       />
     </template>
   </Collapse>
@@ -260,7 +285,9 @@
     <template v-slot:content>
       <ConsoleLink
         :link="data['@real']"
+        :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
+        :call-fn-link-async="callFnLinkAsync"
       />
     </template>
   </Collapse>
@@ -287,7 +314,9 @@
         <template v-slot:content>
           <ConsoleLink
             :link="data['@real']!"
+            :_get-list-link-async="_getListLinkAsync"
             :read-link-object-async="readLinkObjectAsync"
+            :call-fn-link-async="callFnLinkAsync"
           />
         </template>
       </Collapse>
@@ -324,6 +353,9 @@
             v-for="(item, index) in (refreshListLinkAsync(data['@childs'] as Data.Link), listLinkAsync)"
             :key="index"
             :data="item"
+            :_get-list-link-async="_getListLinkAsync"
+            :read-link-object-async="readLinkObjectAsync"
+            :call-fn-link-async="callFnLinkAsync"
           />
         </template>
       </Collapse>
@@ -337,7 +369,9 @@
       <template v-slot:content>
         <ConsoleLink
           :link="(data['@real'] as Data.Link)"
+          :_get-list-link-async="_getListLinkAsync"
           :read-link-object-async="readLinkObjectAsync"
+          :call-fn-link-async="callFnLinkAsync"
         />
       </template>
     </Collapse>
@@ -358,6 +392,9 @@
         '@real': data['@real']!
       }"
       :flat="flat"
+      :_get-list-link-async="_getListLinkAsync"
+      :read-link-object-async="readLinkObjectAsync"
+      :call-fn-link-async="callFnLinkAsync"
     >
       <slot />
     </ConsoleValue>
@@ -369,7 +406,9 @@
       <ConsoleLink
         v-if="data['@real']['@t']"
         :link="data['@real']"
+        :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
+        :call-fn-link-async="callFnLinkAsync"
       />
     </template>
   </Collapse>
@@ -391,7 +430,8 @@ import {
   DataPreview,
   Encode,
   readLinkObject,
-  _getListLink
+  _getListLink,
+  callFnLink
 } from "../logic/Encode"
 import _ConsoleValue from "./ConsoleValue.vue"
 import ConsoleLink from "./ConsoleLink.vue"
@@ -425,6 +465,7 @@ const props = defineProps<{
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
   readLinkObjectAsync: Promisy<typeof readLinkObject>
+  callFnLinkAsync: Promisy<typeof callFnLink>
 }>()
 
 function generateDescriptorArray(des: DataPreview.objReal, size: number) {

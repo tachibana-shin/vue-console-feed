@@ -6,6 +6,7 @@
     class="inline !ml-0"
     :_get-list-link-async="_getListLinkAsync"
     :read-link-object-async="readLinkObjectAsync"
+    :call-fn-link-async="callFnLinkAsync"
   />
 </template>
 
@@ -24,11 +25,11 @@ import { Promisy } from "./Promisy"
 
 const props = defineProps<{
   getter: Data.Link
-  callFnLinkAsync: Promisy<typeof callFnLink>
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
   readLinkObjectAsync: Promisy<typeof readLinkObject>
+  callFnLinkAsync: Promisy<typeof callFnLink>
 }>()
 
 const getted = ref(false)

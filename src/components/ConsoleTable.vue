@@ -24,8 +24,9 @@
   <ConsoleItem
     v-if="dataValue"
     :data="dataValue"
-    :_get-list-link-async="_getListLinkAsync"
-    :read-link-object-async="readLinkObjectAsync"
+    :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
+    :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
+    :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
   />
 </template>
 
@@ -35,7 +36,8 @@ import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import ConsoleItem from "./ConsoleItem.vue"
 import {
   readLinkObjectAsync as readLinkObjectAsyncDefault,
-  _getListLinkAsync as _getListLinkAsyncDefault
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault
 } from "./api-async-defaults"
 import { Encode, readLinkObject, _getListLink } from "../logic/Encode"
 import { reactive, ref } from "vue"
@@ -44,20 +46,14 @@ import { Promisy } from "./Promisy"
 const MAX_COUNT_COLDS = 20
 
 // 20 x 24
-withDefaults(
-  defineProps<{
-    data: ReturnType<typeof Table>
-    dataValue?: ReturnType<typeof Encode>
+defineProps<{
+  data: ReturnType<typeof Table>
+  dataValue?: ReturnType<typeof Encode>
 
-    // api get lazy data
-    _getListLinkAsync: Promisy<typeof _getListLink>
-    readLinkObjectAsync: Promisy<typeof readLinkObject>
-  }>(),
-  {
-    _getListLinkAsync: _getListLinkAsyncDefault,
-    readLinkObjectAsync: readLinkObjectAsyncDefault
-  }
-)
+  // api get lazy data
+  _getListLinkAsync?: Promisy<typeof _getListLink>
+  readLinkObjectAsync?: Promisy<typeof readLinkObject>
+}>()
 
 enum StateSorter {
   ASC = "asc",
