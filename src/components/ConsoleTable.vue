@@ -39,7 +39,7 @@ import {
   _getListLinkAsync as _getListLinkAsyncDefault,
   callFnLinkAsync as callFnLinkAsyncDefault
 } from "./api-async-defaults"
-import { Encode, readLinkObject, _getListLink } from "../logic/Encode"
+import { callFnLink, Encode, readLinkObject, _getListLink } from "../logic/Encode"
 import { reactive, ref } from "vue"
 import { Promisy } from "./Promisy"
 
@@ -53,6 +53,7 @@ defineProps<{
   // api get lazy data
   _getListLinkAsync?: Promisy<typeof _getListLink>
   readLinkObjectAsync?: Promisy<typeof readLinkObject>
+  callFnLinkAsync?: Promisy<typeof callFnLink>
 }>()
 
 enum StateSorter {

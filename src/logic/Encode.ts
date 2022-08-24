@@ -711,7 +711,7 @@ export namespace DataPreview {
   export type RegExp = Pick<Data.RegExp, "@t" | "@name">
   export type Collection = Pick<Data.Collection, "@t" | "@name" | "@size">
   export type Array = Pick<Data.Array, "@t" | "@size" | "@name">
-  export type Function = Pick<Data.Function, "@t" | "@name">
+  export type Function = Pick<Data.Function, "@t">
   export type Element = Pick<Data.Element, "@t" | "@name">
   export type Promise = Pick<Data.Promise, "@t">
   export type Date = Pick<Data.Date, "@t" | "@value">
@@ -821,8 +821,7 @@ export function createPreviewValue(
   }
   if (typeof value === "function") {
     return {
-      "@t": "function",
-      "@name": ""
+      "@t": "function"
     }
   }
 

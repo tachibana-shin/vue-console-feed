@@ -1,4 +1,4 @@
-const r = /(?:^async(?:\s+function\s*)?\*?\s*)|(?:(?:function\s*)?\*?\s*)/
+const r = /(?:^async(?:\s+function\s*)?\s*\*?\s*)|(?:^(?:function\s*)?\*?\s*)/
 // 52
 const rStarSpaces = /^\*\s*/
 const rCommaSpaces = /,\s*/g
@@ -11,11 +11,13 @@ export enum TypesFn {
 }
 
 export function getHeaderFn(code: string) {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const prefix = r.exec(code)![0]
 
   const indexSp = code.indexOf("{")
-  let indexArrow
+  let indexArrow: number
   const endHeader =
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     indexSp === -1 ? (indexArrow = (code.indexOf("=>") >>> 0) + 2) : indexSp
 
   const header = code.slice(prefix.length, endHeader)
@@ -29,7 +31,7 @@ export function getHeaderFn(code: string) {
   const args = header
     .slice(name.length, indexSlashClose + 1)
     .replace(rCommaSpaces, ", ")
-  const typeFn = prefix.startsWith("function")
+  const typeFn = prefix.includes("function")
     ? TypesFn.fn
     : header.includes("=>")
     ? TypesFn.arrowFn
@@ -43,7 +45,9 @@ export function getHeaderFn(code: string) {
         .replace(rSpaces, " ")
     } else {
       content = code
-        .slice(indexSp, (code.lastIndexOf("}") >>> 0) + 1)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        .slice(indexArrow + 1, (code.lastIndexOf("}") >>> 0) + 1)
         .replace(rSpaces, " ")
     }
 
@@ -52,31 +56,3 @@ export function getHeaderFn(code: string) {
 
   return { name, args, content, isAsync, isStar, typeFn }
 }
-
-// const a = async (v: string, vv: string, ...vvv: string[]) => {}
-// const aa = (v: string, vv: string, ...vvv: string[]) => {}
-
-// const b = async function name(params: string) {}
-// const bb = function name(params: string) {}
-
-// const c = async function* name(params: string) {}
-// const cc = function* name(params: string) {}
-
-// const d = async function* name() {}
-// const dd = function* name() {}
-
-// getHeaderFn(a + "")
-// getHeaderFn(aa + "")
-// getHeaderFn(b + "")
-// getHeaderFn(bb + "")
-// getHeaderFn(c + "")
-// getHeaderFn(cc + "")
-// getHeaderFn(d + "")
-// getHeaderFn(dd + "")
-
-// const a = { *as() {}, ac() {}, async *sas() {}, async sac() {} }
-
-// getHeaderFn(a.as + "")
-// getHeaderFn(a.ac + "")
-// getHeaderFn(a.sas + "")
-// getHeaderFn(a.sac + "")
