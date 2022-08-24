@@ -82,10 +82,10 @@
             <PropName :hidden="false" :name="index + ''" />
             <span v-if="data['@name'].endsWith('Map')"
               >{<ConsoleValueStatic :data="item[0]" full /> =>
-              <ConsoleValueStatic :data="item[1]" show-name-fn full />}</span
+              <ConsoleValueStatic :data="item[1]" full />}</span
             >
             <span v-else>
-              <ConsoleValueStatic :data="item[0]" show-name-fn full />
+              <ConsoleValueStatic :data="item[0]" full />
             </span>
 
             <template v-slot:content>

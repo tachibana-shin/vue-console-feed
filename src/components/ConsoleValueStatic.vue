@@ -48,14 +48,7 @@
     "
     >{{ data["@name"] ?? "Array" }}({{ data["@size"] }})</template
   >
-  <template v-else-if="data['@t'] === 'function'">
-    <template v-if="showNameFn"
-      >{{ data["@header"].isAsync ? "async " : "" }}ƒ{{
-        data["@header"].isStar ? "*" : ""
-      }}{{ data["@header"].args }}</template
-    >
-    <template v-else>ƒ</template>
-  </template>
+  <template v-else-if="data['@t'] === 'function'">ƒ</template>
   <template v-else-if="data['@t'] === 'element'">
     <span class="element-tag">{{
       data["@name"].toLowerCase().replace(/^#/, "")
@@ -74,7 +67,6 @@ import { parseLink } from "../logic/parseLink"
 defineProps<{
   data: DataPreview.objReal[""]["@value"] | Data.GetSetter
   hideNameObject?: boolean
-  showNameFn?: boolean
   full?: boolean
   isLog?: boolean
   first?: boolean
