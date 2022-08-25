@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DefineComponent, shallowRef, watchEffect } from "vue"
+import { DefineComponent, shallowRef, watchEffect ,toRaw} from "vue"
 import { Data, Encode, readLinkObject , callFnLink, _getListLink} from "../logic/Encode"
 import _ConsoleValue from "./ConsoleValue.vue"
 import { Promisy } from "./Promisy"
@@ -35,13 +35,13 @@ const props = defineProps<{
 const data = shallowRef<ReturnType<typeof readLinkObject>>()
 watchEffect(() => {
   props
-    .readLinkObjectAsync(props.link)
+    .readLinkObjectAsync(toRaw(props.link))
     .then((response) => (data.value = response))
 })
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 if (import.meta.env.NODE_ENV !== "production")
-  props.readLinkObjectAsync(props.link)
+  props.readLinkObjectAsync(toRaw(props.link))
   .then(res => console.log(res))
 </script>

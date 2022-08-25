@@ -448,7 +448,7 @@ import Collapse from "./Collapse.vue"
 import PropName from "./PropName.vue"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import _GetterField from "./GetterField.vue"
-import { DefineComponent, shallowRef, useAttrs } from "vue"
+import { DefineComponent, shallowRef, useAttrs, toRaw } from "vue"
 import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
 import { parseLink } from "../logic/parseLink"
 import { Promisy } from "./Promisy"
@@ -531,7 +531,7 @@ const listLinkAsync = shallowRef<Awaited<ReturnType<typeof _getListLink>>>()
 function refreshListLinkAsync(link: Data.Link) {
   if (listLinkAsync.value) return
 
-  props._getListLinkAsync(link).then((response) => {
+  props._getListLinkAsync(toRaw(link)).then((response) => {
     listLinkAsync.value = response
   })
 

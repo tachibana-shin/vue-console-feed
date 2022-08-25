@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef, watch } from "vue"
+import { ref, shallowRef, watch, toRaw } from "vue"
 import ConsoleValue from "./ConsoleValue.vue"
 
 import {
@@ -39,7 +39,7 @@ const watcher = watch(getted, () => {
 
   getted.value = true
 
-  props.callFnLinkAsync(props.getter).then((response) => {
+  props.callFnLinkAsync(toRaw(props.getter)).then((response) => {
     value.value = response
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
