@@ -1,26 +1,31 @@
 <template>
-  <table class="console-wrap">
-    <tr>
-      <th @click="changeSorter(KEY_INDEX as any)">(Index)</th>
-      <th
-        v-for="name in data.cols.slice(0, MAX_COUNT_COLDS)"
-        :key="name"
-        @click="changeSorter(name)"
-      >
-        {{ name }}
-      </th>
-    </tr>
-    <tr v-for="[name, row] in sortTable(data.table)" :key="name">
-      <th>{{ name }}</th>
-      <td v-for="colName in data.cols.slice(0, MAX_COUNT_COLDS)" :key="colName">
-        <ConsoleValueStatic
-          v-if="row[colName]"
-          hide-name-object
-          :data="row[colName]"
-        />
-      </td>
-    </tr>
-  </table>
+  <div class="console-wrap">
+    <table>
+      <tr>
+        <th @click="changeSorter(KEY_INDEX as any)">(Index)</th>
+        <th
+          v-for="name in data.cols.slice(0, MAX_COUNT_COLDS)"
+          :key="name"
+          @click="changeSorter(name)"
+        >
+          {{ name }}
+        </th>
+      </tr>
+      <tr v-for="[name, row] in sortTable(data.table)" :key="name">
+        <th>{{ name }}</th>
+        <td
+          v-for="colName in data.cols.slice(0, MAX_COUNT_COLDS)"
+          :key="colName"
+        >
+          <ConsoleValueStatic
+            v-if="row[colName]"
+            hide-name-object
+            :data="row[colName]"
+          />
+        </td>
+      </tr>
+    </table>
+  </div>
   <ConsoleItem
     v-if="dataValue"
     :data="dataValue"
@@ -39,7 +44,12 @@ import {
   _getListLinkAsync as _getListLinkAsyncDefault,
   callFnLinkAsync as callFnLinkAsyncDefault
 } from "./api-async-defaults"
-import { callFnLink, Encode, readLinkObject, _getListLink } from "../logic/Encode"
+import {
+  callFnLink,
+  Encode,
+  readLinkObject,
+  _getListLink
+} from "../logic/Encode"
 import { reactive, ref } from "vue"
 import { Promisy } from "./Promisy"
 
@@ -124,52 +134,55 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 @import "./styles.scss";
 @import "./wrap.scss";
 
-table {
-  text-align: left;
-  border-spacing: 0;
-  width: 100%;
+.console-wrap {
   margin-left: (10px + 7 * 2);
-  margin-top: 10px;
-  table-layout: fixed; // fixed
 
-  th {
-    font-weight: 400;
-  }
+  table {
+    text-align: left;
+    border-spacing: 0;
+    width: 100%;
+    margin-top: 10px;
+    table-layout: fixed; // fixed
 
-  td,
-  th {
-    padding: 3px 4px;
-    @apply truncate;
-  }
-
-  tr:nth-child(2n + 1) {
-    background-color: #292a2d;
-  }
-  tr:nth-child(2n) {
-    background-color: #202124;
-  }
-
-  $border: 1px solid #494c50;
-
-  tr > th,
-  tr > td {
-    border-left: $border;
-
-    &:last-child {
-      border-right: $border;
+    th {
+      font-weight: 400;
     }
-  }
 
-  tr:first-child > th {
-    cursor: pointer;
-    border: {
-      top: $border;
-      bottom: $border;
+    td,
+    th {
+      padding: 3px 4px;
+      @apply truncate;
     }
-  }
-  tr:last-child > th,
-  tr:last-child > td {
-    border-bottom: $border;
+
+    tr:nth-child(2n + 1) {
+      background-color: #292a2d;
+    }
+    tr:nth-child(2n) {
+      background-color: #202124;
+    }
+
+    $border: 1px solid #494c50;
+
+    tr > th,
+    tr > td {
+      border-left: $border;
+
+      &:last-child {
+        border-right: $border;
+      }
+    }
+
+    tr:first-child > th {
+      cursor: pointer;
+      border: {
+        top: $border;
+        bottom: $border;
+      }
+    }
+    tr:last-child > th,
+    tr:last-child > td {
+      border-bottom: $border;
+    }
   }
 }
 </style>
