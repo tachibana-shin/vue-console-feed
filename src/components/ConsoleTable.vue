@@ -135,7 +135,7 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 @import "./wrap.scss";
 
 .console-wrap {
-  margin-left: (10px + 7 * 2);
+  padding-left: (10px + 7 * 2);
 
   table {
     text-align: left;
