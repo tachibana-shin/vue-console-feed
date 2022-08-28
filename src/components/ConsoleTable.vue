@@ -1,5 +1,5 @@
 <template>
-  <div class="console-wrap">
+  <div class="console-wrap console-wrap-table">
     <table>
       <tr>
         <th @click="changeSorter(KEY_INDEX as any)">(Index)</th>
@@ -132,9 +132,8 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 
 <style lang="scss" scoped>
 @import "./styles.scss";
-@import "./wrap.scss";
 
-.console-wrap {
+.console-wrap-table {
   padding-left: (10px + 7 * 2);
 
   table {
