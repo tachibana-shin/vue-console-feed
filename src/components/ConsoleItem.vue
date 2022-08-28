@@ -4,20 +4,39 @@
     :class="type ? `console-${type}` : undefined"
   >
     <span v-if="type" class="console-icon" />
-    <div class="console-value">
+    <div
+      class="console-value"
+      :class="{
+        'has-location': data['@location']
+      }"
+    >
       <ConsoleValue
         :data="data"
         :is-log="type !== undefined"
         :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
-        :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
+        :read-link-object-async="
+          readLinkObjectAsync ?? readLinkObjectAsyncDefault
+        "
         :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
       />
+      <a
+        v-if="data['@location']"
+        class="console-link truncate"
+        :href="data['@location']"
+      >
+        {{ data["@location"].slice(data["@location"].lastIndexOf("/") + 1) }}
+      </a>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Encode, readLinkObject, _getListLink , callFnLink} from "../logic/Encode"
+import {
+  Encode,
+  readLinkObject,
+  _getListLink,
+  callFnLink
+} from "../logic/Encode"
 import {
   readLinkObjectAsync as readLinkObjectAsyncDefault,
   _getListLinkAsync as _getListLinkAsyncDefault,
@@ -51,6 +70,11 @@ defineProps<{
   .console-value {
     min-width: 0;
     flex: 1;
+
+    &.has-location {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   :deep(.console-link) {

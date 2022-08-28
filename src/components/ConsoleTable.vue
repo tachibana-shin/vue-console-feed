@@ -46,7 +46,7 @@ import {
 } from "./api-async-defaults"
 import {
   callFnLink,
-  Encode,
+  _Encode,
   readLinkObject,
   _getListLink
 } from "../logic/Encode"
@@ -58,7 +58,7 @@ const MAX_COUNT_COLDS = 20
 // 20 x 24
 defineProps<{
   data: ReturnType<typeof Table>
-  dataValue?: ReturnType<typeof Encode>
+  dataValue?: ReturnType<typeof _Encode>
 
   // api get lazy data
   _getListLinkAsync?: Promisy<typeof _getListLink>

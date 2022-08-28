@@ -17,7 +17,7 @@ import ConsoleValue from "./ConsoleValue.vue"
 import {
   Data,
   callFnLink,
-  Encode,
+  _Encode,
   _getListLink,
   readLinkObject
 } from "../logic/Encode"
@@ -33,7 +33,7 @@ const props = defineProps<{
 }>()
 
 const getted = ref(false)
-const value = shallowRef<ReturnType<typeof Encode>>()
+const value = shallowRef<ReturnType<typeof _Encode>>()
 const watcher = watch(getted, () => {
   watcher()
 

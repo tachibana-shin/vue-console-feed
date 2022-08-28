@@ -19,7 +19,7 @@ import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
 import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
 import { isRegExp } from "./isRegExp"
 import { getHeaderFn } from "./getHeaderFn"
-
+import { getLocationCall } from "./getLocationCall"
 interface RealItem<T> {
   "@hidden": boolean
   "@value": T
@@ -237,11 +237,11 @@ export function readLinkObject(link: Data.Link) {
   if (import.meta.env.NODE_ENV !== "production")
     console.log("readLink: ", { obj })
 
-  return Encode(obj, false, false)
+  return _Encode(obj, false, false)
 }
 export function callFnLink(
   link: Data.Link
-): ReturnType<typeof Encode> | Data.Error {
+): ReturnType<typeof _Encode> | Data.Error {
   const fn = linkStore.get(link["@link"])
 
   if (typeof fn !== "function")
@@ -252,11 +252,11 @@ export function callFnLink(
       "@real": null
     }
 
-  return Encode(fn(), false, true)
+  return _Encode(fn(), false, true)
 }
 export function _getListLink(
   link: Data.Link
-): (ReturnType<typeof Encode> | Data.Error)[] {
+): (ReturnType<typeof _Encode> | Data.Error)[] {
   const obj = linkStore.get(link["@link"])
 
   if (obj === undefined || !("length" in obj))
@@ -270,14 +270,14 @@ export function _getListLink(
     ]
 
   return Array.from(obj as ArrayLike<Node>).map((item) =>
-    Encode(item, true, true)
+    _Encode(item, true, true)
   )
 }
 export function clearLinkStore() {
   linkStore.clear()
 }
 // ==========================================
-export function Encode(
+export function _Encode(
   data: unknown,
   first: boolean, // false,
   linkReal: boolean // false
@@ -471,8 +471,8 @@ export function Encode(
             "@entries": Array.from(
               (data as unknown as Map<unknown, unknown>).entries?.() ?? []
             ).map(([key, val]) => [
-              Encode(key, false, true),
-              Encode(val, false, true)
+              _Encode(key, false, true),
+              _Encode(val, false, true)
             ]),
             "@real": createLinkObject(data)
           }
@@ -501,16 +501,16 @@ export function Encode(
         return createFakeRecord({
           ...encodeObject(data, getOwnDescriptorsBuffer(data)),
           "[[Int8Array]]": createRealItem(
-            Encode(new Int8Array(data), false, false) as Data.TypedArray,
+            _Encode(new Int8Array(data), false, false) as Data.TypedArray,
             true
           ),
           "[[Uint8Array]]": createRealItem(
-            Encode(new Uint8Array(data), false, false) as Data.TypedArray,
+            _Encode(new Uint8Array(data), false, false) as Data.TypedArray,
             true
           ),
 
           "[[Int16Array]]": createRealItem(
-            Encode(
+            _Encode(
               new Int16Array(data, 0, ~~(data.byteLength / 2)),
               false,
               false
@@ -518,7 +518,7 @@ export function Encode(
             true
           ),
           "[[Int32Array]]": createRealItem(
-            Encode(
+            _Encode(
               new Int32Array(data, 0, ~~(data.byteLength / 4)),
               false,
               false
@@ -527,7 +527,7 @@ export function Encode(
           ),
 
           "[[ArrayBufferByteLength]]": createRealItem(
-            Encode(data.byteLength, false, true) as Data.Number,
+            _Encode(data.byteLength, false, true) as Data.Number,
             true
           )
         } as Data.BufferReal)
@@ -690,6 +690,20 @@ export function Encode(
     // undefined, object, function
   }
 }
+export function Encode(
+  data: unknown,
+  deepLink?: false | number,
+  first = true,
+  linkReal = true
+) {
+  return {
+    ..._Encode(data, first, linkReal),
+    "@location":
+      deepLink === false || deepLink === undefined
+        ? null
+        : getLocationCall(deepLink)
+  }
+}
 
 function createFakeRecord<T extends Data.objReal>(
   value: T,
@@ -825,7 +839,7 @@ export function createPreviewValue(
     }
   }
 
-  return Encode(value, false, true)
+  return _Encode(value, false, true)
 }
 /**
  * @description show prototype public
@@ -875,8 +889,8 @@ function encodeObject(
       const { value } = meta
       if ("get" in meta || "set" in meta) {
         const at: Partial<Record<"get" | "set", Data.Function>> = {}
-        if (meta.get) at.get = Encode(meta.get, false, false) as Data.Function
-        if (meta.set) at.set = Encode(meta.set, false, false) as Data.Function
+        if (meta.get) at.get = _Encode(meta.get, false, false) as Data.Function
+        if (meta.set) at.set = _Encode(meta.set, false, false) as Data.Function
         return [
           name.toString(),
           createRealItem(
@@ -900,7 +914,7 @@ function encodeObject(
         return [
           name.toString(),
           createRealItem(
-            Encode(value, false, true), //createLinkObject(value),
+            _Encode(value, false, true), //createLinkObject(value),
             !meta.enumerable
           )
         ]
@@ -909,7 +923,7 @@ function encodeObject(
         return [
           name.toString(),
           createRealItem(
-            Encode(value, false, true), //createLinkObject(value),
+            _Encode(value, false, true), //createLinkObject(value),
             !meta.enumerable
           )
         ]
@@ -917,13 +931,13 @@ function encodeObject(
 
       return [
         name.toString(),
-        createRealItem(Encode(value, false, true), !meta.enumerable)
+        createRealItem(_Encode(value, false, true), !meta.enumerable)
       ]
     })
   )
 
   return Object.assign(meta, {
-    "[[Prototype]]": createRealItem(Encode(proto, false, true), true)
+    "[[Prototype]]": createRealItem(_Encode(proto, false, true), true)
   })
 }
 /// ===================== On The Road! たのたぴたぢたの。さなたびさにどさ =====================

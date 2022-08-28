@@ -13,12 +13,12 @@
 
 <script lang="ts" setup>
 import { DefineComponent, shallowRef, watchEffect ,toRaw} from "vue"
-import { Data, Encode, readLinkObject , callFnLink, _getListLink} from "../logic/Encode"
+import { Data, _Encode, readLinkObject , callFnLink, _getListLink} from "../logic/Encode"
 import _ConsoleValue from "./ConsoleValue.vue"
 import { Promisy } from "./Promisy"
 
 const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
-  data: ReturnType<typeof Encode>
+  data: ReturnType<typeof _Encode>
   hideNameObject?: boolean
   flat?: boolean
 }>

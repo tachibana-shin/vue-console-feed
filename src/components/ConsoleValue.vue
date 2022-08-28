@@ -437,7 +437,7 @@ export default {
 import {
   Data,
   DataPreview,
-  Encode,
+  _Encode,
   readLinkObject,
   _getListLink,
   callFnLink
@@ -456,7 +456,7 @@ import { Promisy } from "./Promisy"
 const attrs = useAttrs()
 
 const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
-  data: ReturnType<typeof Encode>
+  data: ReturnType<typeof _Encode>
   hideNameObject?: boolean
   flat?: boolean
 }>
@@ -465,7 +465,7 @@ const GetterField = _GetterField as unknown as DefineComponent<{
 }>
 
 const props = defineProps<{
-  data: ReturnType<typeof Encode>
+  data: ReturnType<typeof _Encode>
   flat?: boolean
   hideNameObject?: boolean
 
