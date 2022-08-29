@@ -4,8 +4,6 @@ import { getLocationCall } from "./getLocationCall"
 
 describe("getLocationCall", () => {
   test("normal", () => {
-    expect(getLocationCall()).toEqual(
-      "/workspaces/vue-console-feed/src/logic/getLocationCall.spec.ts:7:56"
-    )
+    expect(getLocationCall().endsWith("/src/logic/getLocationCall.spec.ts:6:56")).toEqual(true)
   })
 })
