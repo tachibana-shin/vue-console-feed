@@ -1,7 +1,17 @@
 <template>
   <span v-if="data['@t'] === 'string'" :class="isLog ? undefined : 'string'">
     <template v-if="first">
-      <span v-html="parseLink(data['@value'], { classes: 'color-white' })" />
+      <component
+        :is="
+          h(
+            'span',
+            parseLink(data['@value'], {
+              classes: 'color-white',
+              component: anchor
+            })
+          )
+        "
+      />
     </template>
     <template v-else-if="full"
       >"{{
@@ -61,8 +71,9 @@
 </template>
 
 <script lang="ts" setup>
-import type { Data, DataPreview } from "../logic/Encode"
+import { Data, DataPreview } from "../logic/Encode"
 import { parseLink } from "../logic/parseLink"
+import { Component, h } from "vue"
 
 defineProps<{
   data: DataPreview.objReal[""]["@value"] | Data.GetSetter
@@ -70,6 +81,10 @@ defineProps<{
   full?: boolean
   isLog?: boolean
   first?: boolean
+
+  anchor: Component<{
+    href: string
+  }>
 }>()
 </script>
 

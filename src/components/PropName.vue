@@ -12,11 +12,11 @@
 
 <script lang="ts" setup>
 defineProps<{
-  hidden: boolean
-  name: string
+  hidden: boolean;
+  name: string;
 
   preview?: boolean
-}>()
+}>();
 </script>
 
 <style lang="scss" scoped>

@@ -1,33 +1,46 @@
-export function formatRelativeLink(value: string): string {
+import { Component } from "vue"
+import { createAnchor } from "./createAnchor"
+
+function formatRelativeLink(value: string): string {
   return value
-    .slice(value.lastIndexOf("/") + 1, -1)
+    .slice(value.lastIndexOf("/") + 1)
     .replace(/t=\d+/, "")
     .replace(/\?:/, ":")
 }
 
-const rUrl = /(?:[^\s]+):\/\/[^\s]+/gi
+const rUrl = /(?:[^\s()]+):\/\/[^\s()]+/gi
 
 export function parseLink(
   text: string,
   options?: {
-    disableClick?: boolean
     minifyLink?: boolean
     classes?: string
+    component?: string | Component
   }
-): string {
-  const tag = options?.disableClick ? "span" : "a"
+) {
+  console.log(options?.component)
   const minifyLink = options?.minifyLink
   const classes = options?.classes ?? ""
+  const component = options?.component ?? "a"
 
   text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;") // block XSS
 
-  text = text.replace(rUrl, (url) => {
-    const text = minifyLink ? formatRelativeLink(url) : url
+  const children = []
+  let lastIndex = 0
+  for (const match of text.matchAll(rUrl)) {
+    children.push(text.slice(lastIndex, match.index))
 
-    return `<${tag} ${
-      tag === "a" ? `href=${JSON.stringify(url)} target="_blank" ` : ""
-    }class="console-link ${classes}">${text}</${tag}>`
-  })
+    children.push(
+      createAnchor(component, {
+        href: match[0],
+        class: ["console-link", classes],
+        get text() {
+          return minifyLink ? formatRelativeLink(match[0]) : match[0]
+        }
+      })
+    )
+    lastIndex = match.index! + match[0].length
+  }
 
-  return text
+  return children
 }

@@ -15,6 +15,7 @@
         v-if="data['@location'] && !noLocation"
         class="truncate console-location"
         :location="data['@location']"
+        :anchor="anchor ?? $slots.anchor"
       />
       <div class="console-message">
         <ConsoleValue
@@ -25,6 +26,7 @@
             readLinkObjectAsync ?? readLinkObjectAsyncDefault
           "
           :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
+          :anchor="anchor ?? $slots.anchor"
         />
       </div>
     </div>
@@ -32,70 +34,38 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, onUpdated, ref } from "vue"
-
-import type {
-  _getListLink,
-  callFnLink,
+import {
   Encode,
-  readLinkObject
+  readLinkObject,
+  _getListLink,
+  callFnLink
 } from "../logic/Encode"
-
+import {
+  readLinkObjectAsync as readLinkObjectAsyncDefault,
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault
+} from "./api-async-defaults"
 import ConsoleValue from "./ConsoleValue.vue"
 import LocationConsole from "./LocationConsole.vue"
-import type { Promisy } from "./Promisy"
-import {
-  _getListLinkAsync as _getListLinkAsyncDefault,
-  callFnLinkAsync as callFnLinkAsyncDefault,
-  readLinkObjectAsync as readLinkObjectAsyncDefault
-} from "./api-async-defaults"
+import { Promisy } from "./Promisy"
+import { Component, useSlots } from "vue"
 
-const props = defineProps<{
+defineProps<{
   data: ReturnType<typeof Encode>
   type?: "warn" | "info" | "debug" | "error" | "output" | "log"
 
-  useLinkClick?: boolean
   noLocation?: boolean
+
+  anchor?: Component<{
+    href: string
+  }>
 
   // api
   _getListLinkAsync?: Promisy<typeof _getListLink>
   readLinkObjectAsync?: Promisy<typeof readLinkObject>
   callFnLinkAsync?: Promisy<typeof callFnLink>
 }>()
-
-const emit = defineEmits<{
-  (name: "linkClick", event: MouseEvent): void
-}>()
-
-const elRef = ref<HTMLDivElement>()
-
-function handlerLink(event: MouseEvent) {
-  event.preventDefault()
-  emit("linkClick", event)
-}
-
-function addEventListenersForLink() {
-  elRef.value?.querySelectorAll("a").forEach((anchor) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((anchor as unknown as any).__consoleLinkListened__)
-      return // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(anchor as unknown as any).__consoleLinkListened__ = true
-    anchor.addEventListener("click", handlerLink)
-  })
-}
-function removeEventListenersForLink() {
-  elRef.value?.querySelectorAll("a").forEach((anchor) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(anchor as unknown as any).__consoleLinkListened__ = false
-    anchor.removeEventListener("click", handlerLink)
-  })
-}
-
-if (props.useLinkClick) {
-  onMounted(addEventListenersForLink)
-  onUpdated(addEventListenersForLink)
-  onBeforeUnmount(removeEventListenersForLink)
-}
+const $slots = useSlots()
 </script>
 
 <style lang="scss" scoped>
@@ -126,7 +96,7 @@ if (props.useLinkClick) {
     }
   }
 
-  :deep(.console-link) {
+  :deep(a) {
     @extend .console-link;
   }
   :deep(.color-white) {

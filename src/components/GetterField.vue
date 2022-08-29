@@ -7,25 +7,29 @@
     :_get-list-link-async="_getListLinkAsync"
     :read-link-object-async="readLinkObjectAsync"
     :call-fn-link-async="callFnLinkAsync"
+    :anchor="anchor"
   />
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef, toRaw, watch } from "vue"
+import { ref, shallowRef, watch, toRaw } from "vue"
+import ConsoleValue from "./ConsoleValue.vue"
 
-import type {
+import {
+  Data,
+  callFnLink,
   _Encode,
   _getListLink,
-  callFnLink,
-  Data,
   readLinkObject
 } from "../logic/Encode"
-
-import ConsoleValue from "./ConsoleValue.vue"
-import type { Promisy } from "./Promisy"
+import { Promisy } from "./Promisy"
 
 const props = defineProps<{
   getter: Data.Link
+
+  anchor: Component<{
+    href: string
+  }>
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
@@ -40,13 +44,11 @@ const watcher = watch(getted, () => {
 
   getted.value = true
 
-  // eslint-disable-next-line promise/catch-or-return
   props.callFnLinkAsync(toRaw(props.getter)).then((response) => {
     value.value = response
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
-    // @ts-ignore
-    // eslint-disable-next-line promise/always-return
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     if (import.meta.env.NODE_ENV !== "production") {
       console.log("valueof", value.value)
     }

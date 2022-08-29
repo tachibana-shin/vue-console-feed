@@ -4,6 +4,7 @@
       v-if="data['@location']"
       class="truncate console-location"
       :location="data['@location']"
+      :anchor="anchor ?? $slots.anchor"
     />
     <table>
       <tr>
@@ -26,6 +27,7 @@
             v-if="row[colName]"
             hide-name-object
             :data="row[colName]"
+            :anchor="anchor ?? $slots.anchor"
           />
         </td>
       </tr>
@@ -38,30 +40,33 @@
     :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
     :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
     no-location
+    :anchor="anchor ?? $slots.anchor"
   />
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue"
-
-import type { _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
-import type { Table } from "../logic/Table"
-
-import ConsoleItem from "./ConsoleItem.vue"
+import { Table } from "../logic/Table"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
-import LocationConsole from "./LocationConsole.vue"
-import type { Promisy } from "./Promisy"
+import ConsoleItem from "./ConsoleItem.vue"
 import {
+  readLinkObjectAsync as readLinkObjectAsyncDefault,
   _getListLinkAsync as _getListLinkAsyncDefault,
-  callFnLinkAsync as callFnLinkAsyncDefault,
-  readLinkObjectAsync as readLinkObjectAsyncDefault
+  callFnLinkAsync as callFnLinkAsyncDefault
 } from "./api-async-defaults"
+import { callFnLink, readLinkObject, _getListLink } from "../logic/Encode"
+import { Component, reactive, ref } from "vue"
+import { Promisy } from "./Promisy"
+import LocationConsole from "./LocationConsole.vue"
 
 const MAX_COUNT_COLDS = 20
 
 // 20 x 24
 defineProps<{
   data: ReturnType<typeof Table>
+
+  anchor?: Component<{
+    href: string
+  }>
 
   // api get lazy data
   _getListLinkAsync?: Promisy<typeof _getListLink>
@@ -136,6 +141,7 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 <style lang="scss" scoped>
 @import "./styles.scss";
 @import "./wrap.scss";
+@import "./location-console.scss";
 
 .console-wrap-table {
   padding-left: (10px + 7 * 2);

@@ -15,6 +15,7 @@
       :is-log="isLog"
       full
       :first="data['@t'] === 'string' ? data['@first'] : false"
+      :anchor="anchor"
     />
   </div>
   <template v-else-if="data['@t'] === 'function'">
@@ -41,6 +42,7 @@
           :_get-list-link-async="_getListLinkAsync"
           :read-link-object-async="readLinkObjectAsync"
           :call-fn-link-async="callFnLinkAsync"
+          :anchor="anchor"
         />
       </template>
     </Collapse>
@@ -57,11 +59,24 @@
     <template v-else-if="data['@size'] !== null"
       >{<span v-for="(item, index) in data['@entries']" :key="index">
         <span v-if="data['@name'].endsWith('Map')">
-          <ConsoleValueStatic :data="item[0]" hide-name-object /> =>
-          <ConsoleValueStatic :data="item[1]" hide-name-object />
+          <ConsoleValueStatic
+            :data="item[0]"
+            hide-name-object
+            :anchor="anchor"
+          />
+          =>
+          <ConsoleValueStatic
+            :data="item[1]"
+            hide-name-object
+            :anchor="anchor"
+          />
         </span>
         <span v-else>
-          <ConsoleValueStatic :data="item[0]" hide-name-object />
+          <ConsoleValueStatic
+            :data="item[0]"
+            hide-name-object
+            :anchor="anchor"
+          />
         </span>
         <span v-if="index < data['@size'] - 1" class="comma">,</span> </span
       >}
@@ -81,11 +96,15 @@
           <Collapse v-for="(item, index) in data['@entries']" :key="index">
             <PropName :hidden="false" :name="index + ''" />
             <span v-if="data['@name'].endsWith('Map')"
-              >{<ConsoleValueStatic :data="item[0]" full /> =>
-              <ConsoleValueStatic :data="item[1]" full />}</span
+              >{<ConsoleValueStatic :data="item[0]" full :anchor="anchor" /> =>
+              <ConsoleValueStatic
+                :data="item[1]"
+                full
+                :anchor="anchor"
+              />}</span
             >
             <span v-else>
-              <ConsoleValueStatic :data="item[0]" full />
+              <ConsoleValueStatic :data="item[0]" full :anchor="anchor" />
             </span>
 
             <template v-slot:content>
@@ -114,6 +133,7 @@
                 :_get-list-link-async="_getListLinkAsync"
                 :read-link-object-async="readLinkObjectAsync"
                 :call-fn-link-async="callFnLinkAsync"
+                :anchor="anchor"
               />
             </template>
           </Collapse>
@@ -125,6 +145,7 @@
         :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
         :call-fn-link-async="callFnLinkAsync"
+        :anchor="anchor"
       />
     </template>
     <!-- {{ item }} -->
@@ -144,6 +165,7 @@
         :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
         :call-fn-link-async="callFnLinkAsync"
+        :anchor="anchor"
       />
     </template>
   </Collapse>
@@ -156,7 +178,11 @@
     <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span
     >{<template v-for="(item, name) in data['@des']?.['@value']" :key="name">
       <PropName :hidden="item['@hidden']" :name="name + ''" preview />
-      <ConsoleValueStatic :data="item['@value']" hide-name-object />
+      <ConsoleValueStatic
+        :data="item['@value']"
+        hide-name-object
+        :anchor="anchor"
+      />
       <span class="comma" v-if="name !== data['@des']!['@lastKey']"
         >,</span
       > </template
@@ -175,6 +201,7 @@
         :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
         :call-fn-link-async="callFnLinkAsync"
+        :anchor="anchor"
       />
       <!-- /@real is link -->
 
@@ -206,6 +233,7 @@
             :_get-list-link-async="_getListLinkAsync"
             :read-link-object-async="readLinkObjectAsync"
             :call-fn-link-async="callFnLinkAsync"
+            :anchor="anchor"
           >
             <PropName hidden :name="actName + ' ' + name" />
           </ConsoleValue>
@@ -227,6 +255,7 @@
           :_get-list-link-async="_getListLinkAsync"
           :read-link-object-async="readLinkObjectAsync"
           :call-fn-link-async="callFnLinkAsync"
+          :anchor="anchor"
         >
           <PropName :hidden="item['@hidden']" :name="name + ''" />
         </ConsoleValue>
@@ -235,7 +264,14 @@
     </template>
   </Collapse>
   <Collapse v-else-if="data['@t'] === 'error'" :only-btn="data['@first']">
-    <slot /><span v-html="parseLink(data['@stack'], { minifyLink: true })" />
+    <slot /><component
+      :is="
+        h(
+          'span',
+          parseLink(data['@stack'], { minifyLink: true, component: anchor })
+        )
+      "
+    />
 
     <template v-slot:content>
       <ConsoleLink
@@ -243,6 +279,7 @@
         :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
         :call-fn-link-async="callFnLinkAsync"
+        :anchor="anchor"
       />
     </template>
   </Collapse>
@@ -265,6 +302,7 @@
         v-else
         :data="item.value['@value']"
         hide-name-object
+        :anchor="anchor"
       />
       <span v-if="data['@size'] - 1 > item.index" class="comma">,</span>
     </template>
@@ -281,6 +319,7 @@
         <ConsoleValueStatic
           :data="data['@des']!['@value'][key.toString()]['@value']"
           hide-name-object
+          :anchor="anchor"
         />
         <span class="comma">,</span>
       </template> </template
@@ -297,6 +336,7 @@
         :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
         :call-fn-link-async="callFnLinkAsync"
+        :anchor="anchor"
       />
     </template>
   </Collapse>
@@ -326,6 +366,7 @@
             :_get-list-link-async="_getListLinkAsync"
             :read-link-object-async="readLinkObjectAsync"
             :call-fn-link-async="callFnLinkAsync"
+            :anchor="anchor"
           />
         </template>
       </Collapse>
@@ -365,6 +406,7 @@
             :_get-list-link-async="_getListLinkAsync"
             :read-link-object-async="readLinkObjectAsync"
             :call-fn-link-async="callFnLinkAsync"
+            :anchor="anchor"
           />
         </template>
       </Collapse>
@@ -381,6 +423,7 @@
           :_get-list-link-async="_getListLinkAsync"
           :read-link-object-async="readLinkObjectAsync"
           :call-fn-link-async="callFnLinkAsync"
+          :anchor="anchor"
         />
       </template>
     </Collapse>
@@ -404,6 +447,7 @@
       :_get-list-link-async="_getListLinkAsync"
       :read-link-object-async="readLinkObjectAsync"
       :call-fn-link-async="callFnLinkAsync"
+      :anchor="anchor"
     >
       <slot />
     </ConsoleValue>
@@ -418,6 +462,7 @@
         :_get-list-link-async="_getListLinkAsync"
         :read-link-object-async="readLinkObjectAsync"
         :call-fn-link-async="callFnLinkAsync"
+        :anchor="anchor"
       />
     </template>
   </Collapse>
@@ -427,52 +472,57 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  inheritAttrs: false
+}
+</script>
+
 <script lang="ts" setup>
-import type { DefineComponent } from "vue"
-import { shallowRef, toRaw, useAttrs } from "vue"
-
-import { Data } from "../logic/Encode"
-import type {
-  _Encode,
-  _getListLink,
-  callFnLink,
+import {
+  Data,
   DataPreview,
-  readLinkObject
+  _Encode,
+  readLinkObject,
+  _getListLink,
+  callFnLink
 } from "../logic/Encode"
-import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
-import { parseLink } from "../logic/parseLink"
-
-import Collapse from "./Collapse.vue"
-import ConsoleLink from "./ConsoleLink.vue"
 import _ConsoleValue from "./ConsoleValue.vue"
+import ConsoleLink from "./ConsoleLink.vue"
+import Collapse from "./Collapse.vue"
+import PropName from "./PropName.vue"
 import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import _GetterField from "./GetterField.vue"
-import type { Promisy } from "./Promisy"
-import PropName from "./PropName.vue"
+import { DefineComponent, shallowRef, useAttrs, toRaw, h, Component } from "vue"
+import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
+import { parseLink } from "../logic/parseLink"
+import { Promisy } from "./Promisy"
 
 const attrs = useAttrs()
 
-const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
-  data: ReturnType<typeof _Encode>
-  hideNameObject?: boolean
-  flat?: boolean
-}>
-const GetterField = _GetterField as unknown as DefineComponent<{
-  getter: Data.Link
-}>
-
-const props = defineProps<{
+interface Props {
   data: ReturnType<typeof _Encode>
   flat?: boolean
   hideNameObject?: boolean
 
   isLog?: boolean
 
+  anchor: Component<{
+    href: string
+  }>
+
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
   readLinkObjectAsync: Promisy<typeof readLinkObject>
   callFnLinkAsync: Promisy<typeof callFnLink>
-}>()
+}
+
+const ConsoleValue = _ConsoleValue as unknown as DefineComponent<Props>
+const GetterField = _GetterField as unknown as DefineComponent<{
+  getter: Data.Link
+}>
+
+const props = defineProps<Props>()
 
 function generateDescriptorArray(des: DataPreview.objReal, size: number) {
   const newDes: (
@@ -488,9 +538,7 @@ function generateDescriptorArray(des: DataPreview.objReal, size: number) {
       }
   )[] = []
 
-  // eslint-disable-next-line functional/no-let
   let countEmpty = 0
-  // eslint-disable-next-line functional/no-let
   for (let i = 0; i < size; i++) {
     if (!des[i]) {
       countEmpty++
@@ -530,18 +578,11 @@ const listLinkAsync = shallowRef<Awaited<ReturnType<typeof _getListLink>>>()
 function refreshListLinkAsync(link: Data.Link) {
   if (listLinkAsync.value) return
 
-  // eslint-disable-next-line promise/catch-or-return, promise/always-return
   props._getListLinkAsync(toRaw(link)).then((response) => {
     listLinkAsync.value = response
   })
 
   // return listLinkAsyn
-}
-</script>
-
-<script lang="ts">
-export default {
-  inheritAttrs: false
 }
 </script>
 

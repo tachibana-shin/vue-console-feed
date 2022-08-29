@@ -1,12 +1,24 @@
 <template>
-  <a class="console-link" :href="location" target="_blank">
-    {{ location.slice(location.lastIndexOf("/") + 1) }}
-  </a>
+  <component
+    :is="
+      createAnchor(anchor, {
+        class: 'console-link',
+        href: location,
+        text: location.slice(location.lastIndexOf('/') + 1)
+      })
+    "
+  />
 </template>
 
 <script lang="ts" setup>
+import { Component } from "vue";
+import { createAnchor } from "../logic/createAnchor"
+
 defineProps<{
   location: string
+  anchor: Component<{
+    href: string
+  }>
 }>()
 </script>
 
