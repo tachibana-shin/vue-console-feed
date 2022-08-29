@@ -1,6 +1,6 @@
 {
   "name": "vue-console-feed",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "a repository npm package",
   "scripts": {
     "format": "prettier -w src",
