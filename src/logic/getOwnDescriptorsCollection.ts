@@ -1,5 +1,5 @@
-import { getValue } from "./getValue"
 import { getObjectName } from "./getObjectName"
+import { getValue } from "./getValue"
 
 const keys = ["size"]
 export function getOwnDescriptorsCollection(

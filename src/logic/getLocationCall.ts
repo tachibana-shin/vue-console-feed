@@ -3,8 +3,10 @@ export function getLocationCall(deep = 3): string | null {
 
   if (!mess) return null
 
-  return mess
-    .slice(mess.lastIndexOf("(") + 1, -1)
-    .replace(/t=\d+/, "")
-    .replace(/\?:/, ":")
+  if (mess.endsWith(")"))
+    return mess
+      .slice(mess.lastIndexOf("(") + 1, -1)
+      .replace(/t=\d+/, "")
+      .replace(/\?:/, ":")
+  return mess.slice(7)
 }

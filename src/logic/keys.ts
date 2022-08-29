@@ -7,4 +7,5 @@ export function keys<T extends object>(obj: T): (string | number | symbol)[] {
   return keys
 }
 
+// eslint-disable-next-line no-irregular-whitespace
 //　チェック

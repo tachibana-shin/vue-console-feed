@@ -61,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Data, DataPreview } from "../logic/Encode"
+import type { Data, DataPreview } from "../logic/Encode"
 import { parseLink } from "../logic/parseLink"
 
 defineProps<{

@@ -1,31 +1,37 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { entries } from "./entries"
-import { isList } from "./isList"
-import { isDom } from "./isDom"
-import { shouldInline } from "./shouldInline"
-import { isCollection } from "./isCollection"
-import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
-import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
-import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
-import { getValue } from "./getValue"
-import { isPromise } from "./isPromise"
-import { isTypedArray } from "./isTypedArray"
-import { isBuffer } from "./isBuffer"
-import { getOwnDescriptorsTypedArray } from "./getOwnDescriptorsTypedArray"
-import { getObjectName } from "./getObjectName"
 import { createRealItem } from "./createRealItem"
-import { isDataView } from "./isDataView"
-import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
-import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
-import { isRegExp } from "./isRegExp"
+import { entries } from "./entries"
 import { getHeaderFn } from "./getHeaderFn"
 import { getLocationCall } from "./getLocationCall"
+import { getObjectName } from "./getObjectName"
+import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
+import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
+import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
+import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
+import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
+import { getOwnDescriptorsTypedArray } from "./getOwnDescriptorsTypedArray"
+import { getValue } from "./getValue"
+import { isBuffer } from "./isBuffer"
+import { isCollection } from "./isCollection"
+import { isDataView } from "./isDataView"
+import { isDom } from "./isDom"
+import { isList } from "./isList"
+import { isPromise } from "./isPromise"
+import { isRegExp } from "./isRegExp"
+import { isTypedArray } from "./isTypedArray"
+import { shouldInline } from "./shouldInline"
 interface RealItem<T> {
   "@hidden": boolean
   "@value": T
 }
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Data {
+  export interface Link {
+    "@t": "link"
+    "@type": "object" | "function"
+    "@link": string
+    "@name": string | null
+  }
   export interface String {
     "@t": "string"
     "@first": boolean
@@ -54,8 +60,9 @@ export namespace Data {
     "@code": string
     "@real": Link | null
   }
-  //=============
+  //= ============
   export interface Collection
+    // eslint-disable-next-line no-use-before-define
     extends Omit<Record, "@t" | "@des" | "@first" | "@real"> {
     "@t": "collection"
     "@name": "map" | "weakmap" | "set" | "weakset"
@@ -63,8 +70,9 @@ export namespace Data {
     "@entries": unknown
     "@real": Link
   }
-  //==============
+  //= =============
   export interface RegExp
+    // eslint-disable-next-line no-use-before-define
     extends Omit<Record, "@t" | "@de" | "@real" | "@des"> {
     "@t": "regexp"
     "@flags": string
@@ -78,6 +86,7 @@ export namespace Data {
       [name in "get" | "set"]: Function
     }>
   }
+  // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
   export interface objReal {
     [name: string]: RealItem<
       | GetSetter
@@ -88,24 +97,27 @@ export namespace Data {
       | Function
       | Collection
       | RegExp
+      // eslint-disable-next-line no-use-before-define
       | Record
       | Nill
       // | Link
+      // eslint-disable-next-line no-use-before-define
       | Error
+      // eslint-disable-next-line no-use-before-define
       | Array
+      // eslint-disable-next-line no-use-before-define
       | Element
+      // eslint-disable-next-line no-use-before-define
       | Promise
+      // eslint-disable-next-line no-use-before-define
       | Date
+      // eslint-disable-next-line no-use-before-define
       | TypedArray
+      // eslint-disable-next-line no-use-before-define
       | Buffer
+      // eslint-disable-next-line no-use-before-define
       | DataView
     >
-  }
-  export interface Link {
-    "@t": "link"
-    "@type": "object" | "function"
-    "@link": string
-    "@name": string | null
   }
   export interface Record {
     "@t": "object"
@@ -113,6 +125,7 @@ export namespace Data {
     "@first": boolean
     "@real": objReal | Link
     "@des": {
+      // eslint-disable-next-line no-use-before-define
       "@value": DataPreview.objReal
       "@lastKey": string
     } | null
@@ -160,6 +173,7 @@ export namespace Data {
     "@real": Link
   }
   export type TypedArrayReal = ArrayReal & {
+    // eslint-disable-next-line no-use-before-define
     buffer: RealItem<Buffer>
     byteLength: RealItem<Number>
     byteOffset: RealItem<Number>
@@ -420,7 +434,7 @@ export function _Encode(
             "@size": data.length,
             "@name": data instanceof NodeList ? "NodeList" : null,
             "@des": createPreviewObject(data),
-            "@real": createLinkObject(data) //encodeObject(data) as ReturnType<typeof encodeObject> & {
+            "@real": createLinkObject(data) // encodeObject(data) as ReturnType<typeof encodeObject> & {
             // length: RealItem<Data.Number>
             // }
           }
@@ -561,7 +575,7 @@ export function _Encode(
           const meta: Data.Promise = {
             "@t": "promise",
             "@first": first,
-            "@state": "pending", //state,
+            "@state": "pending", // state,
             "@real": createLinkObject(data),
             "@des": createPreviewObject(data) // {
             //   ...encodeObject(data)
@@ -576,7 +590,7 @@ export function _Encode(
         return createFakeRecord(encodeObject(data))
       }
 
-      //なんで？
+      // なんで？
       if (isDom(data)) {
         if (linkReal) {
           const attrs =
@@ -698,10 +712,7 @@ export function Encode(
 ) {
   return {
     ..._Encode(data, first, linkReal),
-    "@location":
-      deepLink === false
-        ? null
-        : getLocationCall(deepLink)
+    "@location": deepLink === false ? null : getLocationCall(deepLink)
   }
 }
 
@@ -733,6 +744,7 @@ export namespace DataPreview {
   export type Buffer = Pick<Data.Buffer, "@t" | "@size" | "@name">
   export type DataView = Pick<Data.DataView, "@t" | "@size" | "@name">
 
+  // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
   export interface objReal {
     [name: string]: RealItem<
       | Record
@@ -740,7 +752,6 @@ export namespace DataPreview {
       | RegExp
       | Collection
       | Array
-      // eslint-disable-next-line @typescript-eslint/ban-types
       | Function
       | Element
       | Promise
@@ -851,13 +862,15 @@ function createPreviewObject(
   "@value": DataPreview.objReal
   "@lastKey": string
 } {
+  // eslint-disable-next-line functional/no-let
   let lastKey: string | number | symbol = ""
+  // eslint-disable-next-line n/no-unsupported-features/es-builtins
   const meta = Object.fromEntries(
     entries(
       Object.assign(
         getOwnDescriptorsIn(data),
         Object.getOwnPropertyDescriptors(data),
-        extendsPropertyDescriptors //data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
+        extendsPropertyDescriptors // data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
       )
     ).map(([name, meta]): [string, DataPreview.objReal[""]] => {
       name = name.toString()
@@ -878,12 +891,13 @@ function encodeObject(
   extendsPropertyDescriptors?: Record<string, PropertyDescriptor>,
   proto: object | Function = Object.getPrototypeOf(data)
 ): Data.objReal {
+  // eslint-disable-next-line n/no-unsupported-features/es-builtins
   const meta = Object.fromEntries(
     entries(
       Object.assign(
         getOwnDescriptorsIn(data),
         Object.getOwnPropertyDescriptors(data),
-        extendsPropertyDescriptors //data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
+        extendsPropertyDescriptors // data instanceof RegExp ? getOwnDescriptorsRegExp(data) : undefined
       )
     ).map(([name, meta]): [string, Data.objReal[""]] => {
       const { value } = meta
@@ -896,7 +910,7 @@ function encodeObject(
           createRealItem(
             {
               "@t": "gs",
-              "@value": createLinkObject(() => getValue(data, name, data)), //meta.get?.(),
+              "@value": createLinkObject(() => getValue(data, name, data)), // meta.get?.(),
               "@at": at
             },
             !meta.enumerable
@@ -914,7 +928,7 @@ function encodeObject(
         return [
           name.toString(),
           createRealItem(
-            _Encode(value, false, true), //createLinkObject(value),
+            _Encode(value, false, true), // createLinkObject(value),
             !meta.enumerable
           )
         ]
@@ -923,7 +937,7 @@ function encodeObject(
         return [
           name.toString(),
           createRealItem(
-            _Encode(value, false, true), //createLinkObject(value),
+            _Encode(value, false, true), // createLinkObject(value),
             !meta.enumerable
           )
         ]

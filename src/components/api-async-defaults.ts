@@ -1,4 +1,5 @@
-import { Data, readLinkObject, _getListLink, callFnLink } from "../logic/Encode"
+import type { Data } from "../logic/Encode"
+import { _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
 
 export async function _getListLinkAsync(link: Data.Link) {
   return _getListLink(link)

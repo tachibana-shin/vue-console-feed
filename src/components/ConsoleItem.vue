@@ -32,21 +32,23 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Encode,
-  readLinkObject,
+import { onBeforeUnmount, onMounted, onUpdated, ref } from "vue"
+
+import type {
   _getListLink,
-  callFnLink
+  callFnLink,
+  Encode,
+  readLinkObject
 } from "../logic/Encode"
-import {
-  readLinkObjectAsync as readLinkObjectAsyncDefault,
-  _getListLinkAsync as _getListLinkAsyncDefault,
-  callFnLinkAsync as callFnLinkAsyncDefault
-} from "./api-async-defaults"
+
 import ConsoleValue from "./ConsoleValue.vue"
 import LocationConsole from "./LocationConsole.vue"
-import { Promisy } from "./Promisy"
-import { onUpdated, onMounted, onBeforeUnmount, ref } from "vue"
+import type { Promisy } from "./Promisy"
+import {
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault,
+  readLinkObjectAsync as readLinkObjectAsyncDefault
+} from "./api-async-defaults"
 
 const props = defineProps<{
   data: ReturnType<typeof Encode>
@@ -67,16 +69,16 @@ const emit = defineEmits<{
 
 const elRef = ref<HTMLDivElement>()
 
-function handlerLink(event) {
+function handlerLink(event: MouseEvent) {
   event.preventDefault()
   emit("linkClick", event)
 }
 
-function addEventLitentersForLink() {
+function addEventListenersForLink() {
   elRef.value?.querySelectorAll("a").forEach((anchor) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((anchor as unknown as any).__consoleLinkListened__) return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((anchor as unknown as any).__consoleLinkListened__)
+      return // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(anchor as unknown as any).__consoleLinkListened__ = true
     anchor.addEventListener("click", handlerLink)
   })
@@ -90,8 +92,8 @@ function removeEventListenersForLink() {
 }
 
 if (props.useLinkClick) {
-  onMounted(addEventLitentersForLink)
-  onUpdated(addEventLitentersForLink)
+  onMounted(addEventListenersForLink)
+  onUpdated(addEventListenersForLink)
   onBeforeUnmount(removeEventListenersForLink)
 }
 </script>

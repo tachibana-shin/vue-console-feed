@@ -10,11 +10,18 @@ const types = [
   Uint32Array,
 
   Float32Array,
-  Float64Array,
-
-  BigInt64Array,
-  BigUint64Array
+  Float64Array
 ]
+
+// eslint-disable-next-line n/no-unsupported-features/es-builtins
+if (typeof BigInt64Array !== "undefined") {
+  types.push(
+    // eslint-disable-next-line n/no-unsupported-features/es-builtins
+    BigInt64Array as unknown as typeof Float64Array,
+    // eslint-disable-next-line n/no-unsupported-features/es-builtins
+    BigUint64Array as unknown as typeof Float64Array
+  )
+}
 
 export type TypedArray = typeof types[0]
 

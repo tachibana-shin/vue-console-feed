@@ -1,4 +1,5 @@
-import { createPreviewValue, DataPreview, Encode } from "./Encode"
+import type { DataPreview } from "./Encode"
+import { createPreviewValue, Encode } from "./Encode"
 import { entries } from "./entries"
 import { getLocationCall } from "./getLocationCall"
 import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
@@ -73,11 +74,12 @@ function Table<T extends object>(
     const { value } = meta
 
     //  table[name] = meta.value
+    // eslint-disable-next-line functional/no-let
     let isArray: undefined | boolean
     if (
       value !== null &&
       typeof value === "object" &&
-      (!(isArray = Array.isArray(value)) || !isArrayEmpty(value))
+      (!(isArray = Array.isArray(value)) || !isArrayEmpty({ arr: value }))
     ) {
       const row = (table[name] = {}) as typeof table[""]
       // meta.value

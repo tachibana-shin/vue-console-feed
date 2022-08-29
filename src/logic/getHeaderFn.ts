@@ -15,9 +15,9 @@ export function getHeaderFn(code: string) {
   const prefix = r.exec(code)![0]
 
   const indexSp = code.indexOf("{")
+  // eslint-disable-next-line functional/no-let
   let indexArrow: number
   const endHeader =
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     indexSp === -1 ? (indexArrow = (code.indexOf("=>") >>> 0) + 2) : indexSp
 
   const header = code.slice(prefix.length, endHeader)
@@ -37,6 +37,7 @@ export function getHeaderFn(code: string) {
     ? TypesFn.arrowFn
     : TypesFn.propFn
 
+  // eslint-disable-next-line functional/no-let
   let content: string | undefined
   if (typeFn === TypesFn.arrowFn) {
     if (indexSp > -1) {
@@ -46,7 +47,7 @@ export function getHeaderFn(code: string) {
     } else {
       content = code
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
+        // @ts-expect-error
         .slice(indexArrow + 1, (code.lastIndexOf("}") >>> 0) + 1)
         .replace(rSpaces, " ")
     }

@@ -1,10 +1,6 @@
 import { getValue } from "./getValue"
 
-const keys = [
-  "buffer",
-  "byteLength",
-  "byteOffset"
-]
+const keys = ["buffer", "byteLength", "byteOffset"]
 export function getOwnDescriptorsDataView(typed: DataView) {
   const des: Record<string, PropertyDescriptor> = {}
 

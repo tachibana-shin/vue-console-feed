@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { describe, expect, test } from "vitest"
+
 import { getHeaderFn, TypesFn } from "./getHeaderFn"
 
 // getHeaderFn(a.as + "")
@@ -10,7 +11,9 @@ import { getHeaderFn, TypesFn } from "./getHeaderFn"
 
 describe("getHeaderFn", () => {
   test("arrow function", () => {
+    // eslint-disable-next-line functional/functional-parameters
     const a = async (v: string, vv: string, ...vvv: string[]) => {}
+    // eslint-disable-next-line functional/functional-parameters
     const aa = (v: string, vv: string, ...vvv: string[]) => {}
 
     expect(getHeaderFn(a + "")).toEqual({
@@ -93,13 +96,16 @@ describe("getHeaderFn", () => {
   })
   test("prop function", () => {
     const a = {
+      // eslint-disable-next-line require-yield
       *as() {
+        // eslint-disable-next-line no-unused-expressions
         alert
       },
       ac() {},
       async *sas() {},
       async sac() {},
       arr: () => {
+        // eslint-disable-next-line no-unused-expressions
         alert
       },
       arrNoR: () => 2332,

@@ -1,5 +1,5 @@
 import { getValue } from "./getValue"
-import { TypedArray } from "./isTypedArray"
+import type { TypedArray } from "./isTypedArray"
 
 /*
 BYTES_PER_ELEMENT: 1

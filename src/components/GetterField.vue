@@ -11,17 +11,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef, watch, toRaw } from "vue"
-import ConsoleValue from "./ConsoleValue.vue"
+import { ref, shallowRef, toRaw, watch } from "vue"
 
-import {
-  Data,
-  callFnLink,
+import type {
   _Encode,
   _getListLink,
+  callFnLink,
+  Data,
   readLinkObject
 } from "../logic/Encode"
-import { Promisy } from "./Promisy"
+
+import ConsoleValue from "./ConsoleValue.vue"
+import type { Promisy } from "./Promisy"
 
 const props = defineProps<{
   getter: Data.Link
@@ -39,11 +40,13 @@ const watcher = watch(getted, () => {
 
   getted.value = true
 
+  // eslint-disable-next-line promise/catch-or-return
   props.callFnLinkAsync(toRaw(props.getter)).then((response) => {
     value.value = response
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
+    // @ts-ignore
+    // eslint-disable-next-line promise/always-return
     if (import.meta.env.NODE_ENV !== "production") {
       console.log("valueof", value.value)
     }

@@ -42,22 +42,20 @@
 </template>
 
 <script lang="ts" setup>
-import { Table } from "../logic/Table"
-import ConsoleValueStatic from "./ConsoleValueStatic.vue"
-import ConsoleItem from "./ConsoleItem.vue"
-import {
-  readLinkObjectAsync as readLinkObjectAsyncDefault,
-  _getListLinkAsync as _getListLinkAsyncDefault,
-  callFnLinkAsync as callFnLinkAsyncDefault
-} from "./api-async-defaults"
-import {
-  callFnLink,
-  readLinkObject,
-  _getListLink
-} from "../logic/Encode"
 import { reactive, ref } from "vue"
-import { Promisy } from "./Promisy"
+
+import type { _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
+import type { Table } from "../logic/Table"
+
+import ConsoleItem from "./ConsoleItem.vue"
+import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import LocationConsole from "./LocationConsole.vue"
+import type { Promisy } from "./Promisy"
+import {
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault,
+  readLinkObjectAsync as readLinkObjectAsyncDefault
+} from "./api-async-defaults"
 
 const MAX_COUNT_COLDS = 20
 

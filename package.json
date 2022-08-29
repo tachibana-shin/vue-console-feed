@@ -7,15 +7,16 @@
     "build:logic": "tsup",
     "build": "vite build && vue-tsc --emitDeclarationOnly && pnpm build:logic",
     "dev": "vite dev",
-    "lint": "eslint src --ext=.ts",
+    "lint": "eslint src --ext=.ts,.vue",
     "lint:fix": "pnpm lint --fix",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "release": "bumpp package.json --commit --push --tag && pnpm -r publish --access public",
+    "release": "pnpm test && pnpm typing && bumpp package.json --commit --push --tag && pnpm -r publish --access public",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "typing": "vue-tsc --noEmit"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -53,7 +54,7 @@
   },
   "devDependencies": {
     "@tachibana-shin/eslint-config": "^1.0.2",
-    "@tachibana-shin/eslint-config-vue": "^1.0.5",
+    "@tachibana-shin/eslint-config-vue": "^1.0.7",
     "@types/node": "^17.0.36",
     "@vitejs/plugin-vue": "^3.0.1",
     "bumpp": "^7.1.1",

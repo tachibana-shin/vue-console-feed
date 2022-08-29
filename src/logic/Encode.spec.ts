@@ -1,5 +1,7 @@
-import { describe, test, expect } from "vitest"
-import { Data, Encode } from "./Encode"
+import { describe, expect, test } from "vitest"
+
+import type { Data } from "./Encode"
+import { Encode } from "./Encode"
 
 describe("Encode", () => {
   test("encode", () => {
@@ -66,7 +68,7 @@ describe("Encode", () => {
       get lusa() {
         return this.year ** 2
       },
-      matcher: /\<script\s+\>/,
+      matcher: /<script\s+>/,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       increment: function increment(_value = 56) {
         this.year++
@@ -76,7 +78,7 @@ describe("Encode", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(tt as unknown as any).tt = tt
 
-    const result = Encode(tt, true, true) as Data.Record
+    const result = Encode(tt) as Data.Record
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(result["@des"]!["@value"]).not.toEqual(null)
