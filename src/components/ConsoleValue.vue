@@ -497,29 +497,48 @@ import PropName from "./PropName.vue"
 
 const attrs = useAttrs()
 
-interface Props {
+const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
   data: ReturnType<typeof _Encode>
   flat?: boolean
   hideNameObject?: boolean
 
   isLog?: boolean
 
-  anchor: Component<{
-    href: string
-  }>| Slot | string
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
   readLinkObjectAsync: Promisy<typeof readLinkObject>
   callFnLinkAsync: Promisy<typeof callFnLink>
-}
-
-const ConsoleValue = _ConsoleValue as unknown as DefineComponent<Props>
+}>
 const GetterField = _GetterField as unknown as DefineComponent<{
   getter: Data.Link
 }>
 
-const props = defineProps<Props>()
+const props = defineProps<{
+  data: ReturnType<typeof _Encode>
+  flat?: boolean
+  hideNameObject?: boolean
+
+  isLog?: boolean
+
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
+
+  // api
+  _getListLinkAsync: Promisy<typeof _getListLink>
+  readLinkObjectAsync: Promisy<typeof readLinkObject>
+  callFnLinkAsync: Promisy<typeof callFnLink>
+}>()
 
 function generateDescriptorArray(des: DataPreview.objReal, size: number) {
   const newDes: (
