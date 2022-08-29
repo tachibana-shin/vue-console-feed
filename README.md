@@ -146,7 +146,6 @@ async function readLinkObjectAsync(link: Data.Link) {
 | Option                | Type                        | Required | Description                                                                                                                                                                       |
 | --------------------- | --------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`                | `ReturnType<typeof Table>`  | `true`   | determine the type corresponding to the methods `Table`                                                                                                                           |
-| `dataValue`           | `ReturnType<typeof Encode>` | `false`  | determine the value corresponding to the methods `Encode`. this is data to display the object as `data.log`. If it is equal to `undefined', the component only displays the table |
 | `_getListLinkAsync`   | `Promisy<_getListLink>`     | `false`  | This is the `promise` function of `_getListLink`                                                                                                                                  |
 | `readLinkObjectAsync` | `Promisy<readLinkObject>`   | `false`  | This is the `promise` function of `readLinkObject`                                                                                                                                |
 
@@ -154,7 +153,7 @@ async function readLinkObjectAsync(link: Data.Link) {
 
 ```vue
 <template>
-  <ConsoleTable :data="data" :data-value="dataValue" type="log" />
+  <ConsoleTable :data="data" type="log" />
 </template>
 
 <script lang="ts" setup>
@@ -169,7 +168,6 @@ const value = {
   }
 }
 const data = Table(value)
-const dataValue = Encode(value, true, true)
 </script>
 ```
 
@@ -183,7 +181,6 @@ You have custom API fetch lazy data
 <template>
   <ConsoleTable
     :data="data"
-    :data-value="dataValue"
     :_getListLinkAsync="_getListLinkAsync"
     :readLinkObjectAsync="readLinkObjectAsync"
   />
@@ -207,7 +204,6 @@ const value = {
   }
 }
 const data = Table(value)
-const dataValue = Encode(value, true, true)
 
 // custom api
 async function _getListLinkAsync(link: Data.Link) {

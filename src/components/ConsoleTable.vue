@@ -32,8 +32,8 @@
     </table>
   </div>
   <ConsoleItem
-    v-if="dataValue"
-    :data="dataValue"
+    v-if="data['@collapse']"
+    :data="data['@collapse']"
     :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
     :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
     :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
@@ -52,7 +52,6 @@ import {
 } from "./api-async-defaults"
 import {
   callFnLink,
-  _Encode,
   readLinkObject,
   _getListLink
 } from "../logic/Encode"
@@ -65,7 +64,6 @@ const MAX_COUNT_COLDS = 20
 // 20 x 24
 defineProps<{
   data: ReturnType<typeof Table>
-  dataValue?: ReturnType<typeof _Encode>
 
   // api get lazy data
   _getListLinkAsync?: Promisy<typeof _getListLink>

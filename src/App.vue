@@ -135,7 +135,7 @@ const dataTable = Table([1, 432, 54, 2])
 <template>
   <div>
     <ConsoleItem :data="data" type="log" />
-    <ConsoleTable :data="dataTable" :data-value="Encode([1, 432, 54, 2], false)" />
+    <ConsoleTable :data="dataTable" />
     <ConsoleItem :data="data2" type="error" />
     <ConsoleItem
       :data="data3"

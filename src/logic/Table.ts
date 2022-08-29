@@ -1,4 +1,4 @@
-import { createPreviewValue, DataPreview } from "./Encode"
+import { createPreviewValue, DataPreview, Encode } from "./Encode"
 import { entries } from "./entries"
 import { getLocationCall } from "./getLocationCall"
 import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
@@ -36,7 +36,31 @@ function getDescriptors<T extends object>(data: T) {
   )
 }
 
-export function Table<T extends object>(data: T, deepLink?: false | number) {
+function Table<T extends object>(
+  data: T,
+  deepLink: false | number | undefined,
+  noCollapse: true
+): {
+  table: Record<string, Record<string, DataPreview.objReal[""]["@value"]>>
+  cols: string[]
+  "@location": string | null
+}
+function Table<T extends object>(
+  data: T,
+  deepLink?: false | number,
+  noCollapse?: false
+): {
+  table: Record<string, Record<string, DataPreview.objReal[""]["@value"]>>
+  cols: string[]
+  "@location": string | null
+  "@collapse": ReturnType<typeof Encode>
+}
+
+function Table<T extends object>(
+  data: T,
+  deepLink?: false | number,
+  noCollapse?: boolean
+) {
   const table: Record<
     string,
     Record<string, DataPreview.objReal[""]["@value"]>
@@ -78,6 +102,9 @@ export function Table<T extends object>(data: T, deepLink?: false | number) {
   return {
     table,
     cols: Array.from(nameCols.values()),
-    "@location": deepLink === false ? null : getLocationCall(deepLink)
+    "@location": deepLink === false ? null : getLocationCall(deepLink),
+    "@collapse": noCollapse ? undefined : Encode(data, false)
   }
 }
+
+export { Table }

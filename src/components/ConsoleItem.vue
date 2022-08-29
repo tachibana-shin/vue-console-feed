@@ -46,7 +46,7 @@ import {
 import ConsoleValue from "./ConsoleValue.vue"
 import LocationConsole from "./LocationConsole.vue"
 import { Promisy } from "./Promisy"
-import { onUpdated, onMounted, onBeforeUnmount, ref, watch } from "vue"
+import { onUpdated, onMounted, onBeforeUnmount, ref } from "vue"
 
 const props = defineProps<{
   data: ReturnType<typeof Encode>
@@ -74,14 +74,17 @@ function handlerLink(event) {
 
 function addEventLitentersForLink() {
   elRef.value?.querySelectorAll("a").forEach((anchor) => {
-    if (anchor.__consoleLinkListened__) return
-    anchor.__consoleLinkListened__ = true
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((anchor as unknown as any).__consoleLinkListened__) return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(anchor as unknown as any).__consoleLinkListened__ = true
     anchor.addEventListener("click", handlerLink)
   })
 }
 function removeEventListenersForLink() {
   elRef.value?.querySelectorAll("a").forEach((anchor) => {
-    anchor.__consoleLinkListened__ = false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(anchor as unknown as any).__consoleLinkListened__ = false
     anchor.removeEventListener("click", handlerLink)
   })
 }
