@@ -4,6 +4,6 @@ import { getLocationCall } from "./getLocationCall"
 
 describe("getLocationCall", () => {
   test("normal", () => {
-    expect(getLocationCall().endsWith("/src/logic/getLocationCall.spec.ts:6:56")).toEqual(true)
+    expect(getLocationCall().includes("/src/logic/getLocationCall.spec.ts")).toEqual(true)
   })
 })
