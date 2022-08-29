@@ -2,30 +2,31 @@
   <div
     class="console-wrap console-item"
     :class="type ? `console-${type}` : undefined"
+    ref="elRef"
   >
     <span v-if="type" class="console-icon" />
     <div
       class="console-value"
       :class="{
-        'has-location': data['@location']
+        'has-location': data['@location'] && !noLocation
       }"
     >
-      <ConsoleValue
-        :data="data"
-        :is-log="type !== undefined"
-        :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
-        :read-link-object-async="
-          readLinkObjectAsync ?? readLinkObjectAsyncDefault
-        "
-        :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
+      <LocationConsole
+        v-if="data['@location'] && !noLocation"
+        class="truncate console-location"
+        :location="data['@location']"
       />
-      <a
-        v-if="data['@location']"
-        class="console-link truncate"
-        :href="data['@location']"
-      >
-        {{ data["@location"].slice(data["@location"].lastIndexOf("/") + 1) }}
-      </a>
+      <div class="console-message">
+        <ConsoleValue
+          :data="data"
+          :is-log="type !== undefined"
+          :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
+          :read-link-object-async="
+            readLinkObjectAsync ?? readLinkObjectAsyncDefault
+          "
+          :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -43,21 +44,58 @@ import {
   callFnLinkAsync as callFnLinkAsyncDefault
 } from "./api-async-defaults"
 import ConsoleValue from "./ConsoleValue.vue"
+import LocationConsole from "./LocationConsole.vue"
 import { Promisy } from "./Promisy"
+import { onUpdated, onMounted, onBeforeUnmount, ref, watch } from "vue"
 
-defineProps<{
+const props = defineProps<{
   data: ReturnType<typeof Encode>
   type?: "warn" | "info" | "debug" | "error" | "output" | "log"
+
+  useLinkClick?: boolean
+  noLocation?: boolean
 
   // api
   _getListLinkAsync?: Promisy<typeof _getListLink>
   readLinkObjectAsync?: Promisy<typeof readLinkObject>
   callFnLinkAsync?: Promisy<typeof callFnLink>
 }>()
+
+const emit = defineEmits<{
+  (name: "linkClick", event: MouseEvent): void
+}>()
+
+const elRef = ref<HTMLDivElement>()
+
+function handlerLink(event) {
+  event.preventDefault()
+  emit("linkClick", event)
+}
+
+function addEventLitentersForLink() {
+  elRef.value?.querySelectorAll("a").forEach((anchor) => {
+    if (anchor.__consoleLinkListened__) return
+    anchor.__consoleLinkListened__ = true
+    anchor.addEventListener("click", handlerLink)
+  })
+}
+function removeEventListenersForLink() {
+  elRef.value?.querySelectorAll("a").forEach((anchor) => {
+    anchor.__consoleLinkListened__ = false
+    anchor.removeEventListener("click", handlerLink)
+  })
+}
+
+if (props.useLinkClick) {
+  onMounted(addEventLitentersForLink)
+  onUpdated(addEventLitentersForLink)
+  onBeforeUnmount(removeEventListenersForLink)
+}
 </script>
 
 <style lang="scss" scoped>
 @import "./wrap.scss";
+@import "./location-console.scss";
 
 .console-item {
   // border-top: 1px solid #3a3a3a;
@@ -72,20 +110,25 @@ defineProps<{
     flex: 1;
 
     &.has-location {
-      display: flex;
-      justify-content: space-between;
+      .console-location {
+        float: right;
+        margin-left: 10px;
+      }
+      .console-message {
+        max-width: 100%;
+        float: left;
+      }
     }
   }
 
   :deep(.console-link) {
-    color: rgb(177, 177, 177);
-    text-decoration: underline;
+    @extend .console-link;
   }
   :deep(.color-white) {
     color: white;
   }
 
-  .badge {
+  .console-badge {
     background-color: #5db0d7;
     border-radius: 30px;
   }

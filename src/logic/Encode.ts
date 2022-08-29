@@ -699,7 +699,7 @@ export function Encode(
   return {
     ..._Encode(data, first, linkReal),
     "@location":
-      deepLink === false || deepLink === undefined
+      deepLink === false
         ? null
         : getLocationCall(deepLink)
   }

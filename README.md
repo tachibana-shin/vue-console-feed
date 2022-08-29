@@ -51,12 +51,13 @@ or with CDN:
 - [x] console.warn
 - [x] console.info
 - [x] console.error
+- [ ] console.group
 - [x] Date
 - [x] Buffer
 - [x] TypedArray
 - [x] DataView
 - [x] address `http` in `string` and `Error`
-- [ ] Group console
+- [x] Location link
 
 ## Usage
 

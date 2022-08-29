@@ -1,5 +1,10 @@
 <template>
   <div class="console-wrap console-wrap-table">
+    <LocationConsole
+      v-if="data['@location']"
+      class="truncate console-location"
+      :location="data['@location']"
+    />
     <table>
       <tr>
         <th @click="changeSorter(KEY_INDEX as any)">(Index)</th>
@@ -32,6 +37,7 @@
     :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
     :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
     :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
+    no-location
   />
 </template>
 
@@ -52,6 +58,7 @@ import {
 } from "../logic/Encode"
 import { reactive, ref } from "vue"
 import { Promisy } from "./Promisy"
+import LocationConsole from "./LocationConsole.vue"
 
 const MAX_COUNT_COLDS = 20
 
@@ -132,9 +139,19 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 
 <style lang="scss" scoped>
 @import "./styles.scss";
+@import "./wrap.scss";
 
 .console-wrap-table {
   padding-left: (10px + 7 * 2);
+  padding: {
+    top: 5px;
+    bottom: 5px;
+  }
+
+  .console-location {
+    margin-bottom: 3px;
+    float: right;
+  }
 
   table {
     text-align: left;

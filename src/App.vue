@@ -23,7 +23,10 @@ const tt = {
   uint,
   asn: async function asn(v, vv, ...vvv) {},
   *iwjfgew() {},
-  cvv: () => {alert;window},
+  cvv: () => {
+    alert
+    window
+  },
   gttt: () => 12423543,
   buffer: uint.buffer,
   view: new DataView(uint.buffer),
@@ -117,19 +120,40 @@ try {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   a = err
 }
-const data = Encode(tt, true, true)
+const data = Encode(tt)
 // console.table(tt)
 console.log(data)
+const data2 = Encode(a)
+const data3 = Encode({ a: 778 })
 // console.log(document.body)
+function onLinkClick() {
+  console.log("onLinkClick")
+}
+const dataTable = Table([1, 432, 54, 2])
 </script>
 
 <template>
-  <ConsoleItem :data="data" type="log" />
-  <ConsoleTable :data="Table([1, 432, 54, 2])" />
+  <div>
+    <ConsoleItem :data="data" type="log" />
+    <ConsoleTable :data="dataTable" :data-value="Encode([1, 432, 54, 2], false)" />
+    <ConsoleItem :data="data2" type="error" />
+    <ConsoleItem
+      :data="data3"
+      type="log"
+      use-link-click
+      @link-click="onLinkClick"
+    />
+  </div>
   <!-- <div v-for="data" -->
 </template>
 
 <style lang="scss">
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-size: 14px;
 }

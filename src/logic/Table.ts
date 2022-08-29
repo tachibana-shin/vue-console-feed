@@ -1,5 +1,6 @@
 import { createPreviewValue, DataPreview } from "./Encode"
 import { entries } from "./entries"
+import { getLocationCall } from "./getLocationCall"
 import { getOwnDescriptorsBuffer } from "./getOwnDescriptorsBuffer"
 import { getOwnDescriptorsCollection } from "./getOwnDescriptorsCollection"
 import { getOwnDescriptorsDataView } from "./getOwnDescriptorsDataView"
@@ -35,7 +36,7 @@ function getDescriptors<T extends object>(data: T) {
   )
 }
 
-export function Table<T extends object>(data: T) {
+export function Table<T extends object>(data: T, deepLink?: false | number) {
   const table: Record<
     string,
     Record<string, DataPreview.objReal[""]["@value"]>
@@ -76,6 +77,7 @@ export function Table<T extends object>(data: T) {
 
   return {
     table,
-    cols: Array.from(nameCols.values())
+    cols: Array.from(nameCols.values()),
+    "@location": deepLink === false ? null : getLocationCall(deepLink)
   }
 }

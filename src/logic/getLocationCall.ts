@@ -3,9 +3,8 @@ export function getLocationCall(deep = 3): string | null {
 
   if (!mess) return null
 
-  const isAt = mess.startsWith("    at")
-
-  if (isAt) return mess.slice(7)
-
-  return mess.slice(mess.lastIndexOf("(") + 1, -1)
+  return mess
+    .slice(mess.lastIndexOf("(") + 1, -1)
+    .replace(/t=\d+/, "")
+    .replace(/\?:/, ":")
 }

@@ -1,5 +1,8 @@
 export function formatRelativeLink(value: string): string {
-  return value.slice(value.lastIndexOf("/") + 1)
+  return value
+    .slice(value.lastIndexOf("/") + 1, -1)
+    .replace(/t=\d+/, "")
+    .replace(/\?:/, ":")
 }
 
 const rUrl = /(?:[^\s]+):\/\/[^\s]+/gi
