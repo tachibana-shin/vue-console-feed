@@ -71,9 +71,11 @@
 </template>
 
 <script lang="ts" setup>
-import { Data, DataPreview } from "../logic/Encode"
+import type { Component, Slot} from "vue";
+import { h } from "vue"
+
+import type { Data, DataPreview } from "../logic/Encode"
 import { parseLink } from "../logic/parseLink"
-import { Component, h } from "vue"
 
 defineProps<{
   data: DataPreview.objReal[""]["@value"] | Data.GetSetter
@@ -84,7 +86,7 @@ defineProps<{
 
   anchor: Component<{
     href: string
-  }>
+  }>| Slot | string
 }>()
 </script>
 

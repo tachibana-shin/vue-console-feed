@@ -74,6 +74,7 @@ function Table<T extends object>(
     const { value } = meta
 
     //  table[name] = meta.value
+    // eslint-disable-next-line functional/no-let
     let isArray: undefined | boolean
     if (
       value !== null &&

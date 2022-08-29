@@ -15,7 +15,7 @@
         v-if="data['@location'] && !noLocation"
         class="truncate console-location"
         :location="data['@location']"
-        :anchor="anchor ?? $slots.anchor"
+        :anchor="Anchor"
       />
       <div class="console-message">
         <ConsoleValue
@@ -26,7 +26,7 @@
             readLinkObjectAsync ?? readLinkObjectAsyncDefault
           "
           :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
-          :anchor="anchor ?? $slots.anchor"
+          :anchor="Anchor"
         />
       </div>
     </div>
@@ -34,23 +34,26 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Encode,
-  readLinkObject,
+import type { Component, Slot } from "vue"
+import { computed, useSlots } from "vue"
+
+import type {
   _getListLink,
-  callFnLink
+  callFnLink,
+  Encode,
+  readLinkObject
 } from "../logic/Encode"
-import {
-  readLinkObjectAsync as readLinkObjectAsyncDefault,
-  _getListLinkAsync as _getListLinkAsyncDefault,
-  callFnLinkAsync as callFnLinkAsyncDefault
-} from "./api-async-defaults"
+
 import ConsoleValue from "./ConsoleValue.vue"
 import LocationConsole from "./LocationConsole.vue"
-import { Promisy } from "./Promisy"
-import { Component, useSlots } from "vue"
+import type { Promisy } from "./Promisy"
+import {
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault,
+  readLinkObjectAsync as readLinkObjectAsyncDefault
+} from "./api-async-defaults"
 
-defineProps<{
+const props = defineProps<{
   data: ReturnType<typeof Encode>
   type?: "warn" | "info" | "debug" | "error" | "output" | "log"
 
@@ -58,7 +61,7 @@ defineProps<{
 
   anchor?: Component<{
     href: string
-  }>
+  }> | Slot | string
 
   // api
   _getListLinkAsync?: Promisy<typeof _getListLink>
@@ -66,6 +69,8 @@ defineProps<{
   callFnLinkAsync?: Promisy<typeof callFnLink>
 }>()
 const $slots = useSlots()
+
+const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
 </script>
 
 <style lang="scss" scoped>

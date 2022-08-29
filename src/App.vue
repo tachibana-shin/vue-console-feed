@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { Encode } from "./logic/Encode"
-import { Table } from "./logic/Table"
+import { h } from "vue"
+
 import ConsoleItem from "./components/ConsoleItem.vue"
 import ConsoleTable from "./components/ConsoleTable.vue"
+import { Encode } from "./logic/Encode"
+import { Table } from "./logic/Table"
+
 
 const el = document.createElement("div")
 el.style.color = "red"
@@ -21,10 +24,14 @@ const tt = {
   aep: new Array(99),
   pro,
   uint,
+  // eslint-disable-next-line functional/functional-parameters, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   asn: async function asn(v, vv, ...vvv) {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   *iwjfgew() {},
   cvv: () => {
+    // eslint-disable-next-line no-unused-expressions
     alert
+    // eslint-disable-next-line no-unused-expressions
     window
   },
   gttt: () => 12423543,
@@ -34,7 +41,7 @@ const tt = {
   [Symbol("aafe")]: [3124],
   e: new WeakMap(),
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
   c: new Map([
     [45, [789, 89]],
     ["user", { name: "Shin" }]
@@ -99,7 +106,7 @@ const tt = {
   get lusa() {
     return this.year ** 2
   },
-  matcher: /\<script\s+\>/,
+  matcher: /<script\s+>/,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   increment: function increment(value = 56) {
     this.year++
@@ -111,13 +118,15 @@ const tt = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(tt as unknown as any).tt = tt
 
+// eslint-disable-next-line functional/no-let
 let a
 try {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
+  // eslint-disable-next-line no-undef
   foeojgr()
 } catch (err) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   a = err
 }
 const data = Encode(tt)
@@ -130,8 +139,6 @@ function onLinkClick() {
   console.log("onLinkClick")
 }
 const dataTable = Table([1, 432, 54, 2])
-
-import { h } from "vue"
 const anchor = h("a")
 </script>
 

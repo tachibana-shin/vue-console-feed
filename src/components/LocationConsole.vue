@@ -11,14 +11,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Component } from "vue";
+import type { Component, Slot } from "vue";
+
 import { createAnchor } from "../logic/createAnchor"
 
 defineProps<{
   location: string
   anchor: Component<{
     href: string
-  }>
+  }>| Slot | string
 }>()
 </script>
 

@@ -4,7 +4,7 @@
       v-if="data['@location']"
       class="truncate console-location"
       :location="data['@location']"
-      :anchor="anchor ?? $slots.anchor"
+      :anchor="Anchor"
     />
     <table>
       <tr>
@@ -27,7 +27,7 @@
             v-if="row[colName]"
             hide-name-object
             :data="row[colName]"
-            :anchor="anchor ?? $slots.anchor"
+            :anchor="Anchor"
           />
         </td>
       </tr>
@@ -40,39 +40,45 @@
     :read-link-object-async="readLinkObjectAsync ?? readLinkObjectAsyncDefault"
     :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
     no-location
-    :anchor="anchor ?? $slots.anchor"
+    :anchor="Anchor"
   />
 </template>
 
 <script lang="ts" setup>
-import { Table } from "../logic/Table"
-import ConsoleValueStatic from "./ConsoleValueStatic.vue"
+import type { Component, Slot} from "vue";
+import { computed, reactive , ref, useSlots } from "vue"
+
+
+import type { _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
+import type { Table } from "../logic/Table"
+
 import ConsoleItem from "./ConsoleItem.vue"
-import {
-  readLinkObjectAsync as readLinkObjectAsyncDefault,
-  _getListLinkAsync as _getListLinkAsyncDefault,
-  callFnLinkAsync as callFnLinkAsyncDefault
-} from "./api-async-defaults"
-import { callFnLink, readLinkObject, _getListLink } from "../logic/Encode"
-import { Component, reactive, ref } from "vue"
-import { Promisy } from "./Promisy"
+import ConsoleValueStatic from "./ConsoleValueStatic.vue"
 import LocationConsole from "./LocationConsole.vue"
+import type { Promisy } from "./Promisy"
+import {
+  _getListLinkAsync as _getListLinkAsyncDefault,
+  callFnLinkAsync as callFnLinkAsyncDefault,
+  readLinkObjectAsync as readLinkObjectAsyncDefault
+} from "./api-async-defaults"
 
 const MAX_COUNT_COLDS = 20
 
 // 20 x 24
-defineProps<{
+const props = defineProps<{
   data: ReturnType<typeof Table>
 
   anchor?: Component<{
     href: string
-  }>
+  }> | Slot | string
 
   // api get lazy data
   _getListLinkAsync?: Promisy<typeof _getListLink>
   readLinkObjectAsync?: Promisy<typeof readLinkObject>
   callFnLinkAsync?: Promisy<typeof callFnLink>
 }>()
+const $slots = useSlots()
+const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
 
 enum StateSorter {
   ASC = "asc",

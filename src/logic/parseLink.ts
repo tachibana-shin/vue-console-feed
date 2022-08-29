@@ -1,4 +1,5 @@
-import { Component } from "vue"
+import type { Component, Slot, VNode } from "vue"
+
 import { createAnchor } from "./createAnchor"
 
 function formatRelativeLink(value: string): string {
@@ -15,7 +16,7 @@ export function parseLink(
   options?: {
     minifyLink?: boolean
     classes?: string
-    component?: string | Component
+    component?: string | Component | Slot
   }
 ) {
   console.log(options?.component)
@@ -25,7 +26,8 @@ export function parseLink(
 
   text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;") // block XSS
 
-  const children = []
+  const children: (string | VNode)[] = []
+  // eslint-disable-next-line functional/no-let
   let lastIndex = 0
   for (const match of text.matchAll(rUrl)) {
     children.push(text.slice(lastIndex, match.index))
@@ -39,6 +41,7 @@ export function parseLink(
         }
       })
     )
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     lastIndex = match.index! + match[0].length
   }
 

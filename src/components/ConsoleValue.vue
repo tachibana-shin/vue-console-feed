@@ -472,31 +472,28 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  inheritAttrs: false
-}
-</script>
-
 <script lang="ts" setup>
-import {
-  Data,
-  DataPreview,
+import type { Component, DefineComponent, Slot } from "vue"
+import { h, shallowRef, toRaw, useAttrs } from "vue"
+
+import { Data } from "../logic/Encode"
+import type {
   _Encode,
-  readLinkObject,
   _getListLink,
-  callFnLink
+  callFnLink,
+  DataPreview,
+  readLinkObject
 } from "../logic/Encode"
-import _ConsoleValue from "./ConsoleValue.vue"
-import ConsoleLink from "./ConsoleLink.vue"
-import Collapse from "./Collapse.vue"
-import PropName from "./PropName.vue"
-import ConsoleValueStatic from "./ConsoleValueStatic.vue"
-import _GetterField from "./GetterField.vue"
-import { DefineComponent, shallowRef, useAttrs, toRaw, h, Component } from "vue"
 import { keys as extendsKeysTypedArray } from "../logic/getOwnDescriptorsTypedArray"
 import { parseLink } from "../logic/parseLink"
-import { Promisy } from "./Promisy"
+
+import Collapse from "./Collapse.vue"
+import ConsoleLink from "./ConsoleLink.vue"
+import _ConsoleValue from "./ConsoleValue.vue"
+import ConsoleValueStatic from "./ConsoleValueStatic.vue"
+import _GetterField from "./GetterField.vue"
+import type { Promisy } from "./Promisy"
+import PropName from "./PropName.vue"
 
 const attrs = useAttrs()
 
@@ -509,7 +506,7 @@ interface Props {
 
   anchor: Component<{
     href: string
-  }>
+  }>| Slot | string
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
@@ -538,7 +535,9 @@ function generateDescriptorArray(des: DataPreview.objReal, size: number) {
       }
   )[] = []
 
+  // eslint-disable-next-line functional/no-let
   let countEmpty = 0
+  // eslint-disable-next-line functional/no-let
   for (let i = 0; i < size; i++) {
     if (!des[i]) {
       countEmpty++
@@ -578,11 +577,18 @@ const listLinkAsync = shallowRef<Awaited<ReturnType<typeof _getListLink>>>()
 function refreshListLinkAsync(link: Data.Link) {
   if (listLinkAsync.value) return
 
+  // eslint-disable-next-line promise/catch-or-return, promise/always-return
   props._getListLinkAsync(toRaw(link)).then((response) => {
     listLinkAsync.value = response
   })
 
   // return listLinkAsyn
+}
+</script>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false
 }
 </script>
 
