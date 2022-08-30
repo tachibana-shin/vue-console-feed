@@ -142,7 +142,7 @@ const anchor = h("a")
 
 <template>
   <div>
-    <ConsoleItem :data="Encode('hello world')" type="log" />
+    <ConsoleItem :data="Encode('hello world')" type="log" :count="12" />
     <ConsoleItem :data="data" type="log" :anchor="anchor" />
     <ConsoleTable
       :data="dataTable"

@@ -4,7 +4,9 @@
     :class="type ? `console-${type}` : undefined"
     ref="elRef"
   >
-    <span v-if="type" class="console-icon" />
+    <span v-if="count" class="console-item console-badge">{{ count }}</span>
+    <span v-else-if="type" class="console-icon" />
+
     <div
       class="console-value"
       :class="{
@@ -55,13 +57,17 @@ import {
 
 const props = defineProps<{
   data: ReturnType<typeof Encode>
+  count?: number | string
   type?: "warn" | "info" | "debug" | "error" | "output" | "log"
 
   noLocation?: boolean
 
-  anchor?: Component<{
-    href: string
-  }> | Slot | string
+  anchor?:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
 
   // api
   _getListLinkAsync?: Promisy<typeof _getListLink>
@@ -107,6 +113,13 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
   .console-badge {
     background-color: #5db0d7;
     border-radius: 30px;
+    background-image: none !important;
+  }
+  &.console-warn {
+    background-color: #f28b82;
+  }
+  &.console-error {
+    background-color: #f29766;
   }
 
   .console-icon {
