@@ -51,7 +51,7 @@ or with CDN:
 - [x] console.warn
 - [x] console.info
 - [x] console.error
-- [ ] console.count
+- [x] console.count
 - [ ] console.group
 - [x] Date
 - [x] Buffer
