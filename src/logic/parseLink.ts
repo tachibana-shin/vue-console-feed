@@ -19,7 +19,6 @@ export function parseLink(
     component?: string | Component | Slot
   }
 ) {
-  console.log(options?.component)
   const minifyLink = options?.minifyLink
   const classes = options?.classes ?? ""
   const component = options?.component ?? "a"
@@ -44,6 +43,8 @@ export function parseLink(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     lastIndex = match.index! + match[0].length
   }
+
+  children.push(text.slice(lastIndex))
 
   return children
 }

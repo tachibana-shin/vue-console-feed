@@ -6,7 +6,6 @@ import ConsoleTable from "./components/ConsoleTable.vue"
 import { Encode } from "./logic/Encode"
 import { Table } from "./logic/Table"
 
-
 const el = document.createElement("div")
 el.style.color = "red"
 el.dir = "ltr"
@@ -126,7 +125,6 @@ try {
   // eslint-disable-next-line no-undef
   foeojgr()
 } catch (err) {
-   
   a = err
 }
 const data = Encode(tt)
@@ -144,6 +142,7 @@ const anchor = h("a")
 
 <template>
   <div>
+    <ConsoleItem :data="Encode('hello world')" type="log" />
     <ConsoleItem :data="data" type="log" :anchor="anchor" />
     <ConsoleTable
       :data="dataTable"
@@ -152,7 +151,7 @@ const anchor = h("a")
     />
     <ConsoleItem :data="data2" type="error">
       <template v-slot:anchor="props">
-        <a href="#">{{ props }}</a>
+        <a :href="props.href" :class="props.class">{{ props.text }}</a>
       </template>
     </ConsoleItem>
     <ConsoleItem
@@ -162,7 +161,7 @@ const anchor = h("a")
       @link-click="onLinkClick"
     >
       <template v-slot:anchor="props">
-        <a href="#">{{ props }}</a>
+        <a :href="props.href" :class="props.class">{{ props.text }}</a>
       </template>
     </ConsoleItem>
   </div>
