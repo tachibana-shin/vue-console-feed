@@ -34,7 +34,7 @@ export function parseLink(
     children.push(
       createAnchor(component, {
         href: match[0],
-        class: ["console-link", classes],
+        class: classes,
         get text() {
           return minifyLink ? formatRelativeLink(match[0]) : match[0]
         }

@@ -75,7 +75,6 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
 
 <style lang="scss" scoped>
 @import "./wrap.scss";
-@import "./location-console.scss";
 
 .console-item {
   // border-top: 1px solid #3a3a3a;
@@ -101,9 +100,6 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     }
   }
 
-  :deep(a) {
-    @extend .console-link;
-  }
   :deep(.color-white) {
     color: white;
   }

@@ -147,7 +147,6 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 <style lang="scss" scoped>
 @import "./styles.scss";
 @import "./wrap.scss";
-@import "./location-console.scss";
 
 .console-wrap-table {
   padding-left: (10px + 7 * 2);

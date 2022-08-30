@@ -6,7 +6,7 @@ export function createAnchor(
   options: {
     text: string
     href: string
-    class: string | string[]
+    class?: string | string[]
   }
 ) {
   if (typeof component === "function") return h("span", [(component as Slot)(options)])

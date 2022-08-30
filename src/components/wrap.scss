@@ -12,4 +12,9 @@
   width: 100%;
 
   padding-right: (10px + 7 * 2);
+
+  :deep(a) {
+    color: rgb(177, 177, 177);
+    text-decoration: underline;
+  }
 }
