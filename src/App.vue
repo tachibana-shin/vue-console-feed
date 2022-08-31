@@ -137,14 +137,14 @@ function onLinkClick() {
   console.log("onLinkClick")
 }
 const dataTable = Table([1, 432, 54, 2])
-const anchor = h("a")
+const anchor = ("a")
 </script>
 
 <template>
   <div>
     <ConsoleItem :data="Encode('hello world')" type="log" :count="12" />
     <ConsoleItem :data="data" type="log" :anchor="anchor" />
-    <ConsoleTable
+    <!-- <ConsoleTable
       :data="dataTable"
       :data-value="Encode([1, 432, 54, 2], false)"
       :anchor="anchor"
@@ -163,7 +163,7 @@ const anchor = h("a")
       <template v-slot:anchor="props">
         <a :href="props.href" :class="props.class">{{ props.text }}</a>
       </template>
-    </ConsoleItem>
+    </ConsoleItem> -->
   </div>
   <!-- <div v-for="data" -->
 </template>

@@ -173,6 +173,7 @@
     v-else-if="data['@t'] === 'object'"
     :flat="flat"
     :disable-magic="data['@first']"
+    :force-magic="!data['@des']"
   >
     <slot />
     <span class="array-size" v-if="!hideNameObject">{{ data["@name"] }}</span
@@ -221,6 +222,7 @@
               :_get-list-link-async="_getListLinkAsync"
               :read-link-object-async="readLinkObjectAsync"
               :call-fn-link-async="callFnLinkAsync"
+              :anchor="anchor"
             />
           </div>
           <!-- /@value -->
@@ -251,7 +253,7 @@
           :hide-name-object="
             typeof name === 'string' && !(name as string)?.startsWith('[[') && (item['@value'] as any)?.['@name'] === 'Object'
           "
-          class="truncate"
+          class="truncate ml-4"
           :_get-list-link-async="_getListLinkAsync"
           :read-link-object-async="readLinkObjectAsync"
           :call-fn-link-async="callFnLinkAsync"
@@ -287,6 +289,7 @@
     v-else-if="data['@t'] === 'array' || data['@t'] === 'typedarray'"
     :flat="flat"
     :disable-magic="data['@first']"
+    :force-magic="!data['@des']"
   >
     <slot /><span class="array-size mr-0" v-if="data['@name']">{{
       data["@name"]
@@ -518,6 +521,12 @@ const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
 }>
 const GetterField = _GetterField as unknown as DefineComponent<{
   getter: Data.Link
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
 }>
 
 const props = defineProps<{

@@ -23,10 +23,13 @@
         </svg>
 
         <div class="truncate">
-          <slot
-            v-if="disableMagic || ($slots['summary-opened'] ? !state : true)"
-          />
-          <slot v-else name="summary-opened" />
+          <slot v-if="forceMagic" name="summary-opened" />
+          <template v-else>
+            <slot
+              v-if="disableMagic || ($slots['summary-opened'] ? !state : true)"
+            />
+            <slot v-else name="summary-opened" />
+          </template>
         </div>
       </div>
       <div
@@ -49,6 +52,7 @@ import { ref, useAttrs, watch } from "vue"
 const props = defineProps<{
   onlyBtn?: boolean
   disableMagic?: boolean
+  forceMagic?: boolean
 
   flat?: boolean
   show?: boolean

@@ -294,7 +294,9 @@ export function clearLinkStore() {
 export function _Encode(
   data: unknown,
   first: boolean, // false,
-  linkReal: boolean // false
+  linkReal: boolean, // false
+  preview = true,
+  forceObject = false
 ):
   | Data.String
   | Data.Number
@@ -426,7 +428,7 @@ export function _Encode(
         return createFakeRecord(encodeObject(data))
       }
 
-      if (isList(data)) {
+      if (!forceObject && isList(data)) {
         if (linkReal) {
           const meta: Data.Array = {
             "@t": "array",
@@ -453,10 +455,9 @@ export function _Encode(
             "@size": data.length,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             "@name": (data as unknown as any)[Symbol.toStringTag],
-            "@des": createPreviewObject(
-              data,
-              getOwnDescriptorsTypedArray(data)
-            ),
+            "@des": preview
+              ? createPreviewObject(data, getOwnDescriptorsTypedArray(data))
+              : null,
             "@real": createLinkObject(data) // encodeObject(
             // data,
             // getOwnDescriptorsTypedArray(data)
@@ -515,11 +516,16 @@ export function _Encode(
         return createFakeRecord({
           ...encodeObject(data, getOwnDescriptorsBuffer(data)),
           "[[Int8Array]]": createRealItem(
-            _Encode(new Int8Array(data), false, false) as Data.TypedArray,
+            _Encode(new Int8Array(data), false, true, false) as Data.TypedArray,
             true
           ),
           "[[Uint8Array]]": createRealItem(
-            _Encode(new Uint8Array(data), false, false) as Data.TypedArray,
+            _Encode(
+              new Uint8Array(data),
+              false,
+              true,
+              false
+            ) as Data.TypedArray,
             true
           ),
 
@@ -527,6 +533,7 @@ export function _Encode(
             _Encode(
               new Int16Array(data, 0, ~~(data.byteLength / 2)),
               false,
+              true,
               false
             ) as Data.TypedArray,
             true
@@ -535,6 +542,7 @@ export function _Encode(
             _Encode(
               new Int32Array(data, 0, ~~(data.byteLength / 4)),
               false,
+              true,
               false
             ) as Data.TypedArray,
             true
@@ -697,7 +705,7 @@ export function _Encode(
         "@first": first,
         // わかない。ぜんぜんわかない！
         "@real": linkReal ? createLinkObject(data) : encodeObject(data),
-        "@des": linkReal ? createPreviewObject(data) : null
+        "@des": linkReal && preview ? createPreviewObject(data) : null
       }
       return meta
     }
@@ -951,7 +959,10 @@ function encodeObject(
   )
 
   return Object.assign(meta, {
-    "[[Prototype]]": createRealItem(_Encode(proto, false, true), true)
+    "[[Prototype]]": createRealItem(
+      _Encode(proto, false, true, false, true),
+      true
+    )
   })
 }
 /// ===================== On The Road! たのたぴたぢたの。さなたびさにどさ =====================
