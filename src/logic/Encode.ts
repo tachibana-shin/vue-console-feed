@@ -717,11 +717,17 @@ export function Encode(
   deepLink?: false | number,
   first = true,
   linkReal = true
-) {
-  return {
-    ..._Encode(data, first, linkReal),
-    "@location": deepLink === false ? null : getLocationCall(deepLink)
-  }
+): ReturnType<typeof _Encode> & {
+  "@location"?: string
+} {
+  return Object.assign(
+    _Encode(data, first, linkReal),
+    deepLink === false
+      ? undefined
+      : {
+          "@location": getLocationCall(deepLink)
+        }
+  )
 }
 
 function createFakeRecord<T extends Data.objReal>(

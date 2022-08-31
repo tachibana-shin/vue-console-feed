@@ -37,31 +37,16 @@ function getDescriptors<T extends object>(data: T) {
   )
 }
 
-function Table<T extends object>(
-  data: T,
-  deepLink: false | number | undefined,
-  noCollapse: true
-): {
-  table: Record<string, Record<string, DataPreview.objReal[""]["@value"]>>
-  cols: string[]
-  "@location": string | null
-}
-function Table<T extends object>(
-  data: T,
-  deepLink?: false | number,
-  noCollapse?: false
-): {
-  table: Record<string, Record<string, DataPreview.objReal[""]["@value"]>>
-  cols: string[]
-  "@location": string | null
-  "@collapse": ReturnType<typeof Encode>
-}
-
-function Table<T extends object>(
+export function Table<T extends object>(
   data: T,
   deepLink?: false | number,
   noCollapse?: boolean
-) {
+): {
+  table: Record<string, Record<string, DataPreview.objReal[""]["@value"]>>
+  cols: string[]
+  "@location"?: string
+  "@collapse"?: ReturnType<typeof Encode>
+} {
   const table: Record<
     string,
     Record<string, DataPreview.objReal[""]["@value"]>
@@ -104,9 +89,7 @@ function Table<T extends object>(
   return {
     table,
     cols: Array.from(nameCols.values()),
-    "@location": deepLink === false ? null : getLocationCall(deepLink),
+    "@location": deepLink === false ? undefined : getLocationCall(deepLink),
     "@collapse": noCollapse ? undefined : Encode(data, false)
   }
 }
-
-export { Table }

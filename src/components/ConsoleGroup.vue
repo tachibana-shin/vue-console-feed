@@ -2,7 +2,7 @@
   <Collapse
     show
     class-detail="l0"
-    style="border-bottom: 1px solid #3a3a3a"
+    style="border-bottom: 1px solid var(--c-border)"
     :style="{
       'padding-left': paddingLeftComputed + 'px'
     }"
@@ -22,7 +22,7 @@
     </template>
 
     <template v-slot:content>
-      <template v-for="(item, index) in data['@items']" :key="item">
+      <template v-for="(item, index) in data['@items']" :key="index">
         <ConsoleGroup
           v-if="'@items' in item"
           :data="item"
@@ -55,7 +55,7 @@
 </template>
 
 <style lang="scss" scoped>
-.children\:ml-0:deep(> *) {
+.children\:ml-0:deep(*) {
   margin-left: 0 !important;
 }
 .border-b-none {
@@ -64,16 +64,20 @@
 </style>
 
 <script lang="ts" setup>
-import { _Encode } from "../logic/Encode"
+import type { Component, DefineComponent, Slot } from "vue";
+import { computed, useSlots } from "vue"
+
+import type { _Encode, _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
+
+import Collapse from "./Collapse.vue"
+import _ConsoleGroup from "./ConsoleGroup.vue"
+import ConsoleItem from "./ConsoleItem.vue"
+import type { Promisy } from "./Promisy";
 import {
   _getListLinkAsync as _getListLinkAsyncDefault,
   callFnLinkAsync as callFnLinkAsyncDefault,
   readLinkObjectAsync as readLinkObjectAsyncDefault
 } from "./api-async-defaults"
-import { useSlots, computed, DefineComponent } from "vue"
-import Collapse from "./Collapse.vue"
-import ConsoleItem from "./ConsoleItem.vue"
-import _ConsoleGroup from "./ConsoleGroup.vue"
 
 interface ConsoleItemData {
   data: ReturnType<typeof _Encode>

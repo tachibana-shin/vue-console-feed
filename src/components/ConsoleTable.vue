@@ -1,5 +1,5 @@
 <template>
-  <div class="console-wrap console-wrap-table">
+  <div class="console-colors console-wrap console-wrap-table">
     <LocationConsole
       v-if="data['@location']"
       class="truncate console-location"
@@ -45,9 +45,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { Component, Slot} from "vue";
-import { computed, reactive , ref, useSlots } from "vue"
-
+import type { Component, Slot } from "vue"
+import { computed, reactive, ref, useSlots } from "vue"
 
 import type { _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
 import type { Table } from "../logic/Table"
@@ -68,9 +67,12 @@ const MAX_COUNT_COLDS = 20
 const props = defineProps<{
   data: ReturnType<typeof Table>
 
-  anchor?: Component<{
-    href: string
-  }> | Slot | string
+  anchor?:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
 
   // api get lazy data
   _getListLinkAsync?: Promisy<typeof _getListLink>
@@ -147,6 +149,7 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
 <style lang="scss" scoped>
 @import "./styles.scss";
 @import "./wrap.scss";
+@import "./colors.scss";
 
 .console-wrap-table {
   padding-left: (10px + 7 * 2);
@@ -178,13 +181,13 @@ function sortTable(table: ReturnType<typeof Table>["table"]) {
     }
 
     tr:nth-child(2n + 1) {
-      background-color: #292a2d;
+      background-color: var(--c-bg-table-2np1);
     }
     tr:nth-child(2n) {
-      background-color: #202124;
+      background-color: var(--c-bg);
     }
 
-    $border: 1px solid #494c50;
+    $border: 1px solid var(--c-border-table);
 
     tr > th,
     tr > td {

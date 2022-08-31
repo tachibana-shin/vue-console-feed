@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { h } from "vue"
-
+import ConsoleGroup from "./components/ConsoleGroup.vue"
 import ConsoleItem from "./components/ConsoleItem.vue"
 import ConsoleTable from "./components/ConsoleTable.vue"
-import ConsoleGroup from "./components/ConsoleGroup.vue"
 import { Encode } from "./logic/Encode"
 import { Table } from "./logic/Table"
 

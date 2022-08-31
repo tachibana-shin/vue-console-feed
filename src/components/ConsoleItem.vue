@@ -1,6 +1,6 @@
 <template>
   <div
-    class="console-wrap console-item"
+    class="console-colors console-wrap console-item"
     :class="type ? `console-${type}` : undefined"
     ref="elRef"
   >
@@ -83,10 +83,10 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
 
 <style lang="scss" scoped>
 @import "./wrap.scss";
+@import "./colors.scss";
 
 .console-item {
-  // border-top: 1px solid #3a3a3a;
-  border-bottom: 1px solid #3a3a3a;
+  border-bottom: 1px solid var(--c-border);
   padding: {
     top: 5px;
     bottom: 5px;
@@ -112,13 +112,6 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     color: white;
   }
 
-  &.console-warn {
-    background-color: #f28b82;
-  }
-  &.console-error {
-    background-color: #f29766;
-  }
-
   .console-icon {
     width: 10px;
     height: 18px;
@@ -132,7 +125,7 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     }
   }
   .console-badge {
-    background-color: #5db0d7;
+    background-color: var(--c-badge);
     border-radius: 15px;
     background-image: none;
     height: 15px;
@@ -146,12 +139,12 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
   }
   &.console-warn {
     .console-badge {
-      background-color: #f29766;
+      background-color: var(--c-badge-warn);
     }
   }
   &.console-error {
     .console-badge {
-      background-color: #f28b82;
+      background-color: var(--c-badge-error);
     }
   }
   .console-value {
@@ -165,10 +158,10 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
   }
 
   &.console-warn {
-    background-color: #332b00;
-    border-top: 1px solid #665500;
-    border-bottom: 1px solid #665500;
-    color: #f2ab26;
+    background-color: var(--c-bg-warn);
+    border-top: 1px solid var(--c-border-warn);
+    border-bottom: 1px solid var(--c-border-warn);
+    color: var(--c-text-warn);
     .console-icon {
       background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACkSURBVChTbY7BCoJQFERn0Q/3BX1JuxQjsSCXiV8gtCgxhCIrKIRIqKDVzXl5w5cNHBjm6eGinXiAXu5inY2xYm/mbpIh+vcFhLA3sx0athNUhymEsP+10lAEEA17x8o/9wFuNGnYuVlWve0SQl7P0sBu3aq2R1Q/1JzSkYGd29eqNv2wjdnUuvNRciC/N+qe+7gidbA8zyHkOINsvA/sumcOkjcabcBmw2+mMgAAAABJRU5ErkJggg==");
     }
@@ -182,13 +175,13 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     .console-icon {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 459 459'%3e%3cpath fill='%234D88FF' d='M433.5 127.5h-71.4a177.7 177.7 0 0 0-45.9-51L357 35.7 321.3 0l-56.1 56.1c-10.2-2.6-23-5.1-35.7-5.1s-25.5 2.5-35.7 5.1L137.7 0 102 35.7l40.8 40.8a177.7 177.7 0 0 0-45.9 51H25.5v51H79c-2.5 7.7-2.5 17.9-2.5 25.5v25.5h-51v51h51V306a88 88 0 0 0 2.5 25.5H25.5v51h71.4A152.2 152.2 0 0 0 229.5 459c56.1 0 107.1-30.6 132.6-76.5h71.4v-51H380c2.5-7.7 2.5-17.9 2.5-25.5v-25.5h51v-51h-51V204c0-7.7 0-17.9-2.5-25.5h53.5v-51zm-153 204h-102v-51h102v51zm0-102h-102v-51h102v51z'/%3e%3c/svg%3e");
     }
-    color: #4d88ff;
+    color: var(--c-text-debug);
   }
   &.console-error {
-    background-color: #290000;
-    border-top: 1px solid #5c0000;
-    border-bottom: 1px solid #5c0000;
-    color: #ff5d32;
+    background-color: var(--c-bg-error);
+    border-top: 1px solid var(--c-border-error);
+    border-bottom: 1px solid var(--c-border-error);
+    color:var(--c-text-error);
     .console-icon {
       background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADESURBVChTY4CB7ZI8tmfU5E6e01b+DMIgNkgMKg0BR9Vkux6YWPx/bemIgkFiIDmwogOaqrYPzazAEm8DwuGKYGyQHEgNw0VT05Mwib9v3v7/kJEHxiA2TDFIDcNNU4vPMFPACj58/P/v40cwGyYOUsNwy8IZRSFIEUgxskKQGoZrzp4ErQapYbgYHG371M4dLACTQGaD5EBqwD6/FpzQ9dTBE64IhkFiIDmwIhi4mlJqey8o4eR9r8jPIAxig8QgsgwMAFZz1YtGPXgjAAAAAElFTkSuQmCC");
     }

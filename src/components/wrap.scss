@@ -2,10 +2,10 @@
   font-family: Consolas, Lucida Console, Courier New, monospace, sans-serif;
   white-space: pre-wrap;
 
-  --bg-color: #202124;
+  --bg-color: var(--c-bg);
   // theme
   background-color: var(--bg-color);
-  color: #ffffff;
+  color: var(--c-text);
   font-size: 13px;
   line-height: 1.2;
 
@@ -15,7 +15,7 @@
   padding-right: (10px + 7 * 2);
 
   :deep(a) {
-    color: rgb(177, 177, 177);
+    color: var(--c-anchor);
     text-decoration: underline;
   }
 }

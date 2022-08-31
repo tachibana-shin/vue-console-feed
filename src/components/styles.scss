@@ -1,21 +1,21 @@
 .number {
-  color: #9980dc;
+  color: var(--c-text-number);
 }
 .bint,
 .nill {
-  color: #7b896f;
+  color: var(--c-text-bint);
 }
 .array-size {
-  color: #9aa09a;
+  color: var(--c-text-size);
   margin-right: 4px;
 }
 .string,
 .regexp,
 .symbol {
-  color: #35d4c7; //rgb(233, 63, 59);
+  color: var(--c-text-string); //rgb(233, 63, 59);
 }
 .char-f {
-  color: #f29766;
+  color: var(--c-text-char-f);
 }
 .function,
 .char-f {
@@ -23,20 +23,20 @@
 }
 
 .propName {
-  color: #5db0b5; //rgb(227, 110, 236);
+  color: var(--c-text-propName); //rgb(227, 110, 236);
   font-weight: 500;
 }
 .proto {
-  color: #9aa0a6 !important;
+  color: var(--c-text-proto) !important;
 }
 .propHidden {
-  color: #45778f;
+  color: var(--c-text-propHidden);
 }
 .propPreview {
-  color: #9aa0a6;
+  color: var(--c-text-proto);
 }
 .is {
-  color: #fff;
+  color: var(--c-text-two-dot);
   margin-right: 0.7em;
 }
 
@@ -46,20 +46,20 @@
 
 .element {
   &-tag {
-    color: #3aa3cc;
+    color: var(--c-el-tag);
   }
   &-propName {
-    color: #7bbbb9;
+    color: var(--c-el-attr-key);
   }
   &-propValue {
-    color: #f27739;
+    color: var(--c-el-attr-val);
   }
 
   &-comment {
-    color: #896d4b;
+    color: var(--c-el-comment);
   }
   &-doctype {
-    color: #b6b493;
+    color: var(--c-el-doctype);
   }
 }
 

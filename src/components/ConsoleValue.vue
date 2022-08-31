@@ -513,7 +513,7 @@ const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
       }>
     | Slot
     | string
-    | ((...args) => Component)
+    | ((...args: unknown[]) => Component)
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
@@ -528,7 +528,7 @@ const GetterField = _GetterField as unknown as DefineComponent<{
       }>
     | Slot
     | string
-    | ((...args) => Component)
+    | ((...args: unknown[]) => Component)
 }>
 
 const props = defineProps<{
@@ -544,7 +544,7 @@ const props = defineProps<{
       }>
     | Slot
     | string
-    | ((...args) => Component)
+    | ((...args: unknown[]) => Component)
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>

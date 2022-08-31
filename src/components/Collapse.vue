@@ -78,7 +78,7 @@ svg {
   width: 0.5rem;
   height: 0.5rem;
   margin-right: 4px;
-  fill: #9aa0a6;
+  fill: var(--c-triangle-fill);
   flex: none;
 
   &.opened {

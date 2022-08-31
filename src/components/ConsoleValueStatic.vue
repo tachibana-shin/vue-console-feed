@@ -90,7 +90,7 @@ defineProps<{
       }>
     | Slot
     | string
-    | ((...args) => Component)
+    | ((...args: unknown[]) => Component)
 }>()
 </script>
 

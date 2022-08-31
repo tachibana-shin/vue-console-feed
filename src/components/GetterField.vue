@@ -35,7 +35,7 @@ const props = defineProps<{
       }>
     | Slot
     | string
-    | ((...args) => Component)
+    | ((...args: unknown[]) => Component)
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>
