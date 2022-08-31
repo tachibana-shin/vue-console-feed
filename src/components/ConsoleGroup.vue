@@ -1,24 +1,23 @@
 <template>
   <Collapse
     show
-    class-detail="l0"
-    class-summary="console-colors"
+    class-detail="console-colors l0 line-throught"
+    class-summary="console-colors svg-top"
     style="border-bottom: 1px solid var(--c-border)"
-    :style="{
-      'padding-left': paddingLeftComputed + 'px'
-    }"
+    :padding-left="paddingLeftComputed"
   >
     <template v-slot:summary>
       <ConsoleItem
         :data="data['@key']"
         type="log"
-        class="children:ml-0 border-b-none"
+        class="children:ml-0 border-b-none min-w-0"
         :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
         :read-link-object-async="
           readLinkObjectAsync ?? readLinkObjectAsyncDefault
         "
         :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
         :anchor="Anchor"
+        @click.stop
       />
     </template>
 
@@ -56,11 +55,14 @@
 </template>
 
 <style lang="scss" scoped>
-.children\:ml-0:deep(*) {
+.children\:ml-0:deep(> *) {
   margin-left: 0 !important;
 }
 .border-b-none {
   border-bottom: none;
+}
+.min-w-0 {
+  min-width: 0;
 }
 </style>
 

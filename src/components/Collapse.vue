@@ -10,6 +10,10 @@
         v-bind="attrs"
         class="collapse-summary"
         :class="classSummary"
+        :style="{
+          paddingLeft:
+            paddingLeft === undefined ? undefined : paddingLeft + 'px'
+        }"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +32,7 @@
         </svg>
 
         <slot v-if="slots['summary']" name="summary" />
-        <div v-else class="truncate">
+        <div v-else class="truncate-2">
           <slot v-if="forceMagic" name="summary-opened" />
           <template v-else>
             <slot
@@ -43,6 +47,9 @@
         v-show="state"
         class="collapse-detail"
         :class="classDetail"
+        :style="{
+          '--p-left': paddingLeft === undefined ? undefined : paddingLeft + 'px'
+        }"
       >
         <slot name="content" :state="state" />
       </div>
@@ -57,6 +64,8 @@ const props = defineProps<{
   onlyBtn?: boolean
   disableMagic?: boolean
   forceMagic?: boolean
+
+  paddingLeft?: number
 
   flat?: boolean
   show?: boolean
@@ -81,6 +90,13 @@ const watcher = watch(state, () => {
 @import "./styles.scss";
 @import "./colors.scss";
 
+.truncate-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 svg {
   width: 0.5rem;
   height: 0.5rem;
@@ -90,6 +106,16 @@ svg {
 
   &.opened {
     transform: rotate(90deg);
+  }
+}
+
+.svg-top > svg {
+  align-self: start;
+  margin-top: 1em;
+  transform: translateY(-50%);
+
+  &.opened {
+    transform: translateY(-50%) rotate(90deg);
   }
 }
 
@@ -110,6 +136,21 @@ svg {
 
   :deep(.collapse-summary) {
     font-style: normal;
+  }
+}
+
+.line-throught {
+  position: relative;
+  &:before {
+    content: "";
+    height: 100%;
+    width: 1px;
+    background-color: var(--c-border);
+    position: absolute;
+    top: 0;
+    left: var(--p-left);
+    transform: translateX(3px);
+    z-index: 1;
   }
 }
 </style>

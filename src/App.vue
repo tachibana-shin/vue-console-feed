@@ -127,6 +127,7 @@ try {
   a = err
 }
 const anchor = "a"
+Object.assign(window, { tt })
 </script>
 
 <template>
@@ -161,7 +162,7 @@ const anchor = "a"
             type: 'log'
           },
           {
-            '@key': Encode('group 3'),
+            '@key': Encode(tt),
             '@items': [
               {
                 data: Encode('hello world'),
