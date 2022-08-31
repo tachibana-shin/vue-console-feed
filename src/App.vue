@@ -3,6 +3,7 @@ import { h } from "vue"
 
 import ConsoleItem from "./components/ConsoleItem.vue"
 import ConsoleTable from "./components/ConsoleTable.vue"
+import ConsoleGroup from "./components/ConsoleGroup.vue"
 import { Encode } from "./logic/Encode"
 import { Table } from "./logic/Table"
 
@@ -147,6 +148,38 @@ const anchor = "a"
     </ConsoleItem>
     <ConsoleItem :data="Encode('hello world')" type="error" :count="12" />
     <ConsoleItem :data="Encode('hello world')" type="log" />
+    <ConsoleGroup
+      :data="{
+        '@key': Encode('console.group'),
+        '@items': [
+          {
+            data: Encode('hello world'),
+            count: 1,
+            type: 'log'
+          },
+          {
+            data: Encode('hello world'),
+            count: 1,
+            type: 'log'
+          },
+          {
+            '@key': Encode('group 3'),
+            '@items': [
+              {
+                data: Encode('hello world'),
+                count: 1,
+                type: 'log'
+              },
+              {
+                data: Encode('hello world'),
+                count: 1,
+                type: 'log'
+              }
+            ]
+          }
+        ]
+      }"
+    />
   </div>
   <!-- <div v-for="data" -->
 </template>

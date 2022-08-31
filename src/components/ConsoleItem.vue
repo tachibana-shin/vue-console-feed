@@ -7,7 +7,7 @@
     <span v-if="count && count > 1" class="console-icon console-badge">{{
       count
     }}</span>
-    <span v-else-if="type" class="console-icon" />
+    <span v-else-if="type && type !== 'log'" class="console-icon" />
 
     <div
       class="console-value"

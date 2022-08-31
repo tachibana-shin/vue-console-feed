@@ -377,7 +377,7 @@
       <Collapse
         v-else
         :only-btn="!data['@childs'] || typeof data['@childs'] === 'string'"
-        detail-l7
+        class-detail="l7"
       >
         <span class="element-tag">
           &lt;{{ data["@name"].toLowerCase().replace(/^#/, "")

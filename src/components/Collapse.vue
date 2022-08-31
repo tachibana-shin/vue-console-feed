@@ -22,7 +22,8 @@
           <g><path d="M79.2,10l841.6,490.1L79.2,990V10z" /></g>
         </svg>
 
-        <div class="truncate">
+        <slot v-if="slots['summary']" name="summary" />
+        <div v-else class="truncate">
           <slot v-if="forceMagic" name="summary-opened" />
           <template v-else>
             <slot
@@ -36,9 +37,7 @@
         v-if="state || loaded"
         v-show="state"
         class="collapse-detail"
-        :class="{
-          l7: detailL7
-        }"
+        :class="classDetail"
       >
         <slot name="content" :state="state" />
       </div>
@@ -47,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, useAttrs, watch } from "vue"
+import { ref, useAttrs, useSlots, watch } from "vue"
 
 const props = defineProps<{
   onlyBtn?: boolean
@@ -57,10 +56,11 @@ const props = defineProps<{
   flat?: boolean
   show?: boolean
 
-  detailL7?: boolean
+  classDetail?: string
 }>()
 
 const attrs = useAttrs()
+const slots = useSlots()
 const state = ref(props.show)
 
 const loaded = ref(false)
@@ -96,6 +96,9 @@ svg {
   margin-left: 12px;
   &.l7 {
     margin-left: (4px * 7);
+  }
+  &.l0 {
+    margin-left: 0;
   }
 
   :deep(.collapse-summary) {
