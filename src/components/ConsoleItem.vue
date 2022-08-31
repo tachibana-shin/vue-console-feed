@@ -4,7 +4,9 @@
     :class="type ? `console-${type}` : undefined"
     ref="elRef"
   >
-    <span v-if="count" class="console-item console-badge">{{ count }}</span>
+    <span v-if="count && count > 1" class="console-icon console-badge">{{
+      count
+    }}</span>
     <span v-else-if="type" class="console-icon" />
 
     <div
@@ -110,11 +112,6 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     color: white;
   }
 
-  .console-badge {
-    background-color: #5db0d7;
-    border-radius: 30px;
-    background-image: none !important;
-  }
   &.console-warn {
     background-color: #f28b82;
   }
@@ -133,6 +130,17 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     & + .console-value {
       margin-left: 0;
     }
+  }
+  .console-badge {
+    background-color: #5db0d7;
+    border-radius: 15px;
+    background-image: none;
+    height: 15px;
+    width: auto;
+    font-size: 11px;
+    padding: 0 5px;
+    line-height: 15px;
+    text-align: center;
   }
   .console-value {
     margin-left: (10px + 7px * 2);
