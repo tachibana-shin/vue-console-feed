@@ -11,3 +11,4 @@ export { default as PropName } from "./components/PropName.vue"
 
 export * from "./logic/Encode"
 export * from "./logic/Table"
+export * from "./logic/Group"

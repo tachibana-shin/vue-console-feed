@@ -40,6 +40,11 @@
       "import": "./dist/Table.mjs",
       "require": "./dist/Table.js",
       "types": "./dist/Table.d.ts"
+    },
+    "./group": {
+      "import": "./dist/Group.mjs",
+      "require": "./dist/Group.js",
+      "types": "./dist/Group.d.ts"
     }
   },
   "typesVersions": {

@@ -17,7 +17,7 @@
         "
         :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
         :anchor="Anchor"
-        @click.stop
+        @click.stop="void 0"
       />
     </template>
 
@@ -53,18 +53,6 @@
     </template>
   </Collapse>
 </template>
-
-<style lang="scss" scoped>
-.children\:ml-0:deep(> *) {
-  margin-left: 0 !important;
-}
-.border-b-none {
-  border-bottom: none;
-}
-.min-w-0 {
-  min-width: 0;
-}
-</style>
 
 <script lang="ts" setup>
 import type { Component, DefineComponent, Slot } from "vue"
@@ -139,3 +127,15 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
 
 const paddingLeftComputed = computed(() => props.paddingLeft + 12)
 </script>
+
+<style lang="scss" scoped>
+.children\:ml-0:deep(> *) {
+  margin-left: 0 !important;
+}
+.border-b-none {
+  border-bottom: none;
+}
+.min-w-0 {
+  min-width: 0;
+}
+</style>

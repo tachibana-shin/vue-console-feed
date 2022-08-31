@@ -52,7 +52,7 @@ or with CDN:
 - [x] console.info
 - [x] console.error
 - [x] console.count
-- [ ] console.group
+- [x] console.group
 - [x] Date
 - [x] Buffer
 - [x] TypedArray
