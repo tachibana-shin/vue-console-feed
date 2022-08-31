@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Component, Slot} from "vue";
+import type { Component, Slot } from "vue"
 import { ref, shallowRef, toRaw, watch } from "vue"
 
 import type {
@@ -29,9 +29,13 @@ import type { Promisy } from "./Promisy"
 const props = defineProps<{
   getter: Data.Link
 
-  anchor: Component<{
-    href: string
-  }>| Slot | string
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
+    | ((...args) => Component)
 
   // api
   _getListLinkAsync: Promisy<typeof _getListLink>

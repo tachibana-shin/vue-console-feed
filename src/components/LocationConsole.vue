@@ -22,5 +22,6 @@ defineProps<{
       }>
     | Slot
     | string
+    | ((...args) => Component)
 }>()
 </script>

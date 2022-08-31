@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Component, DefineComponent, Slot } from "vue";
+import type { Component, DefineComponent, Slot } from "vue"
 import { shallowRef, toRaw, watchEffect } from "vue"
 
 import type {
@@ -30,14 +30,26 @@ const ConsoleValue = _ConsoleValue as unknown as DefineComponent<{
   data: ReturnType<typeof _Encode>
   hideNameObject?: boolean
   flat?: boolean
+
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
+    | ((...args) => Component)
 }>
 
 const props = defineProps<{
   link: Data.Link
 
-  anchor: Component<{
-    href: string
-  }> | Slot | string
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
+    | ((...args) => Component)
 
   // @api
   _getListLinkAsync: Promisy<typeof _getListLink>

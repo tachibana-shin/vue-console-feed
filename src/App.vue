@@ -127,43 +127,26 @@ try {
 } catch (err) {
   a = err
 }
-const data = Encode(tt)
-// console.table(tt)
-console.log(data)
-const data2 = Encode(a)
-const data3 = Encode({ a: 778 })
-// console.log(document.body)
-function onLinkClick() {
-  console.log("onLinkClick")
-}
-const dataTable = Table([1, 432, 54, 2])
-const anchor = ("a")
+const anchor = "a"
 </script>
 
 <template>
   <div>
     <ConsoleItem :data="Encode('hello world')" type="log" :count="12" />
-    <ConsoleItem :data="data" type="log" :anchor="anchor" />
-    <!-- <ConsoleTable
-      :data="dataTable"
-      :data-value="Encode([1, 432, 54, 2], false)"
-      :anchor="anchor"
-    />
-    <ConsoleItem :data="data2" type="error">
+    <ConsoleItem :data="Encode(tt)" type="log" :anchor="anchor" />
+    <ConsoleTable :data="Table([1, 432, 54, 2])" :anchor="anchor" />
+    <ConsoleItem :data="Encode(a)" type="error">
       <template v-slot:anchor="props">
         <a :href="props.href" :class="props.class">{{ props.text }}</a>
       </template>
     </ConsoleItem>
-    <ConsoleItem
-      :data="data3"
-      type="log"
-      use-link-click
-      @link-click="onLinkClick"
-    >
+    <ConsoleItem :data="Encode({ a: 778 })" type="log">
       <template v-slot:anchor="props">
         <a :href="props.href" :class="props.class">{{ props.text }}</a>
       </template>
-    </ConsoleItem> -->
+    </ConsoleItem>
+    <ConsoleItem :data="Encode('hello world')" type="error" :count="12" />
+    <ConsoleItem :data="Encode('hello world')" type="log" />
   </div>
   <!-- <div v-for="data" -->
 </template>

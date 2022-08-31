@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Component, Slot} from "vue";
+import type { Component, Slot } from "vue"
 import { h } from "vue"
 
 import type { Data, DataPreview } from "../logic/Encode"
@@ -84,9 +84,13 @@ defineProps<{
   isLog?: boolean
   first?: boolean
 
-  anchor: Component<{
-    href: string
-  }>| Slot | string
+  anchor:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
+    | ((...args) => Component)
 }>()
 </script>
 

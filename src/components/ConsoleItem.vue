@@ -141,6 +141,18 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     padding: 0 5px;
     line-height: 15px;
     text-align: center;
+    background-image: none !important;
+    color: var(--bg-color);
+  }
+  &.console-warn {
+    .console-badge {
+      background-color: #f29766;
+    }
+  }
+  &.console-error {
+    .console-badge {
+      background-color: #f28b82;
+    }
   }
   .console-value {
     margin-left: (10px + 7px * 2);

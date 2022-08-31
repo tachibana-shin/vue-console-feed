@@ -2,8 +2,9 @@
   font-family: Consolas, Lucida Console, Courier New, monospace, sans-serif;
   white-space: pre-wrap;
 
+  --bg-color: #202124;
   // theme
-  background-color: #202124;
+  background-color: var(--bg-color);
   color: #ffffff;
   font-size: 13px;
   line-height: 1.2;
