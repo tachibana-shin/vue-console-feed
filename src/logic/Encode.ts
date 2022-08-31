@@ -911,8 +911,8 @@ function encodeObject(
       const { value } = meta
       if ("get" in meta || "set" in meta) {
         const at: Partial<Record<"get" | "set", Data.Function>> = {}
-        if (meta.get) at.get = _Encode(meta.get, false, false) as Data.Function
-        if (meta.set) at.set = _Encode(meta.set, false, false) as Data.Function
+        if (meta.get) at.get = _Encode(meta.get, false, true) as Data.Function
+        if (meta.set) at.set = _Encode(meta.set, false, true) as Data.Function
         return [
           name.toString(),
           createRealItem(
