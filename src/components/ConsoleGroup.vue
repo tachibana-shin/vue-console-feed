@@ -2,6 +2,7 @@
   <Collapse
     show
     class-detail="l0"
+    class-summary="console-colors"
     style="border-bottom: 1px solid var(--c-border)"
     :style="{
       'padding-left': paddingLeftComputed + 'px'
@@ -64,15 +65,20 @@
 </style>
 
 <script lang="ts" setup>
-import type { Component, DefineComponent, Slot } from "vue";
+import type { Component, DefineComponent, Slot } from "vue"
 import { computed, useSlots } from "vue"
 
-import type { _Encode, _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
+import type {
+  _Encode,
+  _getListLink,
+  callFnLink,
+  readLinkObject
+} from "../logic/Encode"
 
 import Collapse from "./Collapse.vue"
 import _ConsoleGroup from "./ConsoleGroup.vue"
 import ConsoleItem from "./ConsoleItem.vue"
-import type { Promisy } from "./Promisy";
+import type { Promisy } from "./Promisy"
 import {
   _getListLinkAsync as _getListLinkAsyncDefault,
   callFnLinkAsync as callFnLinkAsyncDefault,

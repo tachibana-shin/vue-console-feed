@@ -5,7 +5,12 @@
   <template v-else>
     <slot name="content" v-if="flat" />
     <template v-else>
-      <div @click="state = !state" v-bind="attrs" class="collapse-summary">
+      <div
+        @click="state = !state"
+        v-bind="attrs"
+        class="collapse-summary"
+        :class="classSummary"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -56,6 +61,7 @@ const props = defineProps<{
   flat?: boolean
   show?: boolean
 
+  classSummary?: string
   classDetail?: string
 }>()
 
@@ -73,6 +79,7 @@ const watcher = watch(state, () => {
 
 <style lang="scss" scoped>
 @import "./styles.scss";
+@import "./colors.scss";
 
 svg {
   width: 0.5rem;
