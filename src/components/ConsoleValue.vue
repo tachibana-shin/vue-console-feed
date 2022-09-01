@@ -208,7 +208,7 @@
 
       <template
         v-else
-        v-for="(item, name) in (data['@real'] as Data.objReal)"
+        v-for="(item, name) in (data['@real'] as  Data.objReal )"
         :key="name"
       >
         <!-- get/set -->

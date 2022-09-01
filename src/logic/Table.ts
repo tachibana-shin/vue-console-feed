@@ -42,10 +42,13 @@ export function Table<T extends object>(
   deepLink?: false | number,
   noCollapse?: boolean
 ): {
-  table: Record<string, Record<string, DataPreview.objReal[""]["@value"]>>
-  cols: string[]
-  "@location"?: string
-  "@collapse"?: ReturnType<typeof Encode>
+  readonly table: Record<
+    string,
+    Record<string, DataPreview.objReal[""]["@value"]>
+  >
+  readonly cols: string[]
+  readonly "@location"?: string
+  readonly "@collapse"?: ReturnType<typeof Encode>
 } {
   const table: Record<
     string,

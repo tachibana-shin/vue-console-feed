@@ -34,6 +34,19 @@
           :anchor="Anchor"
           :padding-left="paddingLeftComputed"
         />
+        <ConsoleTable
+          v-else-if="item.type === 'table'"
+          :data="item.data"
+          :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
+          :read-link-object-async="
+            readLinkObjectAsync ?? readLinkObjectAsyncDefault
+          "
+          :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
+          :anchor="Anchor"
+          :style="{
+            paddingLeft: paddingLeftComputed + 'px'
+          }"
+        />
         <ConsoleItem
           v-else
           :data="item.data"
@@ -58,8 +71,8 @@
 import type { Component, DefineComponent, Slot } from "vue"
 import { computed, useSlots } from "vue"
 
+import type { GroupData } from "../logic/DataAPI"
 import type {
-  _Encode,
   _getListLink,
   callFnLink,
   readLinkObject
@@ -68,6 +81,7 @@ import type {
 import Collapse from "./Collapse.vue"
 import _ConsoleGroup from "./ConsoleGroup.vue"
 import ConsoleItem from "./ConsoleItem.vue"
+import ConsoleTable from "./ConsoleTable.vue"
 import type { Promisy } from "./Promisy"
 import {
   _getListLinkAsync as _getListLinkAsyncDefault,
@@ -75,19 +89,9 @@ import {
   readLinkObjectAsync as readLinkObjectAsyncDefault
 } from "./api-async-defaults"
 
-interface ConsoleItemData {
-  data: ReturnType<typeof _Encode>
-  count: number
-  type: "warn" | "info" | "debug" | "error" | "output" | "log"
-}
-interface ConsoleGroupData {
-  "@key": ReturnType<typeof _Encode>
-  "@items": (ConsoleItemData | ConsoleGroupData)[]
-}
-
 const props = withDefaults(
   defineProps<{
-    data: ConsoleGroupData
+    data: GroupData
 
     // @ui
     paddingLeft?: number
@@ -107,7 +111,7 @@ const props = withDefaults(
   { paddingLeft: 0 }
 )
 const ConsoleGroup = _ConsoleGroup as unknown as DefineComponent<{
-  data: ConsoleGroupData
+  data: GroupData
 
   anchor?:
     | Component<{

@@ -1,5 +1,6 @@
 export { default as Collapse } from "./components/Collapse.vue"
 export { default as ConsoleGroup } from "./components/ConsoleGroup.vue"
+export { default as Console } from "./components/Console.vue"
 export { default as ConsoleItem } from "./components/ConsoleItem.vue"
 export { default as ConsoleLink } from "./components/ConsoleLink.vue"
 export { default as ConsoleTable } from "./components/ConsoleTable.vue"
@@ -11,4 +12,4 @@ export { default as PropName } from "./components/PropName.vue"
 
 export * from "./logic/Encode"
 export * from "./logic/Table"
-export * from "./logic/Group"
+export * from "./logic/DataAPI"

@@ -11,6 +11,7 @@ import { getOwnDescriptorsIn } from "./getOwnDescriptorsIn"
 import { getOwnDescriptorsRegExp } from "./getOwnDescriptorsRegExp"
 import { getOwnDescriptorsTypedArray } from "./getOwnDescriptorsTypedArray"
 import { getValue } from "./getValue"
+import { clear, get } from "./id-manager"
 import { isBuffer } from "./isBuffer"
 import { isCollection } from "./isCollection"
 import { isDataView } from "./isDataView"
@@ -21,74 +22,74 @@ import { isRegExp } from "./isRegExp"
 import { isTypedArray } from "./isTypedArray"
 import { shouldInline } from "./shouldInline"
 interface RealItem<T> {
-  "@hidden": boolean
-  "@value": T
+  readonly "@hidden": boolean
+  readonly "@value": T
 }
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Data {
   export interface Link {
-    "@t": "link"
-    "@type": "object" | "function"
-    "@link": string
-    "@name": string | null
+    readonly "@t": "link"
+    readonly "@type": "object" | "function"
+    readonly "@link": string
+    readonly "@name": string | null
   }
   export interface String {
-    "@t": "string"
+    readonly "@t": "string"
     "@first": boolean
     "@value": string
   }
   export interface Number {
-    "@t": "number"
-    "@value": string
+    readonly "@t": "number"
+    readonly "@value": string
   }
   export interface BigInt {
-    "@t": "bint"
-    "@value": string
+    readonly "@t": "bint"
+    readonly "@value": string
   }
   export interface Symbol {
-    "@t": "symbol"
-    "@value": string
+    readonly "@t": "symbol"
+    readonly "@value": string
   }
   export interface Nill {
-    "@t": "nill"
-    "@value": "null" | "undefined"
+    readonly "@t": "nill"
+    readonly "@value": "null" | "undefined"
   }
   export interface Function {
-    "@t": "function"
-    "@first": boolean
-    "@header": ReturnType<typeof getHeaderFn>
-    "@code": string
-    "@real": Link | null
+    readonly "@t": "function"
+    readonly "@first": boolean
+    readonly "@header": ReturnType<typeof getHeaderFn>
+    readonly "@code": string
+    readonly "@real": Link | null
   }
   //= ============
   export interface Collection
     // eslint-disable-next-line no-use-before-define
     extends Omit<Record, "@t" | "@des" | "@first" | "@real"> {
-    "@t": "collection"
-    "@name": "map" | "weakmap" | "set" | "weakset"
-    "@size": number | null
-    "@entries": unknown
-    "@real": Link
+    readonly "@t": "collection"
+    readonly "@name": "map" | "weakmap" | "set" | "weakset"
+    readonly "@size": number | null
+    readonly "@entries": unknown
+    readonly "@real": Link
   }
   //= =============
   export interface RegExp
     // eslint-disable-next-line no-use-before-define
     extends Omit<Record, "@t" | "@de" | "@real" | "@des"> {
-    "@t": "regexp"
-    "@flags": string
-    "@source": string
-    "@real": Link | null
+    readonly "@t": "regexp"
+    readonly "@flags": string
+    readonly "@source": string
+    readonly "@real": Link | null
   }
   export interface GetSetter {
-    "@t": "gs"
-    "@value": Link
-    "@at": Partial<{
+    readonly "@t": "gs"
+    readonly "@value": Link
+    readonly "@at": Partial<{
       [name in "get" | "set"]: Function
     }>
   }
   // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
   export interface objReal {
-    [name: string]: RealItem<
+    readonly [name: string]: RealItem<
       | GetSetter
       | String
       | Number
@@ -120,89 +121,89 @@ export namespace Data {
     >
   }
   export interface Record {
-    "@t": "object"
-    "@name": string | null
-    "@first": boolean
-    "@real": objReal | Link
-    "@des": {
+    readonly "@t": "object"
+    readonly "@name": string | null
+    readonly "@first": boolean
+    readonly "@real": objReal | Link
+    readonly "@des": {
       // eslint-disable-next-line no-use-before-define
-      "@value": DataPreview.objReal
-      "@lastKey": string
+      readonly "@value": DataPreview.objReal
+      readonly "@lastKey": string
     } | null
   }
   export interface Error {
-    "@t": "error"
-    "@first": boolean
-    "@stack": string // use
-    "@real": Link | null // use
+    readonly "@t": "error"
+    readonly "@first": boolean
+    readonly "@stack": string // use
+    readonly "@real": Link | null // use
   }
   export interface Array extends Pick<Record, "@des"> {
-    "@t": "array"
-    "@size": number
-    "@name": string | null
-    "@first": boolean
-    "@real": Link
+    readonly "@t": "array"
+    readonly "@size": number
+    readonly "@name": string | null
+    readonly "@first": boolean
+    readonly "@real": Link
   }
   export type ArrayReal = objReal & {
     // TODO:いみわかない！
-    length: RealItem<Number>
+    readonly length: RealItem<Number>
   }
   export interface Element {
-    "@t": "element"
-    "@name": string
-    "@first": boolean
-    "@attrs"?: [string, string][]
-    "@real": Link | null
-    "@childs"?: string | null | Link
+    readonly "@t": "element"
+    readonly "@name": string
+    readonly "@first": boolean
+    readonly "@attrs"?: [string, string][]
+    readonly "@real": Link | null
+    readonly "@childs"?: string | null | Link
   }
   export interface Promise {
-    "@t": "promise"
-    "@first": boolean
-    "@state": "pending" | "fulfilled" | "rejected"
-    "@real": Link
-    "@des": Exclude<Record["@des"], null>
+    readonly "@t": "promise"
+    readonly "@first": boolean
+    readonly "@state": "pending" | "fulfilled" | "rejected"
+    readonly "@real": Link
+    readonly "@des": Exclude<Record["@des"], null>
   }
   export interface Date extends Pick<Record, "@des"> {
-    "@t": "date"
-    "@first": boolean
-    "@value": string
-    "@real": Link | null
+    readonly "@t": "date"
+    readonly "@first": boolean
+    readonly "@value": string
+    readonly "@real": Link | null
   }
   export interface TypedArray extends Omit<Array, "@t"> {
-    "@t": "typedarray"
-    "@real": Link
+    readonly "@t": "typedarray"
+    readonly "@real": Link
   }
   export type TypedArrayReal = ArrayReal & {
     // eslint-disable-next-line no-use-before-define
-    buffer: RealItem<Buffer>
-    byteLength: RealItem<Number>
-    byteOffset: RealItem<Number>
-    [Symbol.toStringTag]: RealItem<String>
+    readonly buffer: RealItem<Buffer>
+    readonly byteLength: RealItem<Number>
+    readonly byteOffset: RealItem<Number>
+    readonly [Symbol.toStringTag]: RealItem<String>
   }
   export interface Buffer extends Omit<Array, "@t" | "@des" | "@real"> {
-    "@t": "buffer"
+    readonly "@t": "buffer"
     // size is equal byteLength
-    "@real": Link
+    readonly "@real": Link
   }
   export type BufferReal = objReal & {
-    byteLength: RealItem<Number>
-    "[[Int8Array]]": RealItem<TypedArray>
-    "[[Uint8Array]]": RealItem<TypedArray>
+    readonly byteLength: RealItem<Number>
+    readonly "[[Int8Array]]": RealItem<TypedArray>
+    readonly "[[Uint8Array]]": RealItem<TypedArray>
 
-    "[[Int16Array]]": RealItem<TypedArray>
-    "[[Int32Array]]": RealItem<TypedArray>
+    readonly "[[Int16Array]]": RealItem<TypedArray>
+    readonly "[[Int32Array]]": RealItem<TypedArray>
 
-    "[[ArrayBufferByteLength]]": RealItem<Number>
+    readonly "[[ArrayBufferByteLength]]": RealItem<Number>
   }
   export interface DataView extends Omit<Array, "@t" | "@des" | "@name"> {
-    "@t": "dataview"
-    "@name": "DataView"
-    "@real": Link
+    readonly "@t": "dataview"
+    readonly "@name": "DataView"
+    readonly "@real": Link
   }
   export type DataViewReal = ArrayReal & {
-    buffer: RealItem<Buffer>
-    byteLength: RealItem<Number>
-    byteOffset: RealItem<Number>
+    readonly buffer: RealItem<Buffer>
+    readonly byteLength: RealItem<Number>
+    readonly byteOffset: RealItem<Number>
   }
 }
 
@@ -245,7 +246,7 @@ function createLinkObject(obj: object): Data.Link {
     "@name": name
   }
 }
-export function readLinkObject(link: Data.Link) {
+export function readLinkObject(link: Data.Link): ReturnType<typeof _Encode> {
   const obj = linkStore.get(link["@link"])
 
   if (import.meta.env.NODE_ENV !== "production")
@@ -270,7 +271,7 @@ export function callFnLink(
 }
 export function _getListLink(
   link: Data.Link
-): (ReturnType<typeof _Encode> | Data.Error)[] {
+): readonly (ReturnType<typeof _Encode> | Data.Error)[] {
   const obj = linkStore.get(link["@link"])
 
   if (obj === undefined || !("length" in obj))
@@ -289,6 +290,7 @@ export function _getListLink(
 }
 export function clearLinkStore() {
   linkStore.clear()
+  clear()
 }
 // ==========================================
 export function _Encode(
@@ -718,16 +720,14 @@ export function Encode(
   first = true,
   linkReal = true
 ): ReturnType<typeof _Encode> & {
-  "@location"?: string
+  readonly "@id": string
+  readonly "@location"?: string
 } {
-  return Object.assign(
-    _Encode(data, first, linkReal),
-    deepLink === false
-      ? undefined
-      : {
-          "@location": getLocationCall(deepLink)
-        }
-  )
+  return {
+    ..._Encode(data, first, linkReal),
+    "@id": get(data),
+    "@location": deepLink === false ? undefined : getLocationCall(deepLink)
+  }
 }
 
 function createFakeRecord<T extends Data.objReal>(
@@ -760,7 +760,7 @@ export namespace DataPreview {
 
   // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
   export interface objReal {
-    [name: string]: RealItem<
+    readonly [name: string]: RealItem<
       | Record
       | Error
       | RegExp

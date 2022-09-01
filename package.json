@@ -41,10 +41,10 @@
       "require": "./dist/Table.js",
       "types": "./dist/Table.d.ts"
     },
-    "./group": {
-      "import": "./dist/Group.mjs",
-      "require": "./dist/Group.js",
-      "types": "./dist/Group.d.ts"
+    "./data-api": {
+      "import": "./dist/DataAPI.mjs",
+      "require": "./dist/DataAPI.js",
+      "types": "./dist/DataAPI.d.ts"
     }
   },
   "typesVersions": {

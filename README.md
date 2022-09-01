@@ -60,6 +60,22 @@ or with CDN:
 - [x] address `http` in `string` and `Error`
 - [x] Location link
 
+**DataAPI**
+- [x] console.log
+- [x] console.warn
+- [x] console.info
+- [x] console.debug
+- [x] console.error
+- [x] console.table
+- [x] console.group
+- [x] console.groupEnd
+- [x] console.count
+- [x] console.countReset
+- [x] console.time 
+- [x] console.timeLog
+- [x] console.timeEnd
+- [x] console.clear
+
 ## Usage
 
 ### ConsoleItem

@@ -12,18 +12,36 @@
     <div
       class="console-value"
       :class="{
-        'has-location': data['@location'] && !noLocation
+        'has-location': location
       }"
     >
       <LocationConsole
-        v-if="data['@location'] && !noLocation"
+        v-if="location"
         class="truncate console-location"
-        :location="data['@location']"
+        :location="location"
         :anchor="Anchor"
       />
       <div class="console-message">
+        <template v-if="Array.isArray(data)">
+          <ConsoleValue
+            v-for="(item, index) in data"
+            :key="index"
+            :data="item"
+            :is-log="type !== undefined"
+            :_get-list-link-async="
+              _getListLinkAsync ?? _getListLinkAsyncDefault
+            "
+            :read-link-object-async="
+              readLinkObjectAsync ?? readLinkObjectAsyncDefault
+            "
+            :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
+            :anchor="Anchor"
+            class="mr-1"
+          />
+        </template>
         <ConsoleValue
-          :data="data"
+          v-else
+          :data="(data as EncodeData)"
           :is-log="type !== undefined"
           :_get-list-link-async="_getListLinkAsync ?? _getListLinkAsyncDefault"
           :read-link-object-async="
@@ -57,8 +75,10 @@ import {
   readLinkObjectAsync as readLinkObjectAsyncDefault
 } from "./api-async-defaults"
 
+type EncodeData = ReturnType<typeof Encode>
+
 const props = defineProps<{
-  data: ReturnType<typeof Encode>
+  data: EncodeData | readonly EncodeData[]
   count?: number | string
   type?: "warn" | "info" | "debug" | "error" | "output" | "log"
 
@@ -79,6 +99,12 @@ const props = defineProps<{
 const $slots = useSlots()
 
 const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
+
+const location = computed(() =>
+  props.noLocation
+    ? undefined
+    : (Array.isArray(props.data) ? props.data[0] : props.data)["@location"]
+)
 </script>
 
 <style lang="scss" scoped>
@@ -181,10 +207,14 @@ const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
     background-color: var(--c-bg-error);
     border-top: 1px solid var(--c-border-error);
     border-bottom: 1px solid var(--c-border-error);
-    color:var(--c-text-error);
+    color: var(--c-text-error);
     .console-icon {
       background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADESURBVChTY4CB7ZI8tmfU5E6e01b+DMIgNkgMKg0BR9Vkux6YWPx/bemIgkFiIDmwogOaqrYPzazAEm8DwuGKYGyQHEgNw0VT05Mwib9v3v7/kJEHxiA2TDFIDcNNU4vPMFPACj58/P/v40cwGyYOUsNwy8IZRSFIEUgxskKQGoZrzp4ErQapYbgYHG371M4dLACTQGaD5EBqwD6/FpzQ9dTBE64IhkFiIDmwIhi4mlJqey8o4eR9r8jPIAxig8QgsgwMAFZz1YtGPXgjAAAAAElFTkSuQmCC");
     }
   }
+}
+
+.mr-1 {
+  margin-right: 4px;
 }
 </style>
