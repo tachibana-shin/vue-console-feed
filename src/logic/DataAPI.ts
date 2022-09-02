@@ -48,7 +48,7 @@ export class DataAPI<
   Encoded extends boolean,
   Data extends Encoded extends true ? ReturnType<typeof Encode> : unknown
 > {
-  public value: (LogData | TableData | GroupData)[] = reactive([])
+  public value: (LogData | TableData | GroupData)[] = shallowReactive([])
 
   private queueGroups: GroupData[] = []
 
