@@ -7,7 +7,7 @@ function formatRelativeLink(value: string): string {
   try {
     const url = new URL(value)
 
-    url.searchParams.delete(t)
+    url.searchParams.delete("t")
 
     return url.href
   } catch {

@@ -13,7 +13,7 @@ export function getLocationCall(deep = 0): string | undefined {
     try {
       const url = new URL(basename)
 
-      url.searchParams.delete(t)
+      url.searchParams.delete("t")
 
       return url.href
     } catch {

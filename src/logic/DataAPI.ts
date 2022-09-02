@@ -150,8 +150,8 @@ export class DataAPI<
       this.pushOfData({
         type: "table",
         data: readonly(
-          Table(data as unknown as object),
-          this.deepLocation + 2
+          Table(data as unknown as object, 
+            this.deepLocation + 2),
         ) as ReturnType<typeof Table>
       })
 
