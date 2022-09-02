@@ -6,7 +6,7 @@
     <slot name="content" v-if="flat" />
     <template v-else>
       <div
-        @click="state = !state"
+        @click.stop="state = !state"
         v-bind="attrs"
         class="collapse-summary"
         :class="classSummary"
@@ -78,12 +78,14 @@ const attrs = useAttrs()
 const slots = useSlots()
 const state = ref(props.show)
 
-const loaded = ref(false)
+const loaded = ref(state.value)
 
-const watcher = watch(state, () => {
-  loaded.value = true
-  watcher()
-})
+if (!state.value) {
+  const watcher = watch(state, () => {
+    loaded.value = true
+    watcher()
+  })
+}
 </script>
 
 <style lang="scss" scoped>

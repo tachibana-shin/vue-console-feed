@@ -2,10 +2,12 @@
 // "table"
 // "group" | "groupEnd"
 
-import { reactive, readonly } from "vue"
+import { reactive, readonly, shallowReactive } from "vue"
 
 import { Encode } from "./Encode"
 import type { Table } from "./Table"
+import { get } from "./id-manager"
+import { sprintf } from "sprintf-js"
 
 interface LogData {
   readonly data: readonly ReturnType<typeof Encode>[]
@@ -27,7 +29,25 @@ export function isGroup(data: any): data is GroupData {
   return typeof data?.["@items"]?.length === "number"
 }
 
-export class DataAPI {
+export function printfArgs<T extends unknown[]>(args: T): T {
+  if (args.length > 0 && typeof args[0] === "string") {
+    const countParaments = args[0].match(/%\d/g)?.length
+
+    if (countParaments) {
+      return [
+        sprintf(...args.slice(0, countParaments + 1)),
+        ...args.slice(countParaments + 2)
+      ]
+    }
+  }
+
+  return args
+}
+
+export class DataAPI<
+  Encoded extends boolean,
+  Data extends Encoded extends true ? ReturnType<typeof Encode> : unknown
+> {
   public value: (LogData | TableData | GroupData)[] = reactive([])
 
   private queueGroups: GroupData[] = []
@@ -35,10 +55,13 @@ export class DataAPI {
   private counters = new Map<string, number>()
   private timers = new Map<string, number>()
 
+  constructor(private encoded: Encoded = true) {}
+
   private basicMethod(
     type: "warn" | "info" | "debug" | "error" | "log",
-    data: ReturnType<typeof Encode>[]
+    data: Data[]
   ): void {
+    if (!this.encoded) data = printfArgs(data).map((item) => Encode(item))
     // eslint-disable-next-line functional/no-let
     let lastItem: typeof this.value[0]
     if (this.queueGroups.length > 0) {
@@ -49,6 +72,7 @@ export class DataAPI {
     }
 
     if (
+      lastItem &&
       !isGroup(lastItem) &&
       lastItem.type === type &&
       lastItem.data.length === data.length &&
@@ -66,35 +90,57 @@ export class DataAPI {
   }
 
   // eslint-disable-next-line functional/functional-parameters
-  public log(...data: ReturnType<typeof Encode>[]): void {
+  public log(...data: Data[]): void {
     this.basicMethod("log", data)
   }
 
   // eslint-disable-next-line functional/functional-parameters
-  public warn(...data: ReturnType<typeof Encode>[]): void {
+  public warn(...data: Data[]): void {
     this.basicMethod("warn", data)
   }
 
   // eslint-disable-next-line functional/functional-parameters
-  public info(...data: ReturnType<typeof Encode>[]): void {
+  public info(...data: Data[]): void {
     this.basicMethod("info", data)
   }
 
   // eslint-disable-next-line functional/functional-parameters
-  public debug(...data: ReturnType<typeof Encode>[]): void {
+  public debug(...data: Data[]): void {
     this.basicMethod("debug", data)
   }
 
   // eslint-disable-next-line functional/functional-parameters
-  public error(...data: ReturnType<typeof Encode>[]): void {
+  public error(...data: Data[]): void {
     this.basicMethod("error", data)
   }
 
-  public table(data: ReturnType<typeof Table>): void {
-    this.pushOfData({
-      type: "table",
-      data: readonly(data)
-    })
+  public table(
+    data: Encoded extends true ? ReturnType<typeof Table> : unknown
+  ): void {
+    if (this.encoded) {
+      /// ecode
+      if (isTable(data)) {
+        this.pushOfData({
+          type: "table",
+          data: readonly(data)
+        })
+        return
+      }
+
+      this.log(data)
+      return
+    }
+
+    if (typeof data === "object") {
+      this.pushOfData({
+        type: "table",
+        data: readonly(Table(data))
+      })
+
+      return
+    }
+
+    this.log(data)
   }
 
   private pushOfData(data: LogData | TableData | GroupData): void {
@@ -109,10 +155,12 @@ export class DataAPI {
     this.value.push(data)
   }
 
-  public group(key: ReturnType<typeof Encode> = Encode("console.group")): void {
+  public group(
+    key: Data = this.encoded ? Encode("console.group") : "console.group"
+  ): void {
     const newGroup = {
-      "@key": readonly(key),
-      "@items": []
+      "@key": readonly(this.encoded ? key : Encode(key)),
+      "@items": shallowReactive([])
     }
 
     this.pushOfData(newGroup)
@@ -120,11 +168,12 @@ export class DataAPI {
   }
 
   public groupEnd(
-    key: ReturnType<typeof Encode> = Encode("console.group")
+    key: Data = this.encoded ? Encode("console.group") : "console.group"
   ): void {
+    const idKey = this.encoded ? key["@id"] : get(key)
     // eslint-disable-next-line functional/no-let
     for (let i = this.queueGroups.length - 1; i >= 0; i--) {
-      if (this.queueGroups[i]["@key"]["@id"] === key["@id"]) {
+      if (this.queueGroups[i]["@key"]["@id"] === idKey) {
         // end task
         this.queueGroups.splice(i)
         break
@@ -132,7 +181,7 @@ export class DataAPI {
     }
   }
 
-  public count(key: unknown = "default") {
+  public count(key: unknown = "default"): void {
     // eslint-disable-next-line functional/no-let
     let count: number | undefined
     if ((count = this.counters.get(key + ""))) {
@@ -142,14 +191,15 @@ export class DataAPI {
     }
 
     this.counters.set(key + "", count)
-    this.log(Encode(`${key}: ${count}`))
+    const message = `${key}: ${count}`
+    this.log(this.encoded ? Encode(message) : message)
   }
 
-  public countReset(key: unknown = "default") {
+  public countReset(key: unknown = "default"): void {
     this.counters.delete(key + "")
   }
 
-  public time(key: unknown = "default") {
+  public time(key: unknown = "default"): void {
     if (this.timers.has(key + "")) {
       this.warn(Encode(`Timer '${key}' already exists`))
       return
@@ -158,22 +208,23 @@ export class DataAPI {
     this.timers.set(key + "", performance.now())
   }
 
-  public timeLog(key: unknown = "default") {
+  public timeLog(key: unknown = "default"): void {
     const timer = this.timers.get(key + "")
     if (!timer) {
       this.warn(Encode(`Timer '${key}' does not exist`))
       return
     }
 
-    this.log(Encode(`${key}: ${performance.now() - timer}`))
+    const message = `${key}: ${performance.now() - timer} ms`
+    this.log(this.encoded ? Encode(message) : message)
   }
 
-  public timeEnd(key: unknown = "default") {
+  public timeEnd(key: unknown = "default"): void {
     this.timeLog(key)
     this.timers.delete(key + "")
   }
 
-  public clear() {
+  public clear(): void {
     this.value.splice(0)
     this.queueGroups.splice(0)
     this.counters.clear()

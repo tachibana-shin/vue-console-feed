@@ -96,3 +96,7 @@ export function Table<T extends object>(
     "@collapse": noCollapse ? undefined : Encode(data, false)
   }
 }
+
+export function isTable(data: unknown): data is ReturnType<typeof Table> {
+  return typeof data?.table === "object"
+}

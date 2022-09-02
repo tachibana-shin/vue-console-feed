@@ -4,6 +4,8 @@ import ConsoleItem from "./components/ConsoleItem.vue"
 import ConsoleTable from "./components/ConsoleTable.vue"
 import { Encode } from "./logic/Encode"
 import { Table } from "./logic/Table"
+import Console from "./components/Console.vue"
+import { DataAPI } from "./logic/DataAPI"
 
 const el = document.createElement("div")
 el.style.color = "red"
@@ -128,6 +130,48 @@ try {
 }
 const anchor = "a"
 Object.assign(window, { tt })
+
+const dataAPI = new DataAPI(false)
+
+Object.assign(window, {
+  api: dataAPI,
+  Encode
+})
+dataAPI.log("hello DataAPI")
+import { reactive, readonly } from "vue"
+
+const data = reactive({
+  "@key": readonly(Encode("console.group")),
+  "@items": [
+    {
+      data: Encode("hello world"),
+      count: 1,
+      type: "log"
+    },
+    {
+      data: Encode("hello world"),
+      count: 1,
+      type: "log"
+    },
+    {
+      "@key": Encode(tt),
+      "@items": [
+        {
+          data: Encode("hello world"),
+          count: 1,
+          type: "log"
+        },
+        {
+          data: Encode("hello world"),
+          count: 1,
+          type: "log"
+        }
+      ]
+    }
+  ]
+})
+
+Object.assign(window, {data})
 </script>
 
 <template>
@@ -147,38 +191,9 @@ Object.assign(window, { tt })
     </ConsoleItem>
     <ConsoleItem :data="Encode('hello world')" type="error" :count="12" />
     <ConsoleItem :data="Encode('hello world')" type="log" />
-    <ConsoleGroup
-      :data="{
-        '@key': Encode('console.group'),
-        '@items': [
-          {
-            data: Encode('hello world'),
-            count: 1,
-            type: 'log'
-          },
-          {
-            data: Encode('hello world'),
-            count: 1,
-            type: 'log'
-          },
-          {
-            '@key': Encode(tt),
-            '@items': [
-              {
-                data: Encode('hello world'),
-                count: 1,
-                type: 'log'
-              },
-              {
-                data: Encode('hello world'),
-                count: 1,
-                type: 'log'
-              }
-            ]
-          }
-        ]
-      }"
-    />
+    <ConsoleGroup :data="data" />
+
+    <Console :data="dataAPI.value" />
   </div>
   <!-- <div v-for="data" -->
 </template>

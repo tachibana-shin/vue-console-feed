@@ -17,7 +17,6 @@
         "
         :call-fn-link-async="callFnLinkAsync ?? callFnLinkAsyncDefault"
         :anchor="Anchor"
-        @click.stop="void 0"
       />
     </template>
 
@@ -72,11 +71,7 @@ import type { Component, DefineComponent, Slot } from "vue"
 import { computed, useSlots } from "vue"
 
 import type { GroupData } from "../logic/DataAPI"
-import type {
-  _getListLink,
-  callFnLink,
-  readLinkObject
-} from "../logic/Encode"
+import type { _getListLink, callFnLink, readLinkObject } from "../logic/Encode"
 
 import Collapse from "./Collapse.vue"
 import _ConsoleGroup from "./ConsoleGroup.vue"
@@ -88,28 +83,34 @@ import {
   callFnLinkAsync as callFnLinkAsyncDefault,
   readLinkObjectAsync as readLinkObjectAsyncDefault
 } from "./api-async-defaults"
+import { watch } from "vue"
 
-const props = withDefaults(
-  defineProps<{
-    data: GroupData
+const props = defineProps<{
+  data: GroupData
 
-    // @ui
-    paddingLeft?: number
+  // @ui
+  paddingLeft?: number
 
-    anchor?:
-      | Component<{
-          href: string
-        }>
-      | Slot
-      | string
+  anchor?:
+    | Component<{
+        href: string
+      }>
+    | Slot
+    | string
 
-    // api
-    _getListLinkAsync?: Promisy<typeof _getListLink>
-    readLinkObjectAsync?: Promisy<typeof readLinkObject>
-    callFnLinkAsync?: Promisy<typeof callFnLink>
-  }>(),
-  { paddingLeft: 0 }
-)
+  // api
+  _getListLinkAsync?: Promisy<typeof _getListLink>
+  readLinkObjectAsync?: Promisy<typeof readLinkObject>
+  callFnLinkAsync?: Promisy<typeof callFnLink>
+}>()
+
+watch(() => props.data, () => {
+  console.log("change", props.data)
+}, {
+  deep: true,
+  immediate: true
+})
+
 const ConsoleGroup = _ConsoleGroup as unknown as DefineComponent<{
   data: GroupData
 
@@ -129,7 +130,7 @@ const $slots = useSlots()
 
 const Anchor = computed(() => props.anchor ?? $slots.anchor ?? "a")
 
-const paddingLeftComputed = computed(() => props.paddingLeft + 12)
+const paddingLeftComputed = computed(() => (props.paddingLeft ?? 0) + 12)
 </script>
 
 <style lang="scss" scoped>
