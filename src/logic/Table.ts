@@ -97,6 +97,7 @@ export function Table<T extends object>(
   }
 }
 
-export function isTable(data: unknown): data is ReturnType<typeof Table> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isTable(data: any): data is ReturnType<typeof Table> {
   return typeof data?.table === "object"
 }

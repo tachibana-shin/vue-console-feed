@@ -2,12 +2,12 @@
 // "table"
 // "group" | "groupEnd"
 
-import { reactive, readonly, shallowReactive } from "vue"
+import { sprintf } from "sprintf-js"
+import { readonly, shallowReactive } from "vue"
 
 import { Encode } from "./Encode"
-import type { Table } from "./Table"
+import { isTable, Table } from "./Table"
 import { get } from "./id-manager"
-import { sprintf } from "sprintf-js"
 
 interface LogData {
   readonly data: readonly ReturnType<typeof Encode>[]
@@ -29,13 +29,13 @@ export function isGroup(data: any): data is GroupData {
   return typeof data?.["@items"]?.length === "number"
 }
 
-export function printfArgs<T extends unknown[]>(args: T): T {
+export function printfArgs<T extends unknown[]>(args: T) {
   if (args.length > 0 && typeof args[0] === "string") {
     const countParaments = args[0].match(/%\d/g)?.length
 
     if (countParaments) {
       return [
-        sprintf(...args.slice(0, countParaments + 1)),
+        sprintf(args[0], ...args.slice(1, countParaments + 1)),
         ...args.slice(countParaments + 2)
       ]
     }
@@ -45,8 +45,10 @@ export function printfArgs<T extends unknown[]>(args: T): T {
 }
 
 export class DataAPI<
-  Encoded extends boolean,
-  Data extends Encoded extends true ? ReturnType<typeof Encode> : unknown
+  Encoded extends boolean = true,
+  Data extends Encoded extends true
+    ? ReturnType<typeof Encode>
+    : unknown = Encoded extends true ? ReturnType<typeof Encode> : unknown
 > {
   public value: (LogData | TableData | GroupData)[] = shallowReactive([])
 
@@ -55,13 +57,20 @@ export class DataAPI<
   private counters = new Map<string, number>()
   private timers = new Map<string, number>()
 
-  constructor(private encoded: Encoded = true) {}
+  private encoded: Encoded
+
+  constructor(encoded: Encoded) {
+    this.encoded = encoded
+  }
 
   private basicMethod(
     type: "warn" | "info" | "debug" | "error" | "log",
     data: Data[]
   ): void {
-    if (!this.encoded) data = printfArgs(data).map((item) => Encode(item))
+    // これ
+    const dataEncoded = (
+      this.encoded ? data : printfArgs(data).map((item) => Encode(item))
+    ) as readonly ReturnType<typeof Encode>[]
     // eslint-disable-next-line functional/no-let
     let lastItem: typeof this.value[0]
     if (this.queueGroups.length > 0) {
@@ -75,8 +84,10 @@ export class DataAPI<
       lastItem &&
       !isGroup(lastItem) &&
       lastItem.type === type &&
-      lastItem.data.length === data.length &&
-      lastItem.data.every((item, index) => item["@id"] === data[index]["@id"])
+      lastItem.data.length === dataEncoded.length &&
+      lastItem.data.every(
+        (item, index) => item["@id"] === dataEncoded[index]["@id"]
+      )
     ) {
       lastItem.count++
       return
@@ -84,7 +95,7 @@ export class DataAPI<
 
     this.pushOfData({
       type,
-      data: readonly(data),
+      data: readonly(dataEncoded) as typeof dataEncoded,
       count: 1
     })
   }
@@ -115,32 +126,36 @@ export class DataAPI<
   }
 
   public table(
-    data: Encoded extends true ? ReturnType<typeof Table> : unknown
+    data: Encoded extends true
+      ? ReturnType<typeof Table> | ReturnType<typeof Encode>
+      : unknown
   ): void {
     if (this.encoded) {
-      /// ecode
+      /// encode
       if (isTable(data)) {
         this.pushOfData({
           type: "table",
-          data: readonly(data)
+          data: readonly(data) as typeof data
         })
         return
       }
 
-      this.log(data)
+      this.log(data as Data)
       return
     }
 
     if (typeof data === "object") {
       this.pushOfData({
         type: "table",
-        data: readonly(Table(data))
+        data: readonly(Table(data as unknown as object)) as ReturnType<
+          typeof Table
+        >
       })
 
       return
     }
 
-    this.log(data)
+    this.log(data as unknown as Data)
   }
 
   private pushOfData(data: LogData | TableData | GroupData): void {
@@ -156,10 +171,14 @@ export class DataAPI<
   }
 
   public group(
-    key: Data = this.encoded ? Encode("console.group") : "console.group"
+    key: Data = (this.encoded
+      ? Encode("console.group")
+      : "console.group") as Data
   ): void {
-    const newGroup = {
-      "@key": readonly(this.encoded ? key : Encode(key)),
+    const newGroup: GroupData = {
+      "@key": readonly(
+        this.encoded ? (key as ReturnType<typeof Encode>) : Encode(key)
+      ) as ReturnType<typeof Encode>,
       "@items": shallowReactive([])
     }
 
@@ -168,9 +187,13 @@ export class DataAPI<
   }
 
   public groupEnd(
-    key: Data = this.encoded ? Encode("console.group") : "console.group"
+    key: Data = (this.encoded
+      ? Encode("console.group")
+      : "console.group") as Data
   ): void {
-    const idKey = this.encoded ? key["@id"] : get(key)
+    const idKey = this.encoded
+      ? (key as ReturnType<typeof Encode>)["@id"]
+      : get(key)
     // eslint-disable-next-line functional/no-let
     for (let i = this.queueGroups.length - 1; i >= 0; i--) {
       if (this.queueGroups[i]["@key"]["@id"] === idKey) {
@@ -192,7 +215,7 @@ export class DataAPI<
 
     this.counters.set(key + "", count)
     const message = `${key}: ${count}`
-    this.log(this.encoded ? Encode(message) : message)
+    this.log((this.encoded ? Encode(message) : message) as Data)
   }
 
   public countReset(key: unknown = "default"): void {
@@ -201,7 +224,8 @@ export class DataAPI<
 
   public time(key: unknown = "default"): void {
     if (this.timers.has(key + "")) {
-      this.warn(Encode(`Timer '${key}' already exists`))
+      const message = `Timer '${key}' already exists`
+      this.warn((this.encoded ? Encode(message) : message) as Data)
       return
     }
 
@@ -211,12 +235,13 @@ export class DataAPI<
   public timeLog(key: unknown = "default"): void {
     const timer = this.timers.get(key + "")
     if (!timer) {
-      this.warn(Encode(`Timer '${key}' does not exist`))
+      const message = `Timer '${key}' does not exist`
+      this.warn((this.encoded ? Encode(message) : message) as Data)
       return
     }
 
     const message = `${key}: ${performance.now() - timer} ms`
-    this.log(this.encoded ? Encode(message) : message)
+    this.log((this.encoded ? Encode(message) : message) as Data)
   }
 
   public timeEnd(key: unknown = "default"): void {

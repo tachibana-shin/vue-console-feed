@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Component, Slot} from "vue";
+import type { Component, Slot } from "vue"
 import { computed, useSlots } from "vue"
 
 import { isGroup } from "../logic/DataAPI"
@@ -56,7 +56,7 @@ import {
 } from "./api-async-defaults"
 
 const props = defineProps<{
-  data: DataAPI["value"]
+  data: DataAPI<true>["value"]
 
   anchor?:
     | Component<{
