@@ -138,6 +138,7 @@ Object.assign(window, {
   Encode
 })
 dataAPI.log("hello DataAPI")
+dataAPI.table([1, 2, 3, 4, 6])
 import { reactive, readonly } from "vue"
 
 const data = reactive({
@@ -171,7 +172,7 @@ const data = reactive({
   ]
 })
 
-Object.assign(window, {data})
+Object.assign(window, { data })
 </script>
 
 <template>

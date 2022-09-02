@@ -10,9 +10,9 @@
 
 This is the plugin that is almost identical to the [console-feed](https://github.com/samdenty/console-feed) but for Vue. This plugin moves closer to `Console Chrome Devtools` than `console-feed`
 
-[Demo from Stackbliz](https://stackblitz.com/edit/vue-console-feed-demo?file=src%2FApp.vue)
+> [Demo from Stackbliz](https://stackblitz.com/edit/github-m6j4xf)
 
-** this plugin is still being deployed and is about to release **
+**This plugin release!**
 
 ## Preview
 
@@ -61,6 +61,7 @@ or with CDN:
 - [x] Location link
 
 **DataAPI**
+
 - [x] console.log
 - [x] console.warn
 - [x] console.info
@@ -71,7 +72,7 @@ or with CDN:
 - [x] console.groupEnd
 - [x] console.count
 - [x] console.countReset
-- [x] console.time 
+- [x] console.time
 - [x] console.timeLog
 - [x] console.timeEnd
 - [x] console.clear
@@ -86,6 +87,29 @@ or with CDN:
 | `data`                | `ReturnType<typeof Encode>`                                   | `true`   | determine the type corresponding to the methods `Encode`                                                        |
 | `_getListLinkAsync`   | `Promisy<_getListLink>`                                       | `false`  | This is the `promise` function of `_getListLink`                                                                |
 | `readLinkObjectAsync` | `Promisy<readLinkObject>`                                     | `false`  | This is the `promise` function of `readLinkObject`                                                              |
+
+### Console & DataAPI
+
+```vue
+<template>
+  <Console :data="console.value" />
+</template>
+
+<script lang="ts" setup>
+import { Console, DataAPI } from "vue-console-feed"
+
+const console = new DataAPI(false) // if you use API set option to true
+
+console.log("hello world")
+console.count()
+console.group()
+console.count()
+console.table([1, 234, 1])
+console.warn("Warning!!")
+console.count()
+console.groupEnd()
+</script>
+```
 
 #### Example and Promise API
 
@@ -160,11 +184,11 @@ async function readLinkObjectAsync(link: Data.Link) {
 
 ### ConsoleTable
 
-| Option                | Type                        | Required | Description                                                                                                                                                                       |
-| --------------------- | --------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`                | `ReturnType<typeof Table>`  | `true`   | determine the type corresponding to the methods `Table`                                                                                                                           |
-| `_getListLinkAsync`   | `Promisy<_getListLink>`     | `false`  | This is the `promise` function of `_getListLink`                                                                                                                                  |
-| `readLinkObjectAsync` | `Promisy<readLinkObject>`   | `false`  | This is the `promise` function of `readLinkObject`                                                                                                                                |
+| Option                | Type                       | Required | Description                                             |
+| --------------------- | -------------------------- | -------- | ------------------------------------------------------- |
+| `data`                | `ReturnType<typeof Table>` | `true`   | determine the type corresponding to the methods `Table` |
+| `_getListLinkAsync`   | `Promisy<_getListLink>`    | `false`  | This is the `promise` function of `_getListLink`        |
+| `readLinkObjectAsync` | `Promisy<readLinkObject>`  | `false`  | This is the `promise` function of `readLinkObject`      |
 
 #### Example and Promise API
 

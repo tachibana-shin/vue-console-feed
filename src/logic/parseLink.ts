@@ -3,10 +3,16 @@ import type { Component, Slot, VNode } from "vue"
 import { createAnchor } from "./createAnchor"
 
 function formatRelativeLink(value: string): string {
-  return value
-    .slice(value.lastIndexOf("/") + 1)
-    .replace(/t=\d+/, "")
-    .replace(/\?:/, ":")
+  value = value.slice(value.lastIndexOf("/") + 1)
+  try {
+    const url = new URL(value)
+
+    url.searchParams.delete(t)
+
+    return url.href
+  } catch {
+    return value
+  }
 }
 
 const rUrl = /(?:[^\s()]+):\/\/[^\s()]+/gi

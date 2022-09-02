@@ -59,7 +59,7 @@ export class DataAPI<
 
   private encoded: Encoded
 
-  constructor(encoded: Encoded) {
+  constructor(encoded: Encoded, private deepLocation = 0) {
     this.encoded = encoded
   }
 
@@ -69,7 +69,9 @@ export class DataAPI<
   ): void {
     // これ
     const dataEncoded = (
-      this.encoded ? data : printfArgs(data).map((item) => Encode(item))
+      this.encoded
+        ? data
+        : printfArgs(data).map((item) => Encode(item, this.deepLocation + 3))
     ) as readonly ReturnType<typeof Encode>[]
     // eslint-disable-next-line functional/no-let
     let lastItem: typeof this.value[0]
@@ -147,9 +149,10 @@ export class DataAPI<
     if (typeof data === "object") {
       this.pushOfData({
         type: "table",
-        data: readonly(Table(data as unknown as object)) as ReturnType<
-          typeof Table
-        >
+        data: readonly(
+          Table(data as unknown as object),
+          this.deepLocation + 2
+        ) as ReturnType<typeof Table>
       })
 
       return
@@ -172,12 +175,14 @@ export class DataAPI<
 
   public group(
     key: Data = (this.encoded
-      ? Encode("console.group")
+      ? Encode("console.group", this.deepLocation + 2)
       : "console.group") as Data
   ): void {
     const newGroup: GroupData = {
       "@key": readonly(
-        this.encoded ? (key as ReturnType<typeof Encode>) : Encode(key)
+        this.encoded
+          ? (key as ReturnType<typeof Encode>)
+          : Encode(key, this.deepLocation + 2)
       ) as ReturnType<typeof Encode>,
       "@items": shallowReactive([])
     }
@@ -188,7 +193,7 @@ export class DataAPI<
 
   public groupEnd(
     key: Data = (this.encoded
-      ? Encode("console.group")
+      ? Encode("console.group", this.deepLocation + 2)
       : "console.group") as Data
   ): void {
     const idKey = this.encoded
@@ -215,7 +220,9 @@ export class DataAPI<
 
     this.counters.set(key + "", count)
     const message = `${key}: ${count}`
-    this.log((this.encoded ? Encode(message) : message) as Data)
+    this.log(
+      (this.encoded ? Encode(message, this.deepLocation + 2) : message) as Data
+    )
   }
 
   public countReset(key: unknown = "default"): void {
@@ -225,7 +232,11 @@ export class DataAPI<
   public time(key: unknown = "default"): void {
     if (this.timers.has(key + "")) {
       const message = `Timer '${key}' already exists`
-      this.warn((this.encoded ? Encode(message) : message) as Data)
+      this.warn(
+        (this.encoded
+          ? Encode(message, this.deepLocation + 2)
+          : message) as Data
+      )
       return
     }
 
@@ -236,12 +247,18 @@ export class DataAPI<
     const timer = this.timers.get(key + "")
     if (!timer) {
       const message = `Timer '${key}' does not exist`
-      this.warn((this.encoded ? Encode(message) : message) as Data)
+      this.warn(
+        (this.encoded
+          ? Encode(message, this.deepLocation + 2)
+          : message) as Data
+      )
       return
     }
 
     const message = `${key}: ${performance.now() - timer} ms`
-    this.log((this.encoded ? Encode(message) : message) as Data)
+    this.log(
+      (this.encoded ? Encode(message, this.deepLocation + 2) : message) as Data
+    )
   }
 
   public timeEnd(key: unknown = "default"): void {
