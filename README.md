@@ -79,15 +79,6 @@ or with CDN:
 
 ## Usage
 
-### ConsoleItem
-
-| Option                | Type                                                          | Required | Description                                                                                                     |
-| --------------------- | ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `type`                | `"warn" \| "info" \| "debug" \| "error" \| "output" \| "log"` | `false`  | determine the console type corresponding to the methods `data.warn`, `console.info`, `data.debug`, `data.error` |
-| `data`                | `ReturnType<typeof Encode>`                                   | `true`   | determine the type corresponding to the methods `Encode`                                                        |
-| `_getListLinkAsync`   | `Promisy<_getListLink>`                                       | `false`  | This is the `promise` function of `_getListLink`                                                                |
-| `readLinkObjectAsync` | `Promisy<readLinkObject>`                                     | `false`  | This is the `promise` function of `readLinkObject`                                                              |
-
 ### Console & DataAPI
 
 ```vue
@@ -98,7 +89,7 @@ or with CDN:
 <script lang="ts" setup>
 import { Console, DataAPI } from "vue-console-feed"
 
-const console = new DataAPI(false) // if you use API set option to true
+const console = new DataAPI(false, 0) // if you use API set option to true, argument 2 offset deep location
 
 console.log("hello world")
 console.count()
@@ -110,6 +101,15 @@ console.count()
 console.groupEnd()
 </script>
 ```
+
+### ConsoleItem
+
+| Option                | Type                                                          | Required | Description                                                                                                     |
+| --------------------- | ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `type`                | `"warn" \| "info" \| "debug" \| "error" \| "output" \| "log"` | `false`  | determine the console type corresponding to the methods `data.warn`, `console.info`, `data.debug`, `data.error` |
+| `data`                | `ReturnType<typeof Encode>`                                   | `true`   | determine the type corresponding to the methods `Encode`                                                        |
+| `_getListLinkAsync`   | `Promisy<_getListLink>`                                       | `false`  | This is the `promise` function of `_getListLink`                                                                |
+| `readLinkObjectAsync` | `Promisy<readLinkObject>`                                     | `false`  | This is the `promise` function of `readLinkObject`                                                              |
 
 #### Example and Promise API
 
