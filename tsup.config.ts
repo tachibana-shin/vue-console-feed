@@ -7,6 +7,7 @@ export default defineConfig({
   target: "es6",
   dts: true,
   metafile: false,
+  external: ["vue"],
   env: {
     NODE_ENV: "production"
   },
