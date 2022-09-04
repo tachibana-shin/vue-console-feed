@@ -40,8 +40,7 @@ export function printfArgs<T extends unknown[]>(args: T) {
           args[0],
           ...args.slice(1, countParaments + 1),
           ...(length - 1 < countParaments
-            ? Array(countParaments - (length - 1))
-                .fill("%s")
+            ? Array(countParaments - (length - 1)).fill("%s")
             : [])
         ),
         ...args.slice(countParaments + 1)
@@ -53,21 +52,23 @@ export function printfArgs<T extends unknown[]>(args: T) {
 }
 
 export class DataAPI<
-  Encoded extends boolean = true,
+  Encoded extends boolean = false,
   Data extends Encoded extends true
     ? ReturnType<typeof Encode>
     : unknown = Encoded extends true ? ReturnType<typeof Encode> : unknown
 > {
-  public value: (LogData | TableData | GroupData)[] = shallowReactive([])
+  public readonly value: (LogData | TableData | GroupData)[] = shallowReactive(
+    []
+  )
 
-  private queueGroups: GroupData[] = []
+  private readonly queueGroups: GroupData[] = []
 
-  private counters = new Map<string, number>()
-  private timers = new Map<string, number>()
+  private readonly counters = new Map<string, number>()
+  private readonly timers = new Map<string, number>()
 
-  private encoded: Encoded
+  private readonly encoded?: Encoded
 
-  constructor(encoded: Encoded, private deepLocation = 0) {
+  constructor(encoded?: Encoded, private deepLocation = 0) {
     this.encoded = encoded
   }
 
