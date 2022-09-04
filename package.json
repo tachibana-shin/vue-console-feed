@@ -54,6 +54,9 @@
       ],
       "table": [
         "dist/Table.d.ts"
+      ],
+      "data-api": [
+        "dist/DataAPI.d.ts"
       ]
     }
   },

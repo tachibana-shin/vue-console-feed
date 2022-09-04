@@ -31,12 +31,20 @@ export function isGroup(data: any): data is GroupData {
 
 export function printfArgs<T extends unknown[]>(args: T) {
   if (args.length > 0 && typeof args[0] === "string") {
-    const countParaments = args[0].match(/%\d/g)?.length
+    const countParaments = args[0].match(/%\w/g)?.length
 
     if (countParaments) {
+      const { length } = args
       return [
-        sprintf(args[0], ...args.slice(1, countParaments + 1)),
-        ...args.slice(countParaments + 2)
+        sprintf(
+          args[0],
+          ...args.slice(1, countParaments + 1),
+          ...(length - 1 < countParaments
+            ? Array(countParaments - (length - 1))
+                .fill("%s")
+            : [])
+        ),
+        ...args.slice(countParaments + 1)
       ]
     }
   }
@@ -150,8 +158,7 @@ export class DataAPI<
       this.pushOfData({
         type: "table",
         data: readonly(
-          Table(data as unknown as object, 
-            this.deepLocation + 2),
+          Table(data as unknown as object, this.deepLocation + 2)
         ) as ReturnType<typeof Table>
       })
 
