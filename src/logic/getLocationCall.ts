@@ -3,7 +3,7 @@ export function getLocationCall(deep = 0): string | undefined {
 
   const lines = new Error().stack?.toString().split(" at ", deep)
 
-  if (!lines) return 
+  if (!lines) return
 
   const mess = lines[deep - 1] ?? lines[lines.length - 1]
 
@@ -25,5 +25,17 @@ export function getLocationCall(deep = 0): string | undefined {
     }
   }
 
-  return mess.slice(7)
+  const lastIndexSpaceOf = mess.indexOf(" ")
+
+  const basename = mess.slice(lastIndexSpaceOf === -1 ? 0 : lastIndexSpaceOf)
+
+  try {
+    const url = new URL(basename)
+
+    url.searchParams.delete("t")
+
+    return url.href
+  } catch {
+    return basename
+  }
 }
