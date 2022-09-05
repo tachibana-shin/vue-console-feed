@@ -1,7 +1,9 @@
 export function getLocationCall(deep = 0): string | undefined {
   deep += 5
 
-  const lines = new Error().stack.toString().split(" at ", deep)
+  const lines = new Error().stack?.toString().split(" at ", deep)
+
+  if (!lines) return 
 
   const mess = lines[deep - 1] ?? lines[lines.length - 1]
 
