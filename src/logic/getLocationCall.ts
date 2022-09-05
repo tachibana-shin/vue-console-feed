@@ -5,7 +5,7 @@ export function getLocationCall(deep = 0): string | undefined {
 
   if (!lines) return
 
-  const mess = lines[deep - 1] ?? lines[lines.length - 1]
+  const mess = (lines[deep - 1] ?? lines[lines.length - 1])?.trim()
 
   if (!mess) return
 
@@ -28,7 +28,7 @@ export function getLocationCall(deep = 0): string | undefined {
   const lastIndexSpaceOf = mess.indexOf(" ")
 
   const basename = mess.slice(lastIndexSpaceOf === -1 ? 0 : lastIndexSpaceOf)
-
+  
   try {
     const url = new URL(basename)
 
