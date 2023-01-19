@@ -29,6 +29,7 @@ pnpm add vue-console-feed
 or with CDN:
 
 ```html
+<link rel="stylesheet" href="https://cdn.skypack.dev/vue-console-feed/style.css">
 <script type="module">
   import * as ConsoleFeed from "https://cdn.skypack.dev/vue-console-feed"
 </script>
@@ -88,6 +89,7 @@ or with CDN:
 
 <script lang="ts" setup>
 import { Console, DataAPI } from "vue-console-feed"
+import "vue-console-feed/style.css"
 
 const console = new DataAPI(false, 0) // if you use API set option to true, argument 2 offset deep location
 
@@ -120,6 +122,7 @@ console.groupEnd()
 
 <script lang="ts" setup>
 import { ConsoleItem, Encode } from "vue-console-feed"
+import "vue-console-feed/style.css"
 
 const data = Encode(
   {
@@ -158,6 +161,7 @@ import {
   _getListLink,
   readLinkObject
 } from "vue-console-feed"
+import "vue-console-feed/style.css"
 
 const data = Encode(
   {
@@ -199,6 +203,7 @@ async function readLinkObjectAsync(link: Data.Link) {
 
 <script lang="ts" setup>
 import { ConsoleTable, Encode, Table } from "vue-console-feed"
+import "vue-console-feed/style.css"
 
 const value = {
   name: "Shin",
@@ -235,6 +240,7 @@ import {
   _getListLink,
   readLinkObject
 } from "vue-console-feed"
+import "vue-console-feed/style.css"
 
 const value = {
   name: "Shin",
