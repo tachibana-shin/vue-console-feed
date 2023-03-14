@@ -4,6 +4,7 @@
   "description": "a repository npm package",
   "scripts": {
     "format": "prettier -w src",
+    "pretit": "prettier src",
     "build:logic": "tsup",
     "build": "vite build && vue-tsc --emitDeclarationOnly && pnpm build:logic",
     "dev": "vite dev",
