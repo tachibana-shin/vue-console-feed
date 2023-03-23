@@ -57,7 +57,7 @@ const watcher = watch(getted, () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
     // @ts-ignore
     // eslint-disable-next-line promise/always-return
-    if (import.meta.env.NODE_ENV !== "production") {
+    if (import.meta.env.DEV) {
       console.log("valueof", value.value)
     }
   })

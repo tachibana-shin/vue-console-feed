@@ -67,7 +67,9 @@ watchEffect(() => {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
 // @ts-ignore
-if (import.meta.env.NODE_ENV !== "production")
+if (import.meta.env.DEV)
   // eslint-disable-next-line promise/catch-or-return
-  props.readLinkObjectAsync(toRaw(props.link)).then((res) => console.log(res))
+  props.readLinkObjectAsync(toRaw(props.link)).then((res) => {
+    console.log(res)
+  })
 </script>
