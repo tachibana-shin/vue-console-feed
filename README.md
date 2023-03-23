@@ -341,7 +341,7 @@ Console.vue
 </template>
 
 <script lang="ts" setup>
-import { Console, DataAPI } from "vue-console-feed
+import { Console, DataAPI } from "vue-console-feed"
 import type {
   _getListLink,
   callFnLink,
@@ -351,6 +351,15 @@ import type {
 import { v4 } from "uuid"
 
 const console = new DataAPI(true)
+
+function handleMessage(event: MessageEvent<MessageConsoleEncode>) {
+  if (event.data.type === "console") {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    console[event.data.name](...(event.data.args as unknown as any[]))
+  }
+}
+addEventListener("message", handleMessage)
 
 function createAPIAsync(
   type: "getListLink" | "readLinkObject" | "callFnLink"
