@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { reactive, readonly } from "vue"
+
+import Console from "./components/Console.vue"
 import ConsoleGroup from "./components/ConsoleGroup.vue"
 import ConsoleItem from "./components/ConsoleItem.vue"
 import ConsoleTable from "./components/ConsoleTable.vue"
+import { DataAPI } from "./logic/DataAPI"
 import { Encode } from "./logic/Encode"
 import { Table } from "./logic/Table"
-import Console from "./components/Console.vue"
-import { DataAPI } from "./logic/DataAPI"
+
 
 const el = document.createElement("div")
 el.style.color = "red"
@@ -139,7 +142,6 @@ Object.assign(window, {
 })
 dataAPI.log("hello DataAPI")
 dataAPI.table([1, 2, 3, 4, 6])
-import { reactive, readonly } from "vue"
 
 const data = reactive({
   "@key": readonly(Encode("console.group")),
